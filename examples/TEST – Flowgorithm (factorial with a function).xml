@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 31045  -->
+  <question type="coderunner">
+    <name>
+      <text>TEST – Flowgorithm (factorial with a function)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Build a flowchart that reads an integer n and writes its factorial, in the format <code>Factorial: 120</code>. Define a function <strong>Factorial</strong> that receives n and returns the factorial, computed with a For loop.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_flowgorithm</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>30</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[{"flowgorithm": ["{\"v\":3,\"lang\":\"en\",\"functions\":[{\"name\":\"Main\",\"params\":[],\"ret\":{\"type\":\"none\",\"var\":\"\"},\"nodes\":[{\"type\":\"declare\",\"names\":\"n\",\"vtype\":\"integer\",\"array\":false,\"size\":\"\"},{\"type\":\"input\",\"var\":\"n\"},{\"type\":\"output\",\"expr\":\"\\\"Factorial: \\\" & Factorial(n)\",\"newline\":true}]},{\"name\":\"Factorial\",\"params\":[{\"name\":\"n\",\"type\":\"integer\",\"array\":false}],\"ret\":{\"type\":\"integer\",\"var\":\"r\"},\"nodes\":[{\"type\":\"declare\",\"names\":\"r, i\",\"vtype\":\"integer\",\"array\":false,\"size\":\"\"},{\"type\":\"assign\",\"var\":\"r\",\"expr\":\"1\"},{\"type\":\"for\",\"var\":\"i\",\"start\":\"1\",\"end\":\"n\",\"dir\":\"inc\",\"step\":\"1\",\"body\":[{\"type\":\"assign\",\"var\":\"r\",\"expr\":\"r * i\"}]}]}]}"]}]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams><![CDATA[{"funcoes": ["Factorial"], "exigir": ["para"], "lang": "en"}]]></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald><![CDATA[{"exigir":["ciclo"]}]]></templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text>5</text>
+      </stdin>
+      <expected>
+                <text>Factorial: 120</text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text>0</text>
+      </stdin>
+      <expected>
+                <text>Factorial: 1</text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text>10</text>
+      </stdin>
+      <expected>
+                <text>Factorial: 3628800</text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+    </testcases>
+  </question>
+
+</quiz>
