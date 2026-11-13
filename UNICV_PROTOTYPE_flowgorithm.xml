@@ -1,0 +1,2882 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text>UNICV_PROTOTYPE_flowgorithm</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Protótipo da UniCV para perguntas em que o estudante <strong>constrói um fluxograma com as figuras e as regras do Flowgorithm</strong>: variáveis declaradas com tipo, vetores, funções com parâmetros e valor devolvido, e os mesmos operadores e funções predefinidas. O corretor executa o fluxograma com os dados de cada caso de teste e compara o que ele escreve com a saída esperada.</p>
+<p>Figuras disponíveis (com as cores e as formas do Flowgorithm):</p>
+<ul>
+<li><strong>Entrada</strong>: lê uma linha da entrada do teste para uma variável (ou uma posição de um vetor). O valor tem de corresponder ao tipo da variável.</li>
+<li><strong>Saída</strong>: escreve o valor de uma expressão; por omissão muda de linha no fim (pode desligar-se).</li>
+<li><strong>Declarar</strong>: cria variáveis de tipo Inteiro, Real, Texto ou Lógico, ou vetores com um tamanho.</li>
+<li><strong>Atribuição</strong>: <code>variável = expressão</code>.</li>
+<li><strong>Chamar</strong>: executa uma função definida pelo estudante.</li>
+<li><strong>Comentário</strong>: uma nota no fluxograma; não tem efeito na avaliação.</li>
+<li><strong>Se</strong>, <strong>Enquanto</strong>, <strong>Para</strong> (crescente ou decrescente, com passo) e <strong>Fazer</strong> (repete enquanto a condição for verdadeira, testando depois).</li>
+</ul>
+<p>Regras, como no Flowgorithm: as variáveis têm de ser declaradas antes de serem usadas; <code>/</code> dá sempre um real e um real guardado num Inteiro perde a parte decimal; <code>+</code> só soma números e <code>&amp;</code> junta textos; os vetores começam na posição 0; os nomes começam por uma letra, só têm letras e algarismos e não distinguem maiúsculas de minúsculas. Operadores: <code>+ - * / % mod ^</code>, <code>= == != &lt;&gt; &lt; &lt;= &gt; &gt;=</code>, <code>and &amp;&amp; or || not !</code>, <code>&amp;</code>; constantes <code>true</code>, <code>false</code>, <code>pi</code>. Funções predefinidas: Abs, Sgn, Int, Sqrt, Ln, Log, Log10, Sin, Cos, Tan, Arcsin, Arccos, Arctan, Random, Len, Char, ToChar, ToCode, ToInteger, ToReal, ToString, ToFixed e Size. Os valores lógicos escrevem-se <code>true</code> e <code>false</code>; os reais com parte decimal nula escrevem-se sem casas decimais.</p>
+<p>O editor tem, em cima, a lista das funções (Principal e as do estudante), os botões «Nova função», «Propriedades» e eliminar função; à direita, a escolha da língua (português, inglês ou espanhol), «Recomeçar» e «Ajuda». Não estão incluídas as figuras do Flowgorithm que só servem para depurar (Ponto de paragem) nem as de gráficos de tartaruga e de ficheiros.</p>
+<p>Para criar uma pergunta deste tipo:</p>
+<ol>
+<li>Crie uma pergunta CodeRunner do tipo unicv_flowgorithm, escreva o nome e o enunciado e guarde.</li>
+<li>Em cada caso de teste, ponha os dados em <em>Standard Input</em> (um valor por linha) e a saída esperada em <em>Expected output</em>. Deixe <em>Test code</em> vazio.</li>
+<li>Construa o fluxograma de solução no campo <em>Answer</em> e guarde com <em>Validate on save</em> ligado.</li>
+<li>Para fluxogramas altos, aumente o número de linhas da caixa de resposta (<em>Answer box, Rows</em>).</li>
+</ol>
+<p>Parâmetros do modelo (opcionais, em JSON no campo <em>Template params</em>):</p>
+<ul>
+<li><strong>exigir</strong> / <strong>proibir</strong>: listas de figuras, de entre "entrada", "saida", "declarar", "atribuicao", "chamar", "se", "enquanto", "para", "fazer", "comentario" e "ciclo" (também se aceitam os nomes em inglês).</li>
+<li><strong>funcoes</strong>: lista de nomes de funções que o estudante tem de definir, por exemplo <code>["Quadrado"]</code>.</li>
+<li><strong>max_passos</strong>: número máximo de figuras executadas em cada teste (por omissão 100000), para detetar ciclos infinitos.</li>
+<li><strong>lang</strong>: língua das mensagens de erro quando o estudante não escolheu outra no editor: "pt" (por omissão), "en" ou "es".</li>
+</ul>
+<p>Exemplo:</p>
+<pre>{"exigir": ["para"], "funcoes": ["Fatorial"]}</pre>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_flowgorithm</coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>30</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA[""" Protótipo UniCV: pergunta de fluxograma com as figuras e as regras do Flowgorithm.
+    O estudante constrói o fluxograma (com funções, se quiser) e o corretor
+    executa-o com os dados de cada caso de teste, comparando o que ele escreve
+    com a saída esperada.
+
+    Parâmetros do modelo (todos opcionais):
+      max_passos   número máximo de figuras executadas por teste (por omissão 100000)
+      exigir       lista de figuras que o fluxograma tem de usar: "entrada", "saida",
+                   "declarar", "atribuicao", "chamar", "se", "enquanto", "para",
+                   "fazer", "comentario" e "ciclo" (qualquer um dos três ciclos)
+      proibir      lista de figuras que o fluxograma não pode usar
+      funcoes      lista de nomes de funções que o estudante tem de definir
+      lang         língua das mensagens quando o estudante não escolheu outra
+                   no editor: "pt" (por omissão), "en" ou "es"
+"""
+import json
+import math
+import random
+import re
+import sys
+
+__answer__ = """{{ STUDENT_ANSWER | e('py') }}"""
+__params__ = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+
+MENSAGENS = {
+    'pt': {
+        'figura': "{nome} «{texto}»",
+        'figura_vazia': "{nome} (vazia)",
+        'na_funcao': "Na função {f}, {onde}",
+        'em': "{onde}: {erro}.",
+        'tipos_nomes': {'integer': 'Inteiro', 'real': 'Real', 'string': 'Texto', 'boolean': 'Lógico'},
+        'figuras': {'input': 'Entrada', 'output': 'Saída', 'declare': 'Declarar', 'assign': 'Atribuição',
+                    'call': 'Chamar', 'if': 'Se', 'while': 'Enquanto', 'for': 'Para', 'do': 'Fazer',
+                    'comment': 'Comentário'},
+        'ciclo': 'de ciclo (Enquanto, Para ou Fazer)',
+        'ate': 'até', 'ate_desc': 'descendo até', 'palavra_passo': 'passo',
+        'sem_conteudo': "falta preencher a figura",
+        'falta_campo': "falta {campo}",
+        'campo_variavel': "a variável", 'campo_expressao': "a expressão", 'campo_inicio': "o valor inicial",
+        'campo_fim': "o valor final", 'campo_tamanho': "o tamanho do vetor", 'campo_nomes': "o nome das variáveis",
+        'simbolo': "símbolo não reconhecido: '{s}'",
+        'aspas': "falta fechar as aspas de um texto",
+        'sublinhado': "'{n}': os nomes não podem ter o carácter _",
+        'mal_escrita': "expressão mal escrita",
+        'nome_invalido': "'{n}' não é um nome válido (deve começar por uma letra e ter só letras e algarismos)",
+        'reservada': "'{n}' é uma palavra reservada e não pode ser usada como nome",
+        'nao_declarada': "a variável '{n}' não foi declarada",
+        'ja_declarada': "a variável '{n}' já foi declarada",
+        'sem_valor': "a variável '{n}' é usada antes de ter um valor",
+        'elemento_sem_valor': "o elemento {i} do vetor '{n}' é usado antes de ter um valor",
+        'nao_e_vetor': "'{n}' não é um vetor",
+        'vetor_sem_indice': "'{n}' é um vetor: indique a posição entre parênteses retos",
+        'indice_inteiro': "a posição de um vetor tem de ser um número inteiro",
+        'indice_fora': "a posição {i} não existe no vetor '{n}' (as posições vão de 0 a {m})",
+        'tamanho_invalido': "o tamanho de um vetor tem de ser um número inteiro maior do que zero",
+        'destino': "aqui deve vir o nome de uma variável (ou de uma posição de um vetor)",
+        'tipo_atribuicao': "não se pode guardar um valor {de} numa variável {para}",
+        'op_numeros': "o operador {op} só funciona com números",
+        'op_logicos': "o operador {op} só funciona com valores lógicos",
+        'comparar': "não se pode comparar um valor {a} com um valor {b}",
+        'condicao': "a condição tem de dar um valor lógico (true ou false)",
+        'divisao_zero': "divisão por zero",
+        'impossivel': "operação impossível com estes valores",
+        'funcao_desconhecida': "a função '{n}' não existe",
+        'num_args': "a função '{n}' recebe {k} argumento(s), mas foram dados {d}",
+        'arg_tipo': "a função '{n}' não aceita um valor {t} neste argumento",
+        'arg_vetor': "o argumento {k} da função '{n}' tem de ser um vetor de {t}",
+        'sem_retorno': "a função '{n}' não devolve nenhum valor e não pode ser usada numa expressão",
+        'chamar_so_funcoes': "numa figura Chamar só se pode chamar uma função definida no fluxograma",
+        'retorno_nao_declarado': "a variável devolvida '{n}' não foi declarada na função",
+        'retorno_sem_valor': "a variável devolvida '{n}' não tem valor no fim da função",
+        'recursao': "chamadas de funções encadeadas demais (recursão sem fim?)",
+        'entrada_tipo': "o valor lido «{v}» não é {t}",
+        'entrada_tipos': {'integer': 'um número inteiro', 'real': 'um número', 'boolean': 'true nem false'},
+        'mais_dados': "o fluxograma pede mais dados do que os que existem neste teste",
+        'para_variavel': "a variável de uma figura Para tem de ser Inteiro ou Real",
+        'passo': "o passo de uma figura Para tem de ser um número maior do que zero",
+        'nao_termina': "O fluxograma não termina: verifique se a condição do ciclo chega a ser falsa.",
+        'ilegivel': "Não foi possível ler o fluxograma.",
+        'vazio': "O fluxograma está vazio: acrescente figuras entre o Início e o Fim.",
+        'funcao_nome': "Há uma função com um nome inválido: '{n}'.",
+        'funcao_repetida': "Há duas funções com o nome '{n}'.",
+        'param_nome': "A função {f} tem um parâmetro com um nome inválido ou repetido: '{n}'.",
+        'retorno_nome': "A função {f} devolve um valor, mas falta indicar a variável devolvida.",
+        'exigir': "O fluxograma deve usar pelo menos uma figura {nome}.",
+        'proibir': "Neste exercício o fluxograma não pode usar figuras {nome}.",
+        'exigir_funcao': "O fluxograma deve definir uma função chamada {n}.",
+    },
+    'en': {
+        'figura': "{nome} «{texto}»",
+        'figura_vazia': "{nome} (empty)",
+        'na_funcao': "In function {f}, {onde}",
+        'em': "{onde}: {erro}.",
+        'tipos_nomes': {'integer': 'Integer', 'real': 'Real', 'string': 'String', 'boolean': 'Boolean'},
+        'figuras': {'input': 'Input', 'output': 'Output', 'declare': 'Declare', 'assign': 'Assign',
+                    'call': 'Call', 'if': 'If', 'while': 'While', 'for': 'For', 'do': 'Do',
+                    'comment': 'Comment'},
+        'ciclo': 'loop (While, For or Do)',
+        'ate': 'to', 'ate_desc': 'down to', 'palavra_passo': 'step',
+        'sem_conteudo': "the shape has not been filled in",
+        'falta_campo': "{campo} is missing",
+        'campo_variavel': "the variable", 'campo_expressao': "the expression", 'campo_inicio': "the start value",
+        'campo_fim': "the end value", 'campo_tamanho': "the array size", 'campo_nomes': "the variable names",
+        'simbolo': "unrecognised symbol: '{s}'",
+        'aspas': "a string is missing its closing quotes",
+        'sublinhado': "'{n}': names cannot contain the _ character",
+        'mal_escrita': "badly written expression",
+        'nome_invalido': "'{n}' is not a valid name (it must start with a letter and have only letters and digits)",
+        'reservada': "'{n}' is a reserved word and cannot be used as a name",
+        'nao_declarada': "the variable '{n}' has not been declared",
+        'ja_declarada': "the variable '{n}' has already been declared",
+        'sem_valor': "the variable '{n}' is used before it has a value",
+        'elemento_sem_valor': "element {i} of the array '{n}' is used before it has a value",
+        'nao_e_vetor': "'{n}' is not an array",
+        'vetor_sem_indice': "'{n}' is an array: give the index in square brackets",
+        'indice_inteiro': "an array index must be an integer",
+        'indice_fora': "index {i} does not exist in the array '{n}' (indexes go from 0 to {m})",
+        'tamanho_invalido': "the size of an array must be an integer greater than zero",
+        'destino': "the name of a variable (or of an array element) is expected here",
+        'tipo_atribuicao': "a {de} value cannot be stored in a {para} variable",
+        'op_numeros': "the operator {op} only works with numbers",
+        'op_logicos': "the operator {op} only works with Boolean values",
+        'comparar': "a {a} value cannot be compared with a {b} value",
+        'condicao': "the condition must give a Boolean value (true or false)",
+        'divisao_zero': "division by zero",
+        'impossivel': "operation impossible with these values",
+        'funcao_desconhecida': "the function '{n}' does not exist",
+        'num_args': "the function '{n}' takes {k} argument(s), but {d} were given",
+        'arg_tipo': "the function '{n}' does not accept a {t} value in this argument",
+        'arg_vetor': "argument {k} of the function '{n}' must be an array of {t}",
+        'sem_retorno': "the function '{n}' does not return a value and cannot be used in an expression",
+        'chamar_so_funcoes': "a Call shape can only call a function defined in the flowchart",
+        'retorno_nao_declarado': "the return variable '{n}' has not been declared in the function",
+        'retorno_sem_valor': "the return variable '{n}' has no value at the end of the function",
+        'recursao': "too many nested function calls (endless recursion?)",
+        'entrada_tipo': "the value read «{v}» is not {t}",
+        'entrada_tipos': {'integer': 'an integer', 'real': 'a number', 'boolean': 'true or false'},
+        'mais_dados': "the flowchart asks for more data than this test has",
+        'para_variavel': "the variable of a For shape must be Integer or Real",
+        'passo': "the step of a For shape must be a number greater than zero",
+        'nao_termina': "The flowchart does not end: check that the loop condition eventually becomes false.",
+        'ilegivel': "The flowchart could not be read.",
+        'vazio': "The flowchart is empty: add shapes between Main and End.",
+        'funcao_nome': "There is a function with an invalid name: '{n}'.",
+        'funcao_repetida': "There are two functions called '{n}'.",
+        'param_nome': "The function {f} has a parameter with an invalid or repeated name: '{n}'.",
+        'retorno_nome': "The function {f} returns a value, but the return variable is missing.",
+        'exigir': "The flowchart must use at least one {nome} shape.",
+        'proibir': "In this exercise the flowchart cannot use {nome} shapes.",
+        'exigir_funcao': "The flowchart must define a function called {n}.",
+    },
+    'es': {
+        'figura': "{nome} «{texto}»",
+        'figura_vazia': "{nome} (vacía)",
+        'na_funcao': "En la función {f}, {onde}",
+        'em': "{onde}: {erro}.",
+        'tipos_nomes': {'integer': 'Entero', 'real': 'Real', 'string': 'Cadena', 'boolean': 'Lógico'},
+        'figuras': {'input': 'Entrada', 'output': 'Salida', 'declare': 'Declarar', 'assign': 'Asignar',
+                    'call': 'Llamar', 'if': 'Si', 'while': 'Mientras', 'for': 'Para', 'do': 'Hacer',
+                    'comment': 'Comentario'},
+        'ciclo': 'de ciclo (Mientras, Para o Hacer)',
+        'ate': 'hasta', 'ate_desc': 'bajando hasta', 'palavra_passo': 'paso',
+        'sem_conteudo': "falta rellenar la figura",
+        'falta_campo': "falta {campo}",
+        'campo_variavel': "la variable", 'campo_expressao': "la expresión", 'campo_inicio': "el valor inicial",
+        'campo_fim': "el valor final", 'campo_tamanho': "el tamaño del arreglo", 'campo_nomes': "el nombre de las variables",
+        'simbolo': "símbolo no reconocido: '{s}'",
+        'aspas': "falta cerrar las comillas de una cadena",
+        'sublinhado': "'{n}': los nombres no pueden tener el carácter _",
+        'mal_escrita': "expresión mal escrita",
+        'nome_invalido': "'{n}' no es un nombre válido (debe empezar por una letra y tener solo letras y dígitos)",
+        'reservada': "'{n}' es una palabra reservada y no puede usarse como nombre",
+        'nao_declarada': "la variable '{n}' no ha sido declarada",
+        'ja_declarada': "la variable '{n}' ya ha sido declarada",
+        'sem_valor': "la variable '{n}' se usa antes de tener un valor",
+        'elemento_sem_valor': "el elemento {i} del arreglo '{n}' se usa antes de tener un valor",
+        'nao_e_vetor': "'{n}' no es un arreglo",
+        'vetor_sem_indice': "'{n}' es un arreglo: indique la posición entre corchetes",
+        'indice_inteiro': "la posición de un arreglo tiene que ser un número entero",
+        'indice_fora': "la posición {i} no existe en el arreglo '{n}' (las posiciones van de 0 a {m})",
+        'tamanho_invalido': "el tamaño de un arreglo tiene que ser un número entero mayor que cero",
+        'destino': "aquí debe ir el nombre de una variable (o de una posición de un arreglo)",
+        'tipo_atribuicao': "no se puede guardar un valor {de} en una variable {para}",
+        'op_numeros': "el operador {op} solo funciona con números",
+        'op_logicos': "el operador {op} solo funciona con valores lógicos",
+        'comparar': "no se puede comparar un valor {a} con un valor {b}",
+        'condicao': "la condición tiene que dar un valor lógico (true o false)",
+        'divisao_zero': "división por cero",
+        'impossivel': "operación imposible con estos valores",
+        'funcao_desconhecida': "la función '{n}' no existe",
+        'num_args': "la función '{n}' recibe {k} argumento(s), pero se dieron {d}",
+        'arg_tipo': "la función '{n}' no acepta un valor {t} en este argumento",
+        'arg_vetor': "el argumento {k} de la función '{n}' tiene que ser un arreglo de {t}",
+        'sem_retorno': "la función '{n}' no devuelve ningún valor y no puede usarse en una expresión",
+        'chamar_so_funcoes': "en una figura Llamar solo se puede llamar a una función definida en el diagrama",
+        'retorno_nao_declarado': "la variable devuelta '{n}' no ha sido declarada en la función",
+        'retorno_sem_valor': "la variable devuelta '{n}' no tiene valor al final de la función",
+        'recursao': "demasiadas llamadas de funciones encadenadas (¿recursión sin fin?)",
+        'entrada_tipo': "el valor leído «{v}» no es {t}",
+        'entrada_tipos': {'integer': 'un número entero', 'real': 'un número', 'boolean': 'true ni false'},
+        'mais_dados': "el diagrama pide más datos de los que hay en esta prueba",
+        'para_variavel': "la variable de una figura Para tiene que ser Entero o Real",
+        'passo': "el paso de una figura Para tiene que ser un número mayor que cero",
+        'nao_termina': "El diagrama no termina: compruebe que la condición del ciclo llega a ser falsa.",
+        'ilegivel': "No se pudo leer el diagrama de flujo.",
+        'vazio': "El diagrama está vacío: añada figuras entre Principal y Fin.",
+        'funcao_nome': "Hay una función con un nombre no válido: '{n}'.",
+        'funcao_repetida': "Hay dos funciones con el nombre '{n}'.",
+        'param_nome': "La función {f} tiene un parámetro con un nombre no válido o repetido: '{n}'.",
+        'retorno_nome': "La función {f} devuelve un valor, pero falta indicar la variable devuelta.",
+        'exigir': "El diagrama debe usar al menos una figura {nome}.",
+        'proibir': "En este ejercicio el diagrama no puede usar figuras {nome}.",
+        'exigir_funcao': "El diagrama debe definir una función llamada {n}.",
+    },
+}
+
+LINGUA = __params__.get('lang') if __params__.get('lang') in MENSAGENS else 'pt'
+
+
+def msg(chave, **dados):
+    return MENSAGENS[LINGUA][chave].format(**dados)
+
+
+class Erro(Exception):
+    """Um erro a mostrar ao estudante. Os erros 'completos' já dizem onde
+       aconteceram; os outros recebem a indicação da figura.
+    """
+
+    def __init__(self, chave, completo=False, **dados):
+        super().__init__(msg(chave, **dados))
+        self.completo = completo
+
+
+class Fim(Exception):
+    """O limite de passos foi atingido."""
+
+
+# ----- Palavras e nomes -----
+
+RESERVADAS = {'and', 'false', 'mod', 'not', 'or', 'pi', 'true',
+              'boolean', 'integer', 'real', 'string',
+              'arccosh', 'cosh', 'arcsinh', 'sinh', 'arctanh', 'tanh', 'eof'}
+TIPOS = ('integer', 'real', 'string', 'boolean')
+
+
+def nome_tipo(tipo):
+    return MENSAGENS[LINGUA]['tipos_nomes'][tipo]
+
+
+def tipo_de(valor):
+    if isinstance(valor, bool):
+        return 'boolean'
+    if isinstance(valor, int):
+        return 'integer'
+    if isinstance(valor, float):
+        return 'real'
+    return 'string'
+
+
+def numero(valor):
+    return isinstance(valor, (int, float)) and not isinstance(valor, bool)
+
+
+def formatar(valor):
+    """O texto com que um valor é escrito, como no Flowgorithm."""
+    if isinstance(valor, bool):
+        return 'true' if valor else 'false'
+    if isinstance(valor, float):
+        if valor.is_integer() and abs(valor) < 1e15:
+            return str(int(valor))
+        return format(valor, '.15g')
+    return str(valor)
+
+
+def verificar_nome(nome):
+    """Garante que o nome segue as regras dos identificadores."""
+    if '_' in nome:
+        raise Erro('sublinhado', n=nome)
+    if not nome or not nome[0].isalpha() or not all(c.isalpha() or c.isdigit() for c in nome):
+        raise Erro('nome_invalido', n=nome)
+    if nome.lower() in RESERVADAS or nome.lower() in INTRINSECAS:
+        raise Erro('reservada', n=nome)
+    return nome
+
+
+# ----- Expressões -----
+
+TOKEN = re.compile(r'''
+    (?P<texto>"[^"]*")
+  | (?P<aberto>")
+  | (?P<numero>\d+\.\d+|\d+)
+  | (?P<nome>[^\W\d]\w*)
+  | (?P<op>==|!=|<>|<=|>=|&&|\|\||[-+*/%^&<>=!()\[\],≤≥≠¬∧∨×÷↑π])
+  | (?P<espaco>\s+)
+  | (?P<outro>.)
+''', re.VERBOSE)
+
+SINONIMOS = {'=': '==', '<>': '!=', '≠': '!=', '≤': '<=', '≥': '>=', '!': 'not', '¬': 'not',
+             '&&': 'and', '∧': 'and', '||': 'or', '∨': 'or', '×': '*', '÷': '/', 'mod': '%', '↑': '^'}
+PRECEDENCIA = {'or': 1, 'and': 2, '==': 3, '!=': 3, '<': 3, '<=': 3, '>': 3, '>=': 3,
+               '&': 4, '+': 5, '-': 5, '*': 6, '/': 6, '%': 6, '^': 7}
+
+
+def tokens(texto):
+    resultado = []
+    for m in TOKEN.finditer(texto):
+        tipo, valor = m.lastgroup, m.group()
+        if tipo == 'espaco':
+            continue
+        if tipo == 'aberto':
+            raise Erro('aspas')
+        if tipo == 'outro':
+            raise Erro('simbolo', s=valor)
+        if tipo == 'nome':
+            if '_' in valor:
+                raise Erro('sublinhado', n=valor)
+            minusculas = valor.lower()
+            if minusculas in ('and', 'or', 'not', 'mod'):
+                tipo, valor = 'op', SINONIMOS.get(minusculas, minusculas)
+        elif tipo == 'op':
+            valor = SINONIMOS.get(valor, valor)
+        resultado.append((tipo, valor))
+    return resultado
+
+
+class Analisador:
+    """Converte o texto de uma expressão numa árvore:
+         ('num', v) ('str', s) ('bool', b) ('var', nome) ('idx', nome, e)
+         ('call', nome, [e...]) ('un', op, e) ('bin', op, e1, e2)
+    """
+
+    def __init__(self, texto):
+        self.toks = tokens(texto)
+        self.i = 0
+
+    def ver(self):
+        return self.toks[self.i] if self.i < len(self.toks) else (None, None)
+
+    def tirar(self):
+        tok = self.ver()
+        self.i += 1
+        return tok
+
+    def esperar(self, valor):
+        if self.ver() != ('op', valor):
+            raise Erro('mal_escrita')
+        self.i += 1
+
+    def tudo(self):
+        if not self.toks:
+            raise Erro('mal_escrita')
+        arvore = self.binaria(1)
+        if self.i != len(self.toks):
+            raise Erro('mal_escrita')
+        return arvore
+
+    def binaria(self, minimo):
+        esquerda = self.unaria()
+        while True:
+            tipo, op = self.ver()
+            if tipo != 'op' or op not in PRECEDENCIA or PRECEDENCIA[op] < minimo:
+                return esquerda
+            self.i += 1
+            prec = PRECEDENCIA[op]
+            direita = self.binaria(prec if op == '^' else prec + 1)
+            esquerda = ('bin', op, esquerda, direita)
+
+    def unaria(self):
+        tipo, valor = self.ver()
+        if tipo == 'op' and valor in ('-', '+', 'not'):
+            self.i += 1
+            return ('un', valor, self.unaria())
+        return self.primaria()
+
+    def primaria(self):
+        tipo, valor = self.tirar()
+        if tipo == 'numero':
+            return ('num', float(valor) if '.' in valor else int(valor))
+        if tipo == 'texto':
+            return ('str', valor[1:-1])
+        if tipo == 'op' and valor == 'π':
+            return ('num', math.pi)
+        if tipo == 'op' and valor == '(':
+            arvore = self.binaria(1)
+            self.esperar(')')
+            return arvore
+        if tipo == 'nome':
+            minusculas = valor.lower()
+            if minusculas in ('true', 'false'):
+                return ('bool', minusculas == 'true')
+            if minusculas == 'pi':
+                return ('num', math.pi)
+            if self.ver() == ('op', '('):
+                self.i += 1
+                args = []
+                if self.ver() != ('op', ')'):
+                    args.append(self.binaria(1))
+                    while self.ver() == ('op', ','):
+                        self.i += 1
+                        args.append(self.binaria(1))
+                self.esperar(')')
+                return ('call', valor, args)
+            if self.ver() == ('op', '['):
+                self.i += 1
+                indice = self.binaria(1)
+                self.esperar(']')
+                return ('idx', valor, indice)
+            return ('var', valor)
+        raise Erro('mal_escrita')
+
+
+def expressao(texto):
+    return Analisador(texto).tudo()
+
+
+def destino(texto):
+    """Uma variável ou uma posição de um vetor, onde se guarda um valor."""
+    arvore = expressao(texto)
+    if arvore[0] not in ('var', 'idx'):
+        raise Erro('destino')
+    verificar_nome(arvore[1])
+    return arvore
+
+
+# ----- Funções intrínsecas -----
+
+def _num(nome, *valores):
+    for v in valores:
+        if not numero(v):
+            raise Erro('arg_tipo', n=nome, t=nome_tipo(tipo_de(v)))
+
+
+def _txt(nome, v):
+    if not isinstance(v, str):
+        raise Erro('arg_tipo', n=nome, t=nome_tipo(tipo_de(v)))
+
+
+def _int(nome, v):
+    if isinstance(v, bool) or not isinstance(v, int):
+        raise Erro('arg_tipo', n=nome, t=nome_tipo(tipo_de(v)))
+
+
+def _real(funcao):
+    def f(nome, x):
+        _num(nome, x)
+        try:
+            return float(funcao(x))
+        except (ValueError, OverflowError):
+            raise Erro('impossivel')
+    return f
+
+
+def _char(nome, s, i):
+    _txt(nome, s)
+    _int(nome, i)
+    if not 0 <= i < len(s):
+        raise Erro('impossivel')
+    return s[i]
+
+
+def _tointeger(nome, v):
+    if numero(v):
+        return int(v)
+    _txt(nome, v)
+    if not re.fullmatch(r'\s*[-+]?\d+\s*', v):
+        raise Erro('impossivel')
+    return int(v)
+
+
+def _toreal(nome, v):
+    if numero(v):
+        return float(v)
+    _txt(nome, v)
+    try:
+        return float(v)
+    except ValueError:
+        raise Erro('impossivel')
+
+
+def _tofixed(nome, r, i):
+    _num(nome, r)
+    _int(nome, i)
+    if i < 0:
+        raise Erro('impossivel')
+    return format(r, f'.{i}f')
+
+
+def _random(nome, n):
+    _int(nome, n)
+    if n <= 0:
+        raise Erro('impossivel')
+    return ALEATORIO.randrange(n)
+
+
+def _tochar(nome, n):
+    _int(nome, n)
+    try:
+        return chr(n)
+    except (ValueError, OverflowError):
+        raise Erro('impossivel')
+
+
+def _tocode(nome, c):
+    _txt(nome, c)
+    if not c:
+        raise Erro('impossivel')
+    return ord(c[0])
+
+
+def _abs(nome, n):
+    _num(nome, n)
+    return abs(n)
+
+
+def _sgn(nome, n):
+    _num(nome, n)
+    return (n > 0) - (n < 0)
+
+
+def _intf(nome, n):
+    _num(nome, n)
+    return int(n)
+
+
+def _len(nome, s):
+    _txt(nome, s)
+    return len(s)
+
+
+def _tostring(nome, v):
+    return formatar(v)
+
+
+INTRINSECAS = {
+    'abs': (1, _abs), 'arccos': (1, _real(math.acos)), 'arcsin': (1, _real(math.asin)),
+    'arctan': (1, _real(math.atan)), 'cos': (1, _real(math.cos)), 'sin': (1, _real(math.sin)),
+    'tan': (1, _real(math.tan)), 'int': (1, _intf), 'ln': (1, _real(math.log)),
+    'log': (1, _real(math.log)), 'log10': (1, _real(math.log10)), 'sgn': (1, _sgn),
+    'sqrt': (1, _real(math.sqrt)), 'len': (1, _len), 'char': (2, _char),
+    'tochar': (1, _tochar), 'tocode': (1, _tocode), 'tofixed': (2, _tofixed),
+    'tointeger': (1, _tointeger), 'toreal': (1, _toreal), 'tostring': (1, _tostring),
+    'random': (1, _random), 'size': (1, None),
+}
+ALEATORIO = random.Random(2026)
+
+
+# ----- Variáveis -----
+
+class Variavel:
+    def __init__(self, tipo, tamanho=None):
+        self.tipo = tipo
+        self.vetor = tamanho is not None
+        self.valor = [None] * tamanho if self.vetor else None
+
+
+def converter(valor, tipo):
+    """O valor pronto a guardar numa variável do tipo dado (como no Flowgorithm,
+       um Real guardado num Inteiro perde a parte decimal).
+    """
+    if tipo == 'integer' and numero(valor):
+        return int(valor)
+    if tipo == 'real' and numero(valor):
+        return float(valor)
+    if tipo == 'string' and isinstance(valor, str):
+        return valor
+    if tipo == 'boolean' and isinstance(valor, bool):
+        return valor
+    raise Erro('tipo_atribuicao', de=nome_tipo(tipo_de(valor)), para=nome_tipo(tipo))
+
+
+# ----- As figuras -----
+
+CAMPOS = {
+    'declare': ('names',), 'assign': ('var', 'expr'), 'input': ('var',), 'output': ('expr',),
+    'if': ('expr',), 'while': ('expr',), 'do': ('expr',), 'call': ('expr',),
+    'for': ('var', 'start', 'end'), 'comment': (),
+}
+NOME_CAMPO = {'names': 'campo_nomes', 'var': 'campo_variavel', 'expr': 'campo_expressao',
+              'start': 'campo_inicio', 'end': 'campo_fim', 'size': 'campo_tamanho'}
+
+
+def texto_figura(no):
+    """O texto que a figura mostra, para as mensagens."""
+    t = no.get('type')
+    g = lambda k: str(no.get(k) or '').strip()
+    if t == 'declare':
+        tipo = nome_tipo(no.get('vtype')) if no.get('vtype') in TIPOS else ''
+        nomes = g('names')
+        if no.get('array'):
+            nomes = ', '.join(f"{n.strip()}[{g('size')}]" for n in nomes.split(','))
+        return f"{tipo} {nomes}".strip() if nomes else ''
+    if t == 'assign':
+        return f"{g('var')} = {g('expr')}" if g('var') or g('expr') else ''
+    if t == 'for':
+        m = MENSAGENS[LINGUA]
+        texto = f"{g('var')} = {g('start')} {m['ate_desc' if no.get('dir') == 'dec' else 'ate']} {g('end')}"
+        if g('step') and g('step') != '1':
+            texto += f" {m['palavra_passo']} {g('step')}"
+        return texto if g('var') else ''
+    if t == 'comment':
+        return g('text')
+    if t == 'input':
+        return g('var')
+    return g('expr')
+
+
+class Figura:
+    """Uma figura do fluxograma, já analisada."""
+
+    def __init__(self, no, funcao):
+        self.tipo = no.get('type')
+        if self.tipo not in CAMPOS:
+            raise Erro('ilegivel', True)
+        self.funcao = funcao
+        self.texto = texto_figura(no)
+        self.sim = [Figura(n, funcao) for n in no.get('yes', [])] if self.tipo == 'if' else []
+        self.nao = [Figura(n, funcao) for n in no.get('no', [])] if self.tipo == 'if' else []
+        self.corpo = [Figura(n, funcao) for n in no.get('body', [])] if self.tipo in ('while', 'for', 'do') else []
+        try:
+            self.analisar(no)
+        except Erro as erro:
+            raise em_figura(self, erro)
+
+    def descricao(self):
+        nome = MENSAGENS[LINGUA]['figuras'][self.tipo]
+        onde = msg('figura', nome=nome, texto=self.texto) if self.texto else msg('figura_vazia', nome=nome)
+        if self.funcao.lower() != 'main':
+            onde = msg('na_funcao', f=self.funcao, onde=onde[:1].lower() + onde[1:])
+        return onde
+
+    def analisar(self, no):
+        g = lambda k: str(no.get(k) or '').strip()
+        for campo in CAMPOS[self.tipo]:
+            if not g(campo):
+                if all(not g(c) for c in CAMPOS[self.tipo]):
+                    raise Erro('sem_conteudo')
+                raise Erro('falta_campo', campo=msg(NOME_CAMPO[campo]))
+        t = self.tipo
+        if t == 'declare':
+            self.vtipo = no.get('vtype') if no.get('vtype') in TIPOS else 'integer'
+            self.nomes = [verificar_nome(n.strip()) for n in g('names').split(',')]
+            self.tamanho = None
+            if no.get('array'):
+                if not g('size'):
+                    raise Erro('falta_campo', campo=msg('campo_tamanho'))
+                self.tamanho = expressao(g('size'))
+        elif t == 'assign':
+            self.destino = destino(g('var'))
+            self.expr = expressao(g('expr'))
+        elif t == 'input':
+            self.destino = destino(g('var'))
+        elif t in ('output', 'if', 'while', 'do'):
+            self.expr = expressao(g('expr'))
+            self.mudar_linha = no.get('newline', True) is not False
+        elif t == 'call':
+            arvore = expressao(g('expr'))
+            if arvore[0] == 'var':
+                arvore = ('call', arvore[1], [])
+            if arvore[0] != 'call' or arvore[1].lower() in INTRINSECAS:
+                raise Erro('chamar_so_funcoes')
+            self.expr = arvore
+        elif t == 'for':
+            self.destino = expressao(g('var'))
+            if self.destino[0] != 'var':
+                raise Erro('destino')
+            verificar_nome(self.destino[1])
+            self.inicio = expressao(g('start'))
+            self.fim = expressao(g('end'))
+            self.passo = expressao(g('step') or '1')
+            self.descer = no.get('dir') == 'dec'
+
+
+def em_figura(figura, erro):
+    if erro.completo:
+        return erro
+    novo = Erro('em', True, onde=figura.descricao(), erro=str(erro))
+    return novo
+
+
+class Funcao:
+    def __init__(self, dados, principal):
+        self.nome = str(dados.get('name') or '').strip()
+        if principal:
+            self.nome = 'Main'
+        self.params = []
+        self.tipo = None
+        self.retorno = ''
+        if not principal:
+            try:
+                verificar_nome(self.nome)
+            except Erro:
+                raise Erro('funcao_nome', True, n=self.nome)
+            vistos = set()
+            for p in dados.get('params') or []:
+                nome = str(p.get('name') or '').strip()
+                try:
+                    verificar_nome(nome)
+                except Erro:
+                    raise Erro('param_nome', True, f=self.nome, n=nome)
+                if nome.lower() in vistos:
+                    raise Erro('param_nome', True, f=self.nome, n=nome)
+                vistos.add(nome.lower())
+                tipo = p.get('type') if p.get('type') in TIPOS else 'integer'
+                self.params.append((nome, tipo, bool(p.get('array'))))
+            ret = dados.get('ret') or {}
+            if ret.get('type') in TIPOS:
+                self.tipo = ret['type']
+                self.retorno = str(ret.get('var') or '').strip()
+                if not self.retorno:
+                    raise Erro('retorno_nome', True, f=self.nome)
+                try:
+                    verificar_nome(self.retorno)
+                except Erro:
+                    raise Erro('retorno_nome', True, f=self.nome)
+        self.figuras = [Figura(n, self.nome) for n in dados.get('nodes') or []]
+
+
+# ----- A execução -----
+
+class Maquina:
+    def __init__(self, funcoes, dados, max_passos):
+        self.funcoes = {f.nome.lower(): f for f in funcoes}
+        self.dados = dados
+        self.proximo = 0
+        self.saida = []
+        self.passos = 0
+        self.max_passos = max_passos
+        self.profundidade = 0
+
+    def passo(self):
+        self.passos += 1
+        if self.passos > self.max_passos:
+            raise Fim()
+
+    # Variáveis
+
+    def variavel(self, vars_, nome):
+        var = vars_.get(nome.lower())
+        if var is None:
+            raise Erro('nao_declarada', n=nome)
+        return var
+
+    def ler_destino(self, vars_, arvore):
+        """A variável e a posição (ou None) de um destino."""
+        var = self.variavel(vars_, arvore[1])
+        if arvore[0] == 'idx':
+            if not var.vetor:
+                raise Erro('nao_e_vetor', n=arvore[1])
+            return var, self.indice(vars_, var, arvore)
+        if var.vetor:
+            raise Erro('vetor_sem_indice', n=arvore[1])
+        return var, None
+
+    def indice(self, vars_, var, arvore):
+        i = self.valor(vars_, arvore[2])
+        if isinstance(i, bool) or not isinstance(i, int):
+            raise Erro('indice_inteiro')
+        if not 0 <= i < len(var.valor):
+            raise Erro('indice_fora', i=i, n=arvore[1], m=len(var.valor) - 1)
+        return i
+
+    def guardar(self, vars_, arvore, valor):
+        var, i = self.ler_destino(vars_, arvore)
+        valor = converter(valor, var.tipo)
+        if i is None:
+            var.valor = valor
+        else:
+            var.valor[i] = valor
+
+    # Expressões
+
+    def valor(self, vars_, a):
+        k = a[0]
+        if k in ('num', 'str', 'bool'):
+            return a[1]
+        if k == 'var':
+            var = self.variavel(vars_, a[1])
+            if var.vetor:
+                raise Erro('vetor_sem_indice', n=a[1])
+            if var.valor is None:
+                raise Erro('sem_valor', n=a[1])
+            return var.valor
+        if k == 'idx':
+            var = self.variavel(vars_, a[1])
+            if not var.vetor:
+                raise Erro('nao_e_vetor', n=a[1])
+            i = self.indice(vars_, var, a)
+            if var.valor[i] is None:
+                raise Erro('elemento_sem_valor', i=i, n=a[1])
+            return var.valor[i]
+        if k == 'call':
+            return self.chamar(vars_, a[1], a[2], True)
+        if k == 'un':
+            v = self.valor(vars_, a[2])
+            if a[1] == 'not':
+                if not isinstance(v, bool):
+                    raise Erro('op_logicos', op='not')
+                return not v
+            if not numero(v):
+                raise Erro('op_numeros', op=a[1])
+            return -v if a[1] == '-' else v
+        op = a[1]
+        if op in ('and', 'or'):
+            esquerda = self.valor(vars_, a[2])
+            if not isinstance(esquerda, bool):
+                raise Erro('op_logicos', op=op)
+            if (op == 'and' and not esquerda) or (op == 'or' and esquerda):
+                return esquerda
+            direita = self.valor(vars_, a[3])
+            if not isinstance(direita, bool):
+                raise Erro('op_logicos', op=op)
+            return direita
+        x, y = self.valor(vars_, a[2]), self.valor(vars_, a[3])
+        if op == '&':
+            return formatar(x) + formatar(y)
+        if op in ('==', '!=', '<', '<=', '>', '>='):
+            tx, ty = tipo_de(x), tipo_de(y)
+            if not (numero(x) and numero(y)) and tx != ty:
+                raise Erro('comparar', a=nome_tipo(tx), b=nome_tipo(ty))
+            if tx == 'boolean' and op not in ('==', '!='):
+                raise Erro('comparar', a=nome_tipo(tx), b=nome_tipo(ty))
+            return {'==': x == y, '!=': x != y, '<': x < y, '<=': x <= y, '>': x > y, '>=': x >= y}[op]
+        if not (numero(x) and numero(y)):
+            raise Erro('op_numeros', op='mod' if op == '%' else op)
+        try:
+            if op == '+':
+                return x + y
+            if op == '-':
+                return x - y
+            if op == '*':
+                return x * y
+            if op == '/':
+                if y == 0:
+                    raise Erro('divisao_zero')
+                return x / y
+            if op == '%':
+                if y == 0:
+                    raise Erro('divisao_zero')
+                resto = math.fmod(x, y)
+                return int(resto) if isinstance(x, int) and isinstance(y, int) else resto
+            resultado = float(x) ** y
+            if isinstance(resultado, complex):
+                raise Erro('impossivel')
+            return float(resultado)
+        except (OverflowError, ZeroDivisionError):
+            raise Erro('impossivel')
+
+    def chamar(self, vars_, nome, args, em_expressao):
+        minusculas = nome.lower()
+        if minusculas in INTRINSECAS and minusculas not in self.funcoes:
+            n, funcao = INTRINSECAS[minusculas]
+            if len(args) != n:
+                raise Erro('num_args', n=nome, k=n, d=len(args))
+            if minusculas == 'size':
+                if args[0][0] != 'var':
+                    raise Erro('arg_tipo', n=nome, t='')
+                var = self.variavel(vars_, args[0][1])
+                if not var.vetor:
+                    raise Erro('nao_e_vetor', n=args[0][1])
+                return len(var.valor)
+            return funcao(nome, *[self.valor(vars_, a) for a in args])
+        f = self.funcoes.get(minusculas)
+        if f is None or minusculas == 'main':
+            raise Erro('funcao_desconhecida', n=nome)
+        if em_expressao and f.tipo is None:
+            raise Erro('sem_retorno', n=f.nome)
+        if len(args) != len(f.params):
+            raise Erro('num_args', n=f.nome, k=len(f.params), d=len(args))
+        novas = {}
+        for k, ((pnome, ptipo, pvetor), arg) in enumerate(zip(f.params, args), 1):
+            if pvetor:
+                var = vars_.get(arg[1].lower()) if arg[0] == 'var' else None
+                if var is None or not var.vetor or var.tipo != ptipo:
+                    raise Erro('arg_vetor', n=f.nome, k=k, t=nome_tipo(ptipo))
+                novas[pnome.lower()] = var  # Os vetores passam por referência.
+            else:
+                v = self.valor(vars_, arg)
+                try:
+                    v = converter(v, ptipo)
+                except Erro:
+                    raise Erro('arg_tipo', n=f.nome, t=nome_tipo(tipo_de(v)))
+                var = Variavel(ptipo)
+                var.valor = v
+                novas[pnome.lower()] = var
+        self.profundidade += 1
+        if self.profundidade > 150:
+            raise Erro('recursao')
+        try:
+            self.executar(f.figuras, novas)
+        finally:
+            self.profundidade -= 1
+        if f.tipo is None:
+            return None
+        var = novas.get(f.retorno.lower())
+        if var is None or var.vetor:
+            raise Erro('em', True, onde=f.nome, erro=msg('retorno_nao_declarado', n=f.retorno))
+        if var.valor is None:
+            raise Erro('em', True, onde=f.nome, erro=msg('retorno_sem_valor', n=f.retorno))
+        return converter(var.valor, f.tipo)
+
+    # Figuras
+
+    def executar(self, figuras, vars_):
+        for figura in figuras:
+            self.passo()
+            try:
+                self.executar_figura(figura, vars_)
+            except Erro as erro:
+                raise em_figura(figura, erro)
+
+    def condicao(self, vars_, arvore):
+        v = self.valor(vars_, arvore)
+        if not isinstance(v, bool):
+            raise Erro('condicao')
+        return v
+
+    def executar_figura(self, f, vars_):
+        t = f.tipo
+        if t == 'declare':
+            tamanho = None
+            if f.tamanho is not None:
+                tamanho = self.valor(vars_, f.tamanho)
+                if isinstance(tamanho, bool) or not isinstance(tamanho, int) or tamanho <= 0:
+                    raise Erro('tamanho_invalido')
+            for nome in f.nomes:
+                if nome.lower() in vars_:
+                    raise Erro('ja_declarada', n=nome)
+                vars_[nome.lower()] = Variavel(f.vtipo, tamanho)
+        elif t == 'assign':
+            self.guardar(vars_, f.destino, self.valor(vars_, f.expr))
+        elif t == 'input':
+            var, _ = self.ler_destino(vars_, f.destino)
+            if self.proximo >= len(self.dados):
+                raise Erro('mais_dados')
+            texto = self.dados[self.proximo]
+            self.proximo += 1
+            self.guardar(vars_, f.destino, ler_valor(texto, var.tipo))
+        elif t == 'output':
+            self.saida.append(formatar(self.valor(vars_, f.expr)) + ('\n' if f.mudar_linha else ''))
+        elif t == 'if':
+            self.executar(f.sim if self.condicao(vars_, f.expr) else f.nao, vars_)
+        elif t == 'while':
+            while self.condicao(vars_, f.expr):
+                self.executar(f.corpo, vars_)
+                self.passo()
+        elif t == 'do':
+            while True:
+                self.executar(f.corpo, vars_)
+                self.passo()
+                if not self.condicao(vars_, f.expr):
+                    break
+        elif t == 'for':
+            var, _ = self.ler_destino(vars_, f.destino)
+            if var.tipo not in ('integer', 'real'):
+                raise Erro('para_variavel')
+            inicio = self.valor(vars_, f.inicio)
+            fim = self.valor(vars_, f.fim)
+            passo = self.valor(vars_, f.passo)
+            for v in (inicio, fim):
+                if not numero(v):
+                    raise Erro('op_numeros', op='=')
+            if not numero(passo) or passo <= 0:
+                raise Erro('passo')
+            self.guardar(vars_, f.destino, inicio)
+            while (var.valor >= fim) if f.descer else (var.valor <= fim):
+                self.executar(f.corpo, vars_)
+                self.passo()
+                self.guardar(vars_, f.destino, var.valor - passo if f.descer else var.valor + passo)
+        elif t == 'call':
+            self.chamar(vars_, f.expr[1], f.expr[2], False)
+        # O Comentário não faz nada na avaliação.
+
+
+def ler_valor(texto, tipo):
+    """Converte uma linha lida no tipo da variável, como faz o Flowgorithm."""
+    texto = texto.rstrip('\r')
+    if tipo == 'string':
+        return texto
+    limpo = texto.strip()
+    if tipo == 'integer' and re.fullmatch(r'[-+]?\d+', limpo):
+        return int(limpo)
+    if tipo == 'real' and re.fullmatch(r'[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?', limpo):
+        return float(limpo)
+    if tipo == 'boolean' and limpo.lower() in ('true', 'false'):
+        return limpo.lower() == 'true'
+    raise Erro('entrada_tipo', v=texto, t=MENSAGENS[LINGUA]['entrada_tipos'][tipo])
+
+
+# ----- O fluxograma da resposta -----
+
+def carregar(resposta):
+    global LINGUA
+    try:
+        dados = json.loads(resposta)
+        texto = dados.get('flowgorithm', [''])[0]
+        fluxograma = json.loads(texto) if texto else {'functions': []}
+        funcoes = fluxograma.get('functions') or []
+        if fluxograma.get('lang') in MENSAGENS:
+            LINGUA = fluxograma['lang']
+    except (ValueError, KeyError, IndexError, TypeError, AttributeError):
+        raise Erro('ilegivel', True)
+    if not funcoes or not (funcoes[0].get('nodes') or len(funcoes) > 1):
+        raise Erro('vazio', True)
+    resultado = [Funcao(funcoes[0], True)]
+    vistos = {'main'}
+    for dados_funcao in funcoes[1:]:
+        f = Funcao(dados_funcao, False)
+        if f.nome.lower() in vistos:
+            raise Erro('funcao_repetida', True, n=f.nome)
+        vistos.add(f.nome.lower())
+        resultado.append(f)
+    return resultado
+
+
+def todas(figuras):
+    for f in figuras:
+        yield f
+        yield from todas(f.sim)
+        yield from todas(f.nao)
+        yield from todas(f.corpo)
+
+
+FIGURAS_PARAMETRO = {'entrada': {'input'}, 'saida': {'output'}, 'declarar': {'declare'},
+                     'atribuicao': {'assign'}, 'chamar': {'call'}, 'se': {'if'}, 'enquanto': {'while'},
+                     'para': {'for'}, 'fazer': {'do'}, 'comentario': {'comment'},
+                     'ciclo': {'while', 'for', 'do'}}
+# Os mesmos nomes noutras línguas.
+OUTROS_NOMES = {'input': 'entrada', 'output': 'saida', 'declare': 'declarar', 'assign': 'atribuicao',
+                'call': 'chamar', 'if': 'se', 'while': 'enquanto', 'for': 'para', 'do': 'fazer',
+                'comment': 'comentario', 'loop': 'ciclo', 'salida': 'saida', 'asignar': 'atribuicao',
+                'llamar': 'chamar', 'si': 'se', 'mientras': 'enquanto', 'hacer': 'fazer',
+                'comentario': 'comentario', 'bucle': 'ciclo'}
+
+
+def verificar_parametros(funcoes, params):
+    usadas = {f.tipo for fn in funcoes for f in todas(fn.figuras)}
+    nomes = MENSAGENS[LINGUA]['figuras']
+    for chave in ('exigir', 'proibir'):
+        for tipo in params.get(chave, []):
+            tipo = str(tipo).lower()
+            tipo = OUTROS_NOMES.get(tipo, tipo)
+            if tipo not in FIGURAS_PARAMETRO:
+                continue
+            aceites = FIGURAS_PARAMETRO[tipo]
+            nome = MENSAGENS[LINGUA]['ciclo'] if tipo == 'ciclo' else nomes[next(iter(aceites))]
+            if chave == 'exigir' and not (aceites & usadas):
+                raise Erro('exigir', True, nome=nome)
+            if chave == 'proibir' and (aceites & usadas):
+                raise Erro('proibir', True, nome=nome)
+    definidas = {f.nome.lower() for f in funcoes[1:]}
+    for nome in params.get('funcoes', []):
+        if str(nome).lower() not in definidas:
+            raise Erro('exigir_funcao', True, n=nome)
+
+
+__maquina__ = None
+try:
+    __funcoes__ = carregar(__answer__)
+    verificar_parametros(__funcoes__, __params__)
+    __maquina__ = Maquina(__funcoes__, sys.stdin.read().splitlines(), int(__params__.get('max_passos', 100000)))
+    __maquina__.executar(__funcoes__[0].figuras, {})
+    print(''.join(__maquina__.saida), end='')
+except (Erro, Fim, RecursionError) as __erro__:
+    __feito__ = ''.join(__maquina__.saida) if __maquina__ else ''
+    if __feito__ and not __feito__.endswith('\n'):
+        __feito__ += '\n'
+    if isinstance(__erro__, Fim):
+        __texto__ = msg('nao_termina')
+    elif isinstance(__erro__, RecursionError):
+        __texto__ = msg('recursao')
+    else:
+        __texto__ = str(__erro__)
+    print(__feito__ + '*** ' + __texto__)
+]]></template>
+    <iscombinatortemplate>0</iscombinatortemplate>
+    <allowmultiplestdins>0</allowmultiplestdins>
+    <answer></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader>EqualityGrader</grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin>html</uiplugin>
+    <uiparameters><![CDATA[{ "html_src": "prototypeextra" }]]></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra><![CDATA[<script>
+// If the DOM header does not already contain the style sheet for this
+// question type, insert it.
+if (document.getElementsByClassName('qtype-coderunner-unicv-fg').length === 0) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+    div.fg-box {
+        position: relative;
+        background: #ffffff;
+        border: 1px solid #c4cdd5;
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #1d2125;
+        font-size: 14px;
+    }
+
+    div.fg-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
+    div.fg-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    div.fg-box select.fg-sel,
+    div.fg-box button.fg-btn {
+        box-sizing: border-box;
+        height: 32px;
+        margin: 0;
+        padding: 0 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    div.fg-box button.fg-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    div.fg-box button.fg-btn:hover,
+    div.fg-box button.fg-btn:focus,
+    div.fg-box button.fg-btn[aria-expanded="true"] {
+        background: #e7f0fa;
+        border-color: #0f6cbf;
+    }
+
+    div.fg-box button.fg-btn.fg-danger {
+        border-color: #a51d2a;
+        background: #a51d2a;
+        color: #ffffff;
+    }
+
+    div.fg-box button.fg-btn.fg-danger:hover,
+    div.fg-box button.fg-btn.fg-danger:focus {
+        background: #7d1620;
+    }
+
+    div.fg-box span.fg-ask {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    div.fg-box label.fg-lbl {
+        font-size: 13px;
+        color: #48535e;
+        margin: 0;
+    }
+
+    div.fg-scroll {
+        overflow: auto;
+        padding: 4px 0 8px 0;
+    }
+
+    div.fg-canvas {
+        position: relative;
+        margin: 0 auto;
+    }
+
+    div.fg-layer > svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        overflow: visible;
+    }
+
+    div.fg-canvas .fg-line {
+        fill: none;
+        stroke: #404040;
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+    }
+
+    div.fg-canvas .fg-shape { stroke-width: 1.5; }
+    div.fg-canvas .fg-k-term  { fill: #f0e0ff; stroke: #9070a0; }
+    div.fg-canvas .fg-k-input { fill: #d0e8ff; stroke: #7088a0; }
+    div.fg-canvas .fg-k-output { fill: #d8ffd8; stroke: #78a078; }
+    div.fg-canvas .fg-k-assign,
+    div.fg-canvas .fg-k-declare { fill: #ffffd8; stroke: #a0a078; }
+    div.fg-canvas .fg-k-call  { fill: #f0e0ff; stroke: #9070a0; }
+    div.fg-canvas .fg-k-if    { fill: #ffd8d8; stroke: #a07878; }
+    div.fg-canvas .fg-k-loop  { fill: #ffe0b0; stroke: #a08050; }
+    div.fg-canvas .fg-k-comment { fill: #ffffff; stroke: #404040; stroke-dasharray: 4 3; }
+    div.fg-canvas .fg-dot { fill: #ffe0b0; stroke: #a08050; stroke-width: 1.5; }
+
+    div.fg-canvas .fg-txt {
+        font-size: 14px;
+        dominant-baseline: central;
+        text-anchor: middle;
+        white-space: pre;
+    }
+
+    div.fg-canvas .fg-t-term { fill: #301040; }
+    div.fg-canvas .fg-t-input { fill: #102840; }
+    div.fg-canvas .fg-t-output { fill: #184018; }
+    div.fg-canvas .fg-t-assign,
+    div.fg-canvas .fg-t-declare { fill: #404018; }
+    div.fg-canvas .fg-t-call { fill: #301040; }
+    div.fg-canvas .fg-t-if { fill: #401818; }
+    div.fg-canvas .fg-t-loop { fill: #402000; }
+    div.fg-canvas .fg-t-comment { fill: #404040; }
+    div.fg-canvas .fg-t-empty { fill: #6a737b; font-style: italic; }
+
+    div.fg-canvas .fg-label {
+        position: absolute;
+        white-space: nowrap;
+        line-height: 16px;
+        font-size: 12px;
+        color: #48535e;
+        background: #ffffff;
+        padding: 0 3px;
+    }
+
+    div.fg-canvas button.fg-hit {
+        position: absolute;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    div.fg-canvas button.fg-hit:hover {
+        border-color: rgba(15, 108, 191, 0.45);
+    }
+
+    div.fg-canvas button.fg-hit:focus,
+    div.fg-canvas button.fg-hit.fg-sel-on {
+        border-color: #0f6cbf;
+        outline: none;
+    }
+
+    div.fg-canvas button.fg-plus,
+    div.fg-canvas button.fg-del {
+        position: absolute;
+        box-sizing: border-box;
+        padding: 0;
+        border-radius: 50%;
+        background: #ffffff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
+
+    div.fg-canvas button.fg-plus {
+        width: 22px;
+        height: 22px;
+        border: 1px solid #0f6cbf;
+        color: #0f6cbf;
+    }
+
+    div.fg-canvas button.fg-plus:hover,
+    div.fg-canvas button.fg-plus:focus,
+    div.fg-canvas button.fg-plus.fg-open {
+        background: #0f6cbf;
+        color: #ffffff;
+    }
+
+    div.fg-canvas button.fg-del {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #8f959e;
+        color: #5f6b76;
+    }
+
+    div.fg-canvas button.fg-del:hover,
+    div.fg-canvas button.fg-del:focus {
+        border-color: #a51d2a;
+        background: #f8d7da;
+        color: #a51d2a;
+    }
+
+    div.fg-menu,
+    div.fg-pop {
+        position: absolute;
+        z-index: 5;
+        background: #ffffff;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    div.fg-menu {
+        width: 330px;
+        padding: 6px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2px;
+    }
+
+    div.fg-menu button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: 34px;
+        padding: 0 8px;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #1d2125;
+        font-size: 14px;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    div.fg-menu button:hover, div.fg-menu button:focus {
+        background: #dceafc;
+    }
+
+    div.fg-pop {
+        width: 320px;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    div.fg-pop div.fg-pophead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    div.fg-pop div.fg-pophead span {
+        flex: 1;
+    }
+
+    div.fg-pop label.fg-field {
+        display: block;
+        margin: 0 0 8px 0;
+        color: #48535e;
+    }
+
+    div.fg-pop label.fg-check {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 0 8px 0;
+        color: #1d2125;
+    }
+
+    div.fg-pop input.fg-in,
+    div.fg-pop select.fg-in,
+    div.fg-pop textarea.fg-in {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 3px;
+        padding: 4px 6px;
+        border: 1px solid #8f959e;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #1d2125;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+    }
+
+    div.fg-pop select.fg-in {
+        font-family: inherit;
+        height: 30px;
+    }
+
+    div.fg-pop input.fg-in:focus,
+    div.fg-pop select.fg-in:focus,
+    div.fg-pop textarea.fg-in:focus {
+        border-color: #0f6cbf;
+        outline: 2px solid rgba(15, 108, 191, 0.25);
+    }
+
+    div.fg-pop div.fg-row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    div.fg-pop div.fg-param {
+        display: grid;
+        grid-template-columns: 1fr 96px auto 26px;
+        gap: 6px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    div.fg-pop div.fg-param input.fg-in,
+    div.fg-pop div.fg-param select.fg-in {
+        margin-top: 0;
+    }
+
+    div.fg-pop div.fg-param label {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin: 0;
+        font-size: 12px;
+    }
+
+    div.fg-pop div.fg-popfoot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    div.fg-pop button.fg-round,
+    div.fg-helpwin button.fg-round {
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 1px solid #8f959e;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #48535e;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    div.fg-pop div.fg-sub {
+        margin: 4px 0 6px 0;
+        font-weight: 700;
+        color: #1d2125;
+    }
+
+    div.fg-helpwin {
+        position: absolute;
+        z-index: 6;
+        top: 52px;
+        right: 14px;
+        box-sizing: border-box;
+        width: 460px;
+        max-width: calc(100% - 28px);
+        max-height: 540px;
+        overflow: auto;
+        padding: 12px 14px;
+        background: #ffffff;
+        border: 1px solid #8f959e;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    div.fg-helpwin[hidden] {
+        display: none;
+    }
+
+    div.fg-helpwin div.fg-helphead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    div.fg-helpwin div.fg-h {
+        margin: 12px 0 4px 0;
+        font-weight: 700;
+        color: #0f4c8a;
+    }
+
+    div.fg-helpwin p {
+        margin: 0 0 4px 0;
+    }
+
+    div.fg-helpwin div.fg-hrow {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        align-items: start;
+        padding: 3px 0;
+    }
+
+    div.fg-helpwin div.fg-hrow.fg-op {
+        grid-template-columns: 100px 1fr;
+    }
+
+    div.fg-helpwin span.fg-desc {
+        display: block;
+        color: #48535e;
+    }
+
+    div.fg-helpwin code {
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: #1d2125;
+        background: #f1f3f5;
+        padding: 1px 4px;
+        border-radius: 3px;
+    }
+
+    div.fg-helpwin .fg-mini {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        vertical-align: middle;
+        background: #ffffff;
+    }
+
+    div.fg-helpwin .fg-mini.fg-mini-plus {
+        border: 1px solid #0f6cbf;
+        color: #0f6cbf;
+    }
+
+    div.fg-helpwin .fg-mini.fg-mini-del {
+        border: 1px solid #8f959e;
+        color: #5f6b76;
+    }
+`;
+    styleElement.classList.add('qtype-coderunner-unicv-fg');
+    document.head.append(styleElement);
+}
+</script>
+
+<input type="hidden" id="___textareaId___-fg" class="coderunner-ui-element" name="flowgorithm">
+<div class="fg-box">
+    <div class="fg-bar">
+        <div id="___textareaId___-fg-funcs" class="fg-group"></div>
+        <div id="___textareaId___-fg-tools" class="fg-group"></div>
+    </div>
+    <div id="___textareaId___-fg-helpwin" class="fg-helpwin" role="dialog" hidden></div>
+    <div class="fg-scroll">
+        <div id="___textareaId___-fg-canvas" class="fg-canvas"><div class="fg-layer"></div></div>
+    </div>
+</div>
+
+<script>
+(() => {
+
+    //jshint esversion: 6
+
+    const T = '___textareaId___';
+    const store = document.getElementById(T + '-fg');
+    const canvas = document.getElementById(T + '-fg-canvas');
+    const layer = canvas.querySelector('.fg-layer');
+    const funcsBar = document.getElementById(T + '-fg-funcs');
+    const toolsBar = document.getElementById(T + '-fg-tools');
+    const helpWin = document.getElementById(T + '-fg-helpwin');
+    const textarea = document.getElementById(T);
+    const readOnly = !!(textarea && (textarea.readOnly || textarea.disabled));
+    const markerId = 'fg-arrow-' + Math.random().toString(36).slice(2);
+
+    // Geometry, in px.
+    const GAP = 44;          // Length of the arrow between two consecutive shapes.
+    const BH = 40;           // Height of most shapes (and of the loops).
+    const DH = 64;           // Height of an If.
+    const TH = 38;           // Height of the terminals.
+    const PAD = 24;          // Space around the whole flowchart.
+    const DOT = 7;           // Radius of the circle where a Do loop starts.
+    const CUT = 18;          // How much the sides of a loop hexagon are cut.
+
+    // The kinds of shape. 'cls' gives the colours, 'loop' kinds have a body.
+    const KINDS = {
+        input:      { cls: 'input' },
+        output:     { cls: 'output' },
+        declare:    { cls: 'declare' },
+        assign:     { cls: 'assign' },
+        call:       { cls: 'call' },
+        if:         { cls: 'if' },
+        while:      { cls: 'loop', loop: true },
+        for:        { cls: 'loop', loop: true },
+        do:         { cls: 'loop', loop: true },
+        comment:    { cls: 'comment' }
+    };
+    const ORDER = ['input', 'output', 'declare', 'assign', 'call', 'if', 'while', 'for', 'do', 'comment'];
+    const TYPES = ['integer', 'real', 'string', 'boolean'];
+    // The fields of each kind of shape, in the order they are edited.
+    const FIELDS = {
+        declare: ['names', 'vtype', 'array', 'size'],
+        assign: ['var', 'expr'],
+        input: ['var'],
+        output: ['expr', 'newline'],
+        if: ['expr'], while: ['expr'], do: ['expr'],
+        for: ['var', 'start', 'end', 'dir', 'step'],
+        call: ['expr'],
+        comment: ['text']
+    };
+    // The fields that must be filled in for the shape not to be shown as empty.
+    const REQUIRED = {
+        declare: ['names'], assign: ['var', 'expr'], input: ['var'], output: ['expr'],
+        if: ['expr'], while: ['expr'], do: ['expr'], for: ['var', 'start', 'end'],
+        call: ['expr'], comment: ['text']
+    };
+
+    // The texts of the editor in each language. To add a language, add an
+    // entry here with the same keys (and the messages in the template).
+    const I18N = {
+        pt: {
+            name: 'Português', main: 'Principal', end: 'Fim', ret: 'Devolver', yes: 'Verdadeiro', no: 'Falso',
+            next: 'Seguinte', done: 'Concluído',
+            kinds: {
+                input: 'Entrada', output: 'Saída', declare: 'Declarar', assign: 'Atribuição', call: 'Chamar',
+                if: 'Se', while: 'Enquanto', for: 'Para', do: 'Fazer', comment: 'Comentário'
+            },
+            types: { integer: 'Inteiro', real: 'Real', string: 'Texto', boolean: 'Lógico' },
+            w: { input: 'Ler', output: 'Escrever', array: 'Vetor', to: 'até', downto: 'descendo até', step: 'passo' },
+            f: {
+                names: 'Nomes das variáveis (separados por vírgulas)', vtype: 'Tipo', array: 'É um vetor (array)',
+                size: 'Tamanho do vetor', var: 'Variável', expr: 'Expressão', newline: 'Mudar de linha no fim',
+                start: 'Valor inicial', end: 'Valor final', dir: 'Sentido', inc: 'Crescente', dec: 'Decrescente',
+                step: 'Passo', callExpr: 'Função a chamar, com os argumentos', cond: 'Condição', text: 'Texto do comentário',
+                assignVar: 'Variável (ou posição de um vetor)', inputVar: 'Variável onde guardar o valor lido'
+            },
+            ok: 'OK', addHere: 'Inserir uma figura aqui', remove: 'Eliminar esta figura', edit: 'Editar',
+            funcLabel: 'Função', addFunc: 'Nova função', funcProps: 'Propriedades', delFunc: 'Eliminar função',
+            delFuncAsk: 'Eliminar a função?', newFunc: 'Funcao', fname: 'Nome da função', retType: 'Tipo devolvido',
+            none: 'Nenhum', retVar: 'Variável devolvida (declarada na função)', params: 'Parâmetros',
+            addParam: 'Acrescentar parâmetro', paramName: 'nome', noParams: 'Sem parâmetros.',
+            language: 'Língua', reset: 'Recomeçar', resetTip: 'Eliminar todas as figuras e funções e recomeçar',
+            resetAsk: 'Eliminar todas as figuras e funções?', resetYes: 'Sim, eliminar', cancel: 'Cancelar',
+            help: 'Ajuda', close: 'Fechar',
+            hShapes: 'Figuras', hOps: 'Operadores', hFuncs: 'Funções predefinidas', hRules: 'Regras',
+            hMine: 'Funções do estudante', hAdd: 'Adicionar e editar', hDel: 'Eliminar',
+            shapes: {
+                input: ['Ler n', 'Lê um valor do teclado para a variável.'],
+                output: ['Escrever "Total: " & n', 'Escreve o valor de uma expressão.'],
+                declare: ['Inteiro a, b', 'Cria variáveis (ou vetores) de um tipo.'],
+                assign: ['soma = a + b', 'Guarda o valor de uma expressão numa variável.'],
+                call: ['Mostrar(x)', 'Executa uma função do estudante.'],
+                if: ['a > b', 'Segue por Verdadeiro ou por Falso.'],
+                while: ['i <= 10', 'Repete enquanto a condição for verdadeira (testa antes).'],
+                for: ['i = 1 até 10', 'Repete, contando com a variável.'],
+                do: ['n < 0', 'Repete enquanto a condição for verdadeira (testa depois).'],
+                comment: ['Lê os dados', 'Uma nota; não é executada.']
+            },
+            ops: [['Aritméticos', '+ | - | * | / | % | mod | ^'], ['Comparação', '= | == | != | <> | < | <= | > | >='],
+                ['Lógicos', 'and | && | or | || | not | !'], ['Texto', '"Olá" | &', 'o & junta textos e valores'],
+                ['Constantes', 'true | false | pi']],
+            funcsText: 'Abs, Sgn, Int, Sqrt, Ln, Log, Log10, Sin, Cos, Tan, Arcsin, Arccos, Arctan, Random(n), Len(s), Char(s, i), ToChar, ToCode, ToInteger, ToReal, ToString, ToFixed(r, i), Size(vetor)',
+            rules: [
+                'As variáveis têm de ser declaradas (figura Declarar) antes de serem usadas. Os tipos são Inteiro, Real, Texto e Lógico.',
+                'A divisão / dá sempre um número real; um real guardado num Inteiro perde a parte decimal.',
+                'O + só soma números; para juntar texto use &.',
+                'As posições de um vetor começam em 0: a[0], a[1], …',
+                'Os nomes começam por uma letra e só têm letras e algarismos (sem _); maiúsculas e minúsculas são iguais.'
+            ],
+            mineText: 'Com «Nova função» cria uma função, com parâmetros e, se quiser, um valor devolvido. Use-a numa figura Chamar ou numa expressão, por exemplo Quadrado(4). Escolha na lista a função que quer desenhar.',
+            addText: 'Clique num {plus} sobre uma seta e escolha a figura; abre-se uma pequena janela para preencher. Para alterar uma figura, clique nela.',
+            delText: 'Clique no {del} da figura. Ao eliminar um Se ou um ciclo, elimina também as figuras que estão dentro dele. «Recomeçar» elimina tudo e deixa só o Início e o Fim.'
+        },
+        en: {
+            name: 'English', main: 'Main', end: 'End', ret: 'Return', yes: 'True', no: 'False',
+            next: 'Next', done: 'Done',
+            kinds: {
+                input: 'Input', output: 'Output', declare: 'Declare', assign: 'Assign', call: 'Call',
+                if: 'If', while: 'While', for: 'For', do: 'Do', comment: 'Comment'
+            },
+            types: { integer: 'Integer', real: 'Real', string: 'String', boolean: 'Boolean' },
+            w: { input: 'Input', output: 'Output', array: 'Array', to: 'to', downto: 'down to', step: 'step' },
+            f: {
+                names: 'Variable names (separated by commas)', vtype: 'Type', array: 'Array',
+                size: 'Array size', var: 'Variable', expr: 'Expression', newline: 'Add a new line',
+                start: 'Start value', end: 'End value', dir: 'Direction', inc: 'Increasing', dec: 'Decreasing',
+                step: 'Step by', callExpr: 'Function to call, with its arguments', cond: 'Condition', text: 'Comment text',
+                assignVar: 'Variable (or array element)', inputVar: 'Variable to store the value read'
+            },
+            ok: 'OK', addHere: 'Insert a shape here', remove: 'Delete this shape', edit: 'Edit',
+            funcLabel: 'Function', addFunc: 'New function', funcProps: 'Properties', delFunc: 'Delete function',
+            delFuncAsk: 'Delete the function?', newFunc: 'Function', fname: 'Function name', retType: 'Return type',
+            none: 'None', retVar: 'Return variable (declared in the function)', params: 'Parameters',
+            addParam: 'Add parameter', paramName: 'name', noParams: 'No parameters.',
+            language: 'Language', reset: 'Start over', resetTip: 'Delete all the shapes and functions and start over',
+            resetAsk: 'Delete all the shapes and functions?', resetYes: 'Yes, delete', cancel: 'Cancel',
+            help: 'Help', close: 'Close',
+            hShapes: 'Shapes', hOps: 'Operators', hFuncs: 'Intrinsic functions', hRules: 'Rules',
+            hMine: 'Your own functions', hAdd: 'Adding and editing', hDel: 'Deleting',
+            shapes: {
+                input: ['Input n', 'Reads a value from the keyboard into the variable.'],
+                output: ['Output "Total: " & n', 'Displays the value of an expression.'],
+                declare: ['Integer a, b', 'Creates variables (or arrays) of a type.'],
+                assign: ['sum = a + b', 'Stores the value of an expression in a variable.'],
+                call: ['Show(x)', 'Runs one of your functions.'],
+                if: ['a > b', 'Goes on through True or through False.'],
+                while: ['i <= 10', 'Repeats while the condition is true (tested first).'],
+                for: ['i = 1 to 10', 'Repeats, counting with the variable.'],
+                do: ['n < 0', 'Repeats while the condition is true (tested after).'],
+                comment: ['Read the data', 'A note; it is not run.']
+            },
+            ops: [['Arithmetic', '+ | - | * | / | % | mod | ^'], ['Comparison', '= | == | != | <> | < | <= | > | >='],
+                ['Logical', 'and | && | or | || | not | !'], ['Text', '"Hello" | &', '& joins texts and values'],
+                ['Constants', 'true | false | pi']],
+            funcsText: 'Abs, Sgn, Int, Sqrt, Ln, Log, Log10, Sin, Cos, Tan, Arcsin, Arccos, Arctan, Random(n), Len(s), Char(s, i), ToChar, ToCode, ToInteger, ToReal, ToString, ToFixed(r, i), Size(array)',
+            rules: [
+                'Variables must be declared (Declare shape) before they are used. The types are Integer, Real, String and Boolean.',
+                'The division / always gives a real number; a real stored in an Integer loses its fractional part.',
+                'The + only adds numbers; use & to join text.',
+                'Array indexes start at 0: a[0], a[1], …',
+                'Names start with a letter and have only letters and digits (no _); upper and lower case are the same.'
+            ],
+            mineText: 'Use "New function" to create a function, with parameters and, if you wish, a return value. Use it in a Call shape or in an expression, for example Square(4). Choose in the list the function you want to draw.',
+            addText: 'Click a {plus} on an arrow and choose the shape; a small window opens to fill it in. To change a shape, click on it.',
+            delText: 'Click the {del} of the shape. Deleting an If or a loop also deletes the shapes inside it. "Start over" deletes everything and leaves only Main and End.'
+        },
+        es: {
+            name: 'Español', main: 'Principal', end: 'Fin', ret: 'Devolver', yes: 'Verdadero', no: 'Falso',
+            next: 'Siguiente', done: 'Terminado',
+            kinds: {
+                input: 'Entrada', output: 'Salida', declare: 'Declarar', assign: 'Asignar', call: 'Llamar',
+                if: 'Si', while: 'Mientras', for: 'Para', do: 'Hacer', comment: 'Comentario'
+            },
+            types: { integer: 'Entero', real: 'Real', string: 'Cadena', boolean: 'Lógico' },
+            w: { input: 'Leer', output: 'Escribir', array: 'Arreglo', to: 'hasta', downto: 'bajando hasta', step: 'paso' },
+            f: {
+                names: 'Nombres de las variables (separados por comas)', vtype: 'Tipo', array: 'Es un arreglo',
+                size: 'Tamaño del arreglo', var: 'Variable', expr: 'Expresión', newline: 'Saltar de línea al final',
+                start: 'Valor inicial', end: 'Valor final', dir: 'Sentido', inc: 'Creciente', dec: 'Decreciente',
+                step: 'Paso', callExpr: 'Función a llamar, con los argumentos', cond: 'Condición', text: 'Texto del comentario',
+                assignVar: 'Variable (o posición de un arreglo)', inputVar: 'Variable donde guardar el valor leído'
+            },
+            ok: 'OK', addHere: 'Insertar una figura aquí', remove: 'Eliminar esta figura', edit: 'Editar',
+            funcLabel: 'Función', addFunc: 'Nueva función', funcProps: 'Propiedades', delFunc: 'Eliminar función',
+            delFuncAsk: '¿Eliminar la función?', newFunc: 'Funcion', fname: 'Nombre de la función', retType: 'Tipo devuelto',
+            none: 'Ninguno', retVar: 'Variable devuelta (declarada en la función)', params: 'Parámetros',
+            addParam: 'Añadir parámetro', paramName: 'nombre', noParams: 'Sin parámetros.',
+            language: 'Idioma', reset: 'Reiniciar', resetTip: 'Eliminar todas las figuras y funciones y empezar de nuevo',
+            resetAsk: '¿Eliminar todas las figuras y funciones?', resetYes: 'Sí, eliminar', cancel: 'Cancelar',
+            help: 'Ayuda', close: 'Cerrar',
+            hShapes: 'Figuras', hOps: 'Operadores', hFuncs: 'Funciones predefinidas', hRules: 'Reglas',
+            hMine: 'Funciones propias', hAdd: 'Añadir y editar', hDel: 'Eliminar',
+            shapes: {
+                input: ['Leer n', 'Lee un valor del teclado para la variable.'],
+                output: ['Escribir "Total: " & n', 'Escribe el valor de una expresión.'],
+                declare: ['Entero a, b', 'Crea variables (o arreglos) de un tipo.'],
+                assign: ['suma = a + b', 'Guarda el valor de una expresión en una variable.'],
+                call: ['Mostrar(x)', 'Ejecuta una de sus funciones.'],
+                if: ['a > b', 'Sigue por Verdadero o por Falso.'],
+                while: ['i <= 10', 'Repite mientras la condición sea verdadera (comprueba antes).'],
+                for: ['i = 1 hasta 10', 'Repite, contando con la variable.'],
+                do: ['n < 0', 'Repite mientras la condición sea verdadera (comprueba después).'],
+                comment: ['Lee los datos', 'Una nota; no se ejecuta.']
+            },
+            ops: [['Aritméticos', '+ | - | * | / | % | mod | ^'], ['Comparación', '= | == | != | <> | < | <= | > | >='],
+                ['Lógicos', 'and | && | or | || | not | !'], ['Texto', '"Hola" | &', 'el & une textos y valores'],
+                ['Constantes', 'true | false | pi']],
+            funcsText: 'Abs, Sgn, Int, Sqrt, Ln, Log, Log10, Sin, Cos, Tan, Arcsin, Arccos, Arctan, Random(n), Len(s), Char(s, i), ToChar, ToCode, ToInteger, ToReal, ToString, ToFixed(r, i), Size(arreglo)',
+            rules: [
+                'Las variables tienen que declararse (figura Declarar) antes de usarse. Los tipos son Entero, Real, Cadena y Lógico.',
+                'La división / da siempre un número real; un real guardado en un Entero pierde la parte decimal.',
+                'El + solo suma números; para unir texto use &.',
+                'Las posiciones de un arreglo empiezan en 0: a[0], a[1], …',
+                'Los nombres empiezan por una letra y solo tienen letras y dígitos (sin _); mayúsculas y minúsculas son iguales.'
+            ],
+            mineText: 'Con «Nueva función» crea una función, con parámetros y, si quiere, un valor devuelto. Úsela en una figura Llamar o en una expresión, por ejemplo Cuadrado(4). Elija en la lista la función que quiere dibujar.',
+            addText: 'Haga clic en un {plus} sobre una flecha y elija la figura; se abre una pequeña ventana para rellenarla. Para cambiar una figura, haga clic en ella.',
+            delText: 'Haga clic en el {del} de la figura. Al eliminar un Si o un ciclo se eliminan también las figuras que están dentro. «Reiniciar» elimina todo y deja solo el Inicio y el Fin.'
+        }
+    };
+
+    let lang = 'pt';
+    let L = I18N[lang];
+
+    const PLUS_ICON = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"></path></svg>';
+    const X_ICON = '<svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"></path></svg>';
+    const RESET_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7a4.5 4.5 0 1 0 1.4-3.3"></path><path d="M2.2 1.6v2.6h2.6"></path></svg>';
+    const HELP_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="6"></circle><path d="M5.2 5.4a1.9 1.9 0 1 1 2.6 1.8c-.5.3-.8.6-.8 1.2"></path><path d="M7 10.6v.1"></path></svg>';
+    const GEAR_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="2.2"></circle><path d="M7 1v2M7 11v2M1 7h2M11 7h2M2.8 2.8l1.4 1.4M9.8 9.8l1.4 1.4M2.8 11.2l1.4-1.4M9.8 4.2l1.4-1.4"></path></svg>';
+    const COLORS = {
+        input: ['#d0e8ff', '#7088a0'], output: ['#d8ffd8', '#78a078'], declare: ['#ffffd8', '#a0a078'],
+        assign: ['#ffffd8', '#a0a078'], call: ['#f0e0ff', '#9070a0'], if: ['#ffd8d8', '#a07878'],
+        while: ['#ffe0b0', '#a08050'], for: ['#ffe0b0', '#a08050'], do: ['#ffe0b0', '#a08050'],
+        comment: ['#ffffff', '#404040']
+    };
+
+    // A small drawing of a kind of shape, for the menu and the help window.
+    function icon(type) {
+        const c = COLORS[type];
+        const fs = `fill="${c[0]}" stroke="${c[1]}"`;
+        let inner;
+        if (type === 'input' || type === 'output') {
+            inner = `<polygon points="6,1 31,1 26,15 1,15" ${fs}></polygon>`;
+        } else if (type === 'declare') {
+            inner = `<rect x="1" y="1" width="30" height="14" ${fs}></rect><path d="M1 4.5h30M4.5 1v14" stroke="${c[1]}" fill="none"></path>`;
+        } else if (type === 'call') {
+            inner = `<rect x="1" y="1" width="30" height="14" ${fs}></rect><path d="M4.5 1v14M27.5 1v14" stroke="${c[1]}" fill="none"></path>`;
+        } else if (type === 'if') {
+            inner = `<polygon points="16,1 31,8 16,15 1,8" ${fs}></polygon>`;
+        } else if (KINDS[type].loop) {
+            inner = `<polygon points="6,1 26,1 31,8 26,15 6,15 1,8" ${fs}></polygon>`;
+        } else if (type === 'comment') {
+            inner = `<rect x="1" y="1" width="30" height="14" ${fs} stroke-dasharray="3 2"></rect>`;
+        } else {
+            inner = `<rect x="1" y="1" width="30" height="14" ${fs}></rect>`;
+        }
+        return `<svg aria-hidden="true" width="32" height="16" viewBox="0 0 32 16">${inner}</svg>`;
+    }
+
+    // Escape a value for use in HTML text or in a double-quoted attribute.
+    function esc(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ----- Measuring text -----
+
+    const measurer = document.createElement('canvas').getContext('2d');
+
+    function textWidth(text) {
+        if (!measurer) {
+            return text.length * 8;
+        }
+        measurer.font = '14px ' + (window.getComputedStyle(canvas).fontFamily || 'sans-serif');
+        return measurer.measureText(text).width;
+    }
+
+    // ----- The model -----
+    // The answer is a list of functions; the first one is the main program.
+    // A function is {name, params: [{name, type, array}], ret: {type, var}, nodes}.
+    // A shape is {type, ...its fields} plus 'yes' and 'no' for an If and
+    // 'body' for a loop. Ids exist only while editing.
+
+    let nextId = 1;
+    let funcs = [];
+    let current = 0;
+
+    function newNode(type) {
+        const node = { type: type };
+        FIELDS[type].forEach(f => {
+            node[f] = f === 'vtype' ? 'integer' : f === 'dir' ? 'inc' : f === 'step' ? '1' :
+                f === 'newline' ? true : f === 'array' ? false : '';
+        });
+        if (type === 'if') {
+            node.yes = [];
+            node.no = [];
+        } else if (KINDS[type].loop) {
+            node.body = [];
+        }
+        return node;
+    }
+
+    function prepare(list) {
+        return list.filter(n => n && KINDS[n.type]).map(raw => {
+            const node = newNode(raw.type);
+            FIELDS[raw.type].forEach(f => {
+                if (raw[f] !== undefined) {
+                    node[f] = raw[f];
+                }
+            });
+            node.id = nextId++;
+            if (raw.type === 'if') {
+                node.yes = prepare(Array.isArray(raw.yes) ? raw.yes : []);
+                node.no = prepare(Array.isArray(raw.no) ? raw.no : []);
+            } else if (KINDS[raw.type].loop) {
+                node.body = prepare(Array.isArray(raw.body) ? raw.body : []);
+            }
+            return node;
+        });
+    }
+
+    function newFunc(name) {
+        return { name: name, params: [], ret: { type: 'none', var: '' }, nodes: [] };
+    }
+
+    let answerLang = '';
+
+    function load() {
+        let raw = store.value;
+        if (!raw) {
+            // The value may not have been loaded into the hidden field.
+            const outerDiv = document.getElementById('qtype-coderunner-outer-div-' + T);
+            const leftovers = outerDiv ? outerDiv.getAttribute('data-leftovers') : '';
+            if (leftovers) {
+                try {
+                    const data = JSON.parse(leftovers);
+                    raw = data.flowgorithm ? data.flowgorithm[0] : '';
+                    store.value = raw || '';
+                } catch (e) {
+                    raw = '';
+                }
+            }
+        }
+        let list = [];
+        try {
+            const data = raw ? JSON.parse(raw) : {};
+            list = Array.isArray(data.functions) ? data.functions : [];
+            if (I18N[data.lang]) {
+                answerLang = data.lang;
+            }
+        } catch (e) {
+            list = [];
+        }
+        funcs = list.filter(f => f && typeof f === 'object').map((f, i) => ({
+            name: i === 0 ? 'Main' : String(f.name || ''),
+            params: (Array.isArray(f.params) ? f.params : []).map(p => ({
+                name: String(p.name || ''), type: TYPES.includes(p.type) ? p.type : 'integer', array: !!p.array
+            })),
+            ret: {
+                type: f.ret && TYPES.includes(f.ret.type) ? f.ret.type : 'none',
+                var: f.ret && f.ret.var ? String(f.ret.var) : ''
+            },
+            nodes: prepare(Array.isArray(f.nodes) ? f.nodes : [])
+        }));
+        if (!funcs.length) {
+            funcs = [newFunc('Main')];
+        }
+    }
+
+    function plain(list) {
+        return list.map(node => {
+            const copy = { type: node.type };
+            FIELDS[node.type].forEach(f => {
+                copy[f] = node[f];
+            });
+            if (node.type === 'if') {
+                copy.yes = plain(node.yes);
+                copy.no = plain(node.no);
+            } else if (KINDS[node.type].loop) {
+                copy.body = plain(node.body);
+            }
+            return copy;
+        });
+    }
+
+    // Store the flowchart in the hidden field that is the answer. A main
+    // program with no shapes and no functions is an empty answer.
+    function save() {
+        if (readOnly) {
+            return;
+        }
+        const empty = funcs.length === 1 && !funcs[0].nodes.length;
+        store.value = empty ? '' : JSON.stringify({
+            v: 3, lang: lang,
+            functions: funcs.map(f => ({ name: f.name, params: f.params, ret: f.ret, nodes: plain(f.nodes) }))
+        });
+    }
+
+    // The list that holds the shape with the given id, and its position there.
+    function find(id, list) {
+        for (let i = 0; i < list.length; i++) {
+            const node = list[i];
+            if (node.id === id) {
+                return { list: list, index: i, node: node };
+            }
+            const inner = node.type === 'if' ? (find(id, node.yes) || find(id, node.no)) :
+                KINDS[node.type].loop ? find(id, node.body) : null;
+            if (inner) {
+                return inner;
+            }
+        }
+        return null;
+    }
+
+    // ----- What each shape shows -----
+
+    function val(node, field) {
+        return String(node[field] === undefined || node[field] === null ? '' : node[field]).trim();
+    }
+
+    function isEmpty(node) {
+        return REQUIRED[node.type].length > 0 && REQUIRED[node.type].every(f => !val(node, f));
+    }
+
+    function shapeText(node) {
+        if (isEmpty(node)) {
+            return L.kinds[node.type];
+        }
+        const v = f => val(node, f);
+        switch (node.type) {
+            case 'declare': {
+                let names = v('names');
+                if (node.array) {
+                    names = names.split(',').map(n => n.trim() + '[' + v('size') + ']').join(', ');
+                }
+                return L.types[node.vtype] + (node.array ? ' ' + L.w.array : '') + ' ' + names;
+            }
+            case 'assign':
+                return v('var') + ' = ' + v('expr');
+            case 'input':
+                return L.w.input + ' ' + v('var');
+            case 'output':
+                return L.w.output + ' ' + v('expr');
+            case 'for': {
+                const step = v('step');
+                return v('var') + ' = ' + v('start') + ' ' + (node.dir === 'dec' ? L.w.downto : L.w.to) + ' ' + v('end') +
+                    (step && step !== '1' ? ' ' + L.w.step + ' ' + step : '');
+            }
+            case 'comment':
+                return v('text').replace(/\s+/g, ' ');
+            default:
+                return v('expr');
+        }
+    }
+
+    function shapeWidth(node) {
+        const t = textWidth(shapeText(node));
+        switch (node.type) {
+            case 'if':
+                return Math.max(120, t * 1.5 + 50);
+            case 'while':
+            case 'for':
+            case 'do':
+                return Math.max(110, t + 2 * CUT + 24);
+            case 'input':
+            case 'output':
+                return Math.max(110, t + 52);
+            case 'declare':
+            case 'call':
+                return Math.max(110, t + 40);
+            default:
+                return Math.max(100, t + 28);
+        }
+    }
+
+    // ----- Layout: sizes are measured first, then everything is drawn. -----
+    // Each measure is {l, r, h}: how far the drawing extends to the left and
+    // to the right of its centre line, and its height.
+
+    function measureNode(node) {
+        const w = shapeWidth(node);
+        let m;
+        if (node.type === 'if') {
+            const no = measureSeq(node.no);
+            const yes = measureSeq(node.yes);
+            const offL = Math.max(no.r + 20, w / 2 + 40);
+            const offR = Math.max(yes.l + 20, w / 2 + 40);
+            const inner = Math.max(no.h, yes.h);
+            m = { l: offL + no.l, r: offR + yes.r, h: DH / 2 + inner, offL: offL, offR: offR, inner: inner };
+        } else if (node.type === 'while' || node.type === 'for') {
+            // The body goes to the right, as in Flowgorithm, and comes back
+            // into the bottom of the hexagon.
+            const body = measureSeq(node.body);
+            const back = Math.min(w / 4, 30);
+            const off = Math.max(w / 2 + 34, back + 22 + body.l);
+            const labelW = textWidth(node.type === 'for' ? L.done : L.no) * 0.86 + 24;
+            m = { l: Math.max(w / 2, labelW), r: off + body.r, h: BH / 2 + body.h + 18, off: off, back: back };
+        } else if (node.type === 'do') {
+            // A small circle, the body to the right and the hexagon below.
+            const body = measureSeq(node.body);
+            const off = Math.max(w / 2 + 34, body.l + 26);
+            const labelW = textWidth(L.yes) * 0.86 + 24;
+            m = { l: Math.max(w / 2, labelW), r: Math.max(w / 2 + 12, off + body.r), h: 2 * DOT + body.h + 16 + BH, off: off };
+        } else {
+            m = { l: w / 2, r: w / 2 + 12, h: BH };
+        }
+        m.w = w;
+        node.m = m;
+        return m;
+    }
+
+    function measureSeq(list) {
+        const m = { l: 50, r: 50, h: GAP };
+        list.forEach(node => {
+            const n = measureNode(node);
+            m.l = Math.max(m.l, n.l);
+            m.r = Math.max(m.r, n.r);
+            m.h += n.h + GAP;
+        });
+        return m;
+    }
+
+    let svg, html, lists, boxes;
+
+    function line(points, arrow) {
+        let pts = points;
+        if (arrow) {
+            // Stop the line short of the tip, which the arrow head covers.
+            const a = points[points.length - 2], b = points[points.length - 1];
+            const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+            pts = points.slice(0, -1).concat([[b[0] - (b[0] - a[0]) / len * 4, b[1] - (b[1] - a[1]) / len * 4]]);
+        }
+        const d = pts.map((p, i) => (i ? 'L' : 'M') + ' ' + p[0] + ' ' + p[1]).join(' ');
+        svg += `<path class="fg-line" d="${d}"${arrow ? ` marker-end="url(#${markerId})"` : ''}></path>`;
+    }
+
+    function label(text, x, y, align) {
+        const shift = align === 'right' ? 'transform:translateX(-100%);' : '';
+        html += `<span class="fg-label" style="left:${x}px;top:${y}px;${shift}">${esc(text)}</span>`;
+    }
+
+    function plusButton(listKey, index, x, y) {
+        if (readOnly) {
+            return;
+        }
+        html += `<button type="button" class="fg-plus" data-fg-list="${listKey}" data-fg-index="${index}" style="left:${x - 11}px;top:${y - 11}px" aria-label="${esc(L.addHere)}" title="${esc(L.addHere)}">${PLUS_ICON}</button>`;
+    }
+
+    function text(node, x, y, cls) {
+        const empty = isEmpty(node);
+        svg += `<text class="fg-txt ${empty ? 'fg-t-empty' : 'fg-t-' + cls}" x="${x}" y="${y}">${esc(shapeText(node))}</text>`;
+    }
+
+    // The invisible button over a shape, to edit it, and its delete button.
+    function hit(node, x0, y0, x1, y1, delX, delY) {
+        boxes[node.id] = { x0: x0, y0: y0, x1: x1, y1: y1 };
+        const name = L.kinds[node.type];
+        const shown = shapeText(node);
+        html += `<button type="button" class="fg-hit${editing && editing.id === node.id ? ' fg-sel-on' : ''}" data-fg-edit="${node.id}" style="left:${x0 - 3}px;top:${y0 - 3}px;width:${x1 - x0 + 6}px;height:${y1 - y0 + 6}px" aria-label="${esc(L.edit + ': ' + name + (shown !== name ? ' ' + shown : ''))}" title="${esc(name)}"${readOnly ? ' disabled' : ''}></button>`;
+        if (!readOnly) {
+            html += `<button type="button" class="fg-del" data-fg-del="${node.id}" style="left:${delX - 10}px;top:${delY - 10}px" aria-label="${esc(L.remove)}" title="${esc(L.remove)}">${X_ICON}</button>`;
+        }
+    }
+
+    function hexagon(cx, y, w, cls) {
+        const mid = y + BH / 2;
+        svg += `<polygon class="fg-shape fg-k-${cls}" points="${cx - w / 2 + CUT},${y} ${cx + w / 2 - CUT},${y} ${cx + w / 2},${mid} ${cx + w / 2 - CUT},${y + BH} ${cx - w / 2 + CUT},${y + BH} ${cx - w / 2},${mid}"></polygon>`;
+    }
+
+    // Draw a list of shapes going down from (cx, y). Every arrow between two
+    // shapes carries a "+" button. Returns the y where the list ends.
+    function drawSeq(list, cx, y, lastArrow) {
+        const listKey = lists.push(list) - 1;
+        for (let i = 0; i <= list.length; i++) {
+            line([[cx, y], [cx, y + GAP]], i < list.length ? true : lastArrow);
+            plusButton(listKey, i, cx, y + GAP / 2);
+            y += GAP;
+            if (i < list.length) {
+                drawNode(list[i], cx, y);
+                y += list[i].m.h;
+            }
+        }
+        return y;
+    }
+
+    function drawNode(node, cx, y) {
+        const m = node.m, w = m.w, cls = KINDS[node.type].cls;
+        const x0 = cx - w / 2, x1 = cx + w / 2;
+        switch (node.type) {
+            case 'input':
+            case 'output': {
+                // Both have the same shape; only the colour and the word differ.
+                const skew = 14;
+                svg += `<polygon class="fg-shape fg-k-${cls}" points="${x0 + skew},${y} ${x1},${y} ${x1 - skew},${y + BH} ${x0},${y + BH}"></polygon>`;
+                text(node, cx, y + BH / 2, cls);
+                hit(node, x0, y, x1, y + BH, x1 - 4, y);
+                break;
+            }
+            case 'declare':
+                svg += `<rect class="fg-shape fg-k-${cls}" x="${x0}" y="${y}" width="${w}" height="${BH}"></rect>` +
+                    `<path class="fg-shape fg-k-${cls}" d="M ${x0} ${y + 7} H ${x1} M ${x0 + 7} ${y} V ${y + BH}"></path>`;
+                text(node, cx + 3, y + BH / 2 + 3, cls);
+                hit(node, x0, y, x1, y + BH, x1, y);
+                break;
+            case 'call':
+                svg += `<rect class="fg-shape fg-k-${cls}" x="${x0}" y="${y}" width="${w}" height="${BH}"></rect>` +
+                    `<path class="fg-shape fg-k-${cls}" d="M ${x0 + 8} ${y} V ${y + BH} M ${x1 - 8} ${y} V ${y + BH}"></path>`;
+                text(node, cx, y + BH / 2, cls);
+                hit(node, x0, y, x1, y + BH, x1, y);
+                break;
+            case 'comment':
+                svg += `<rect class="fg-shape fg-k-${cls}" x="${x0}" y="${y}" width="${w}" height="${BH}"></rect>`;
+                text(node, cx, y + BH / 2, cls);
+                hit(node, x0, y, x1, y + BH, x1, y);
+                break;
+            case 'if': {
+                const mid = y + DH / 2;
+                svg += `<polygon class="fg-shape fg-k-${cls}" points="${cx},${y} ${x1},${mid} ${cx},${y + DH} ${x0},${mid}"></polygon>`;
+                text(node, cx, mid, cls);
+                hit(node, cx - w / 4, y + 6, cx + w / 4, y + DH - 6, cx + w / 4 + 8, y + DH / 4 - 4);
+                const xL = cx - m.offL, xR = cx + m.offR, join = mid + m.inner;
+                line([[x0, mid], [xL, mid]]);
+                line([[x1, mid], [xR, mid]]);
+                label(L.no, x0 - 2, mid - 19, 'right');
+                label(L.yes, x1 + 2, mid - 19);
+                const endL = drawSeq(node.no, xL, mid, false);
+                const endR = drawSeq(node.yes, xR, mid, false);
+                if (endL < join) {
+                    line([[xL, endL], [xL, join]]);
+                }
+                if (endR < join) {
+                    line([[xR, endR], [xR, join]]);
+                }
+                line([[xL, join], [xR, join]]);
+                break;
+            }
+            case 'while':
+            case 'for': {
+                const mid = y + BH / 2, xB = cx + m.off, back = cx + m.back;
+                hexagon(cx, y, w, cls);
+                text(node, cx, mid, cls);
+                hit(node, x0 + 4, y, x1 - 4, y + BH, x1 - CUT + 6, y);
+                // To the body on the right...
+                line([[x1, mid], [xB, mid]]);
+                const end = drawSeq(node.body, xB, mid, false);
+                // ...and back into the bottom of the hexagon.
+                line([[xB, end], [back, end], [back, y + BH]], true);
+                // Out of the loop, straight down.
+                line([[cx, y + BH], [cx, y + m.h]]);
+                if (node.type === 'for') {
+                    label(L.next, x1 + 2, mid - 19);
+                    label(L.done, cx - 14, y + BH + 2, 'right');
+                } else {
+                    label(L.yes, x1 + 2, mid - 19);
+                    label(L.no, cx - 14, y + BH + 2, 'right');
+                }
+                break;
+            }
+            case 'do': {
+                // The circle where the loop starts, the body on the right and
+                // the condition below; while it is true, back up to the circle.
+                const cy = y + DOT, xB = cx + m.off;
+                svg += `<circle class="fg-dot" cx="${cx}" cy="${cy}" r="${DOT}"></circle>`;
+                line([[cx + DOT, cy], [xB, cy]]);
+                const end = drawSeq(node.body, xB, cy, false);
+                const hy = y + m.h - BH, mid = hy + BH / 2;
+                line([[xB, end], [xB, mid], [x1, mid]], true);
+                hexagon(cx, hy, w, cls);
+                text(node, cx, mid, cls);
+                hit(node, x0 + 4, hy, x1 - 4, hy + BH, x1 - CUT + 6, hy);
+                line([[cx, hy], [cx, cy + DOT]], true);
+                label(L.yes, cx - 4, hy - 20, 'right');
+                label(L.no, cx - 14, hy + BH + 2, 'right');
+                break;
+            }
+            default:
+                svg += `<rect class="fg-shape fg-k-${cls}" x="${x0}" y="${y}" width="${w}" height="${BH}"></rect>`;
+                text(node, cx, y + BH / 2, cls);
+                hit(node, x0, y, x1, y + BH, x1, y);
+        }
+    }
+
+    function terminal(textValue, cx, y, editable) {
+        const w = Math.max(100, textWidth(textValue) + 40);
+        svg += `<rect class="fg-shape fg-k-term" x="${cx - w / 2}" y="${y}" width="${w}" height="${TH}" rx="${TH / 2}"></rect>` +
+            `<text class="fg-txt fg-t-term" x="${cx}" y="${y + TH / 2}">${esc(textValue)}</text>`;
+        if (editable) {
+            html += `<button type="button" class="fg-hit" data-fg-func="1" style="left:${cx - w / 2 - 3}px;top:${y - 3}px;width:${w + 6}px;height:${TH + 6}px" aria-label="${esc(L.funcProps)}" title="${esc(L.funcProps)}"></button>`;
+        }
+        return w;
+    }
+
+    function funcTitle(f) {
+        return current === 0 ? L.main : (f.name || '?');
+    }
+
+    function endTitle(f) {
+        return f.ret.type !== 'none' ? L.ret + ' ' + (f.ret.var || '?') : L.end;
+    }
+
+    // Draw the current function again from the model.
+    function render() {
+        const f = funcs[current];
+        const m = measureSeq(f.nodes);
+        const termW = Math.max(textWidth(funcTitle(f)), textWidth(endTitle(f))) / 2 + 30;
+        const left = Math.max(m.l, termW), right = Math.max(m.r, termW);
+        const cx = Math.round(PAD + left);
+        const width = Math.round(left + right + 2 * PAD);
+        svg = '';
+        html = '';
+        lists = [];
+        boxes = {};
+        terminal(funcTitle(f), cx, PAD, current > 0 && !readOnly);
+        const end = drawSeq(f.nodes, cx, PAD + TH, true);
+        terminal(endTitle(f), cx, end, false);
+        const height = end + TH + PAD;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        layer.innerHTML = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true">
+<defs><marker id="${markerId}" orient="auto" markerWidth="8" markerHeight="8" refX="1" refY="4" markerUnits="userSpaceOnUse"><path d="M0 0 L7 4 L0 8 Z" fill="#404040"></path></marker></defs>${svg}</svg>${html}`;
+        placePopups();
+    }
+
+    // ----- The menu of shapes and the editing windows -----
+
+    let menu = null;      // The menu of the shapes that can be inserted.
+    let pop = null;       // The editing window that is open.
+    let editing = null;   // The shape being edited, or {func: true}.
+
+    function makeRoom() {
+        let w = 0, h = 0;
+        [menu, pop].forEach(el => {
+            if (el) {
+                w = Math.max(w, el.offsetLeft + el.offsetWidth + 8);
+                h = Math.max(h, el.offsetTop + el.offsetHeight + 8);
+            }
+        });
+        canvas.style.minWidth = w ? w + 'px' : '';
+        canvas.style.minHeight = h ? h + 'px' : '';
+    }
+
+    function closeMenu() {
+        if (menu) {
+            menu.remove();
+            menu = null;
+            layer.querySelectorAll('.fg-plus.fg-open').forEach(b => b.classList.remove('fg-open'));
+            makeRoom();
+        }
+    }
+
+    function openMenu(button) {
+        closeMenu();
+        closePop();
+        button.classList.add('fg-open');
+        menu = document.createElement('div');
+        menu.className = 'fg-menu';
+        menu.setAttribute('data-fg-list', button.getAttribute('data-fg-list'));
+        menu.setAttribute('data-fg-index', button.getAttribute('data-fg-index'));
+        menu.innerHTML = ORDER.map(type =>
+            `<button type="button" data-fg-add="${type}">${icon(type)}<span>${esc(L.kinds[type])}</span></button>`).join('');
+        menu.style.left = (parseFloat(button.style.left) + 30) + 'px';
+        menu.style.top = (parseFloat(button.style.top) - 4) + 'px';
+        canvas.appendChild(menu);
+        makeRoom();
+        menu.querySelector('button').focus();
+    }
+
+    function closePop() {
+        if (pop) {
+            pop.remove();
+            pop = null;
+            const was = editing;
+            editing = null;
+            makeRoom();
+            render();
+            // Give the focus back to the shape that was being edited.
+            const back = was && was.id ? layer.querySelector(`[data-fg-edit="${was.id}"]`) :
+                was && was.func ? layer.querySelector('[data-fg-func]') : null;
+            if (back) {
+                back.focus();
+            }
+        }
+    }
+
+    // Put the editing window next to what it edits.
+    function placePopups() {
+        if (!pop || !editing) {
+            return;
+        }
+        let x = PAD, y = PAD;
+        if (editing.id) {
+            const box = boxes[editing.id];
+            if (!box) {
+                closePop();
+                return;
+            }
+            x = box.x1 + 16;
+            y = box.y0 - 6;
+        } else {
+            x = parseFloat(canvas.style.width) / 2 + 70;
+        }
+        pop.style.left = x + 'px';
+        pop.style.top = Math.max(0, y) + 'px';
+        makeRoom();
+    }
+
+    function field(name, labelText, value, extra) {
+        return `<label class="fg-field">${esc(labelText)}<input type="text" class="fg-in" data-fg-f="${name}" value="${esc(value)}" spellcheck="false" autocomplete="off"${extra || ''}></label>`;
+    }
+
+    function typeSelect(name, value, withNone, attrs) {
+        const options = (withNone ? ['none'] : []).concat(TYPES).map(t =>
+            `<option value="${t}"${t === value ? ' selected' : ''}>${esc(t === 'none' ? L.none : L.types[t])}</option>`).join('');
+        return `<select class="fg-in" data-fg-f="${name}"${attrs || ''}>${options}</select>`;
+    }
+
+    function popHead(iconHtml, title) {
+        return `<div class="fg-pophead">${iconHtml}<span>${esc(title)}</span><button type="button" class="fg-round" data-fg-act="pop-close" aria-label="${esc(L.close)}" title="${esc(L.close)}">${X_ICON}</button></div>`;
+    }
+
+    const POP_FOOT = () => `<div class="fg-popfoot"><button type="button" class="fg-btn" data-fg-act="pop-close">${esc(L.ok)}</button></div>`;
+
+    function shapeForm(node) {
+        const v = f => val(node, f);
+        let body = '';
+        switch (node.type) {
+            case 'declare':
+                body = field('names', L.f.names, node.names) +
+                    `<label class="fg-field">${esc(L.f.vtype)}${typeSelect('vtype', node.vtype, false)}</label>` +
+                    `<label class="fg-check"><input type="checkbox" data-fg-f="array"${node.array ? ' checked' : ''}>${esc(L.f.array)}</label>` +
+                    (node.array ? field('size', L.f.size, node.size) : '');
+                break;
+            case 'assign':
+                body = field('var', L.f.assignVar, node.var) + field('expr', L.f.expr, node.expr);
+                break;
+            case 'input':
+                body = field('var', L.f.inputVar, node.var);
+                break;
+            case 'output':
+                body = field('expr', L.f.expr, node.expr) +
+                    `<label class="fg-check"><input type="checkbox" data-fg-f="newline"${node.newline !== false ? ' checked' : ''}>${esc(L.f.newline)}</label>`;
+                break;
+            case 'if':
+            case 'while':
+            case 'do':
+                body = field('expr', L.f.cond, node.expr);
+                break;
+            case 'for':
+                body = field('var', L.f.var, node.var) +
+                    `<div class="fg-row2">${field('start', L.f.start, node.start)}${field('end', L.f.end, node.end)}</div>` +
+                    `<div class="fg-row2"><label class="fg-field">${esc(L.f.dir)}<select class="fg-in" data-fg-f="dir">` +
+                    `<option value="inc"${node.dir !== 'dec' ? ' selected' : ''}>${esc(L.f.inc)}</option>` +
+                    `<option value="dec"${node.dir === 'dec' ? ' selected' : ''}>${esc(L.f.dec)}</option></select></label>` +
+                    field('step', L.f.step, node.step) + '</div>';
+                break;
+            case 'call':
+                body = field('expr', L.f.callExpr, node.expr);
+                break;
+            case 'comment':
+                body = `<label class="fg-field">${esc(L.f.text)}<textarea class="fg-in" data-fg-f="text" rows="3" spellcheck="true">${esc(v('text'))}</textarea></label>`;
+                break;
+        }
+        return popHead(icon(node.type), L.kinds[node.type]) + body + POP_FOOT();
+    }
+
+    function funcForm(f) {
+        const params = f.params.map((p, i) =>
+            `<div class="fg-param"><input type="text" class="fg-in" data-fg-p="${i}" data-fg-pf="name" value="${esc(p.name)}" placeholder="${esc(L.paramName)}" aria-label="${esc(L.paramName)}" spellcheck="false" autocomplete="off">` +
+            typeSelect('', p.type, false, ` data-fg-p="${i}" data-fg-pf="type" aria-label="${esc(L.f.vtype)}"`) +
+            `<label><input type="checkbox" data-fg-p="${i}" data-fg-pf="array"${p.array ? ' checked' : ''}>${esc(L.w.array)}</label>` +
+            `<button type="button" class="fg-round" data-fg-act="param-del" data-fg-p="${i}" aria-label="${esc(L.remove)}" title="${esc(L.remove)}">${X_ICON}</button></div>`).join('');
+        return popHead('', L.funcLabel + ': ' + (f.name || '?')) +
+            field('fname', L.fname, f.name) +
+            `<div class="fg-sub">${esc(L.params)}</div>${params || `<p>${esc(L.noParams)}</p>`}` +
+            `<div><button type="button" class="fg-btn" data-fg-act="param-add">${PLUS_ICON}<span>${esc(L.addParam)}</span></button></div>` +
+            `<div class="fg-row2" style="margin-top:10px"><label class="fg-field">${esc(L.retType)}${typeSelect('rtype', f.ret.type, true)}</label>` +
+            (f.ret.type !== 'none' ? field('rvar', L.retVar, f.ret.var) : '') + '</div>' + POP_FOOT();
+    }
+
+    function openPop(target, focusField) {
+        closeMenu();
+        if (pop) {
+            pop.remove();
+        }
+        editing = target;
+        pop = document.createElement('div');
+        pop.className = 'fg-pop';
+        pop.setAttribute('role', 'dialog');
+        pop.innerHTML = target.func ? funcForm(funcs[current]) : shapeForm(target);
+        canvas.appendChild(pop);
+        render();
+        const first = (focusField && pop.querySelector(focusField)) || pop.querySelector('.fg-in');
+        if (first) {
+            first.focus();
+        }
+    }
+
+    // A change in an editing window: update the model and the drawing.
+    function popChanged(input) {
+        const name = input.getAttribute('data-fg-f');
+        const value = input.type === 'checkbox' ? input.checked : input.value;
+        let rebuild = null;
+        if (editing && editing.func) {
+            const f = funcs[current];
+            const p = input.getAttribute('data-fg-p');
+            if (p !== null) {
+                f.params[+p][input.getAttribute('data-fg-pf')] = value;
+            } else if (name === 'fname') {
+                f.name = value;
+                pop.querySelector('.fg-pophead span').textContent = L.funcLabel + ': ' + (value || '?');
+                renderFuncs();
+            } else if (name === 'rtype') {
+                f.ret.type = value;
+                rebuild = '[data-fg-f="rtype"]';
+            } else if (name === 'rvar') {
+                f.ret.var = value;
+            }
+        } else if (editing) {
+            editing[name] = value;
+            if (name === 'array') {
+                rebuild = '[data-fg-f="array"]';
+            }
+        }
+        save();
+        if (rebuild) {
+            openPop(editing, rebuild);
+        } else {
+            render();
+        }
+    }
+
+    function insert(listKey, index, type) {
+        const node = prepare([newNode(type)])[0];
+        lists[listKey].splice(index, 0, node);
+        save();
+        render();
+        openPop(node);
+    }
+
+    function remove(id) {
+        const found = find(id, funcs[current].nodes);
+        if (found) {
+            if (editing && (editing.id === id || find(editing.id, [found.node]))) {
+                closePop();
+            }
+            found.list.splice(found.index, 1);
+            save();
+            render();
+        }
+    }
+
+    canvas.addEventListener('click', event => {
+        if (readOnly) {
+            return;
+        }
+        const add = event.target.closest('[data-fg-add]');
+        if (add && menu) {
+            const listKey = parseInt(menu.getAttribute('data-fg-list'));
+            const index = parseInt(menu.getAttribute('data-fg-index'));
+            closeMenu();
+            insert(listKey, index, add.getAttribute('data-fg-add'));
+            return;
+        }
+        if (pop && pop.contains(event.target)) {
+            const act = event.target.closest('[data-fg-act]');
+            const what = act ? act.getAttribute('data-fg-act') : '';
+            if (what === 'pop-close') {
+                closePop();
+            } else if (what === 'param-add') {
+                funcs[current].params.push({ name: '', type: 'integer', array: false });
+                save();
+                openPop(editing, `[data-fg-p="${funcs[current].params.length - 1}"]`);
+            } else if (what === 'param-del') {
+                funcs[current].params.splice(+act.getAttribute('data-fg-p'), 1);
+                save();
+                openPop(editing, '[data-fg-act="param-add"]');
+            }
+            return;
+        }
+        const plus = event.target.closest('.fg-plus');
+        if (plus) {
+            if (plus.classList.contains('fg-open')) {
+                closeMenu();
+            } else {
+                openMenu(plus);
+            }
+            return;
+        }
+        closeMenu();
+        const del = event.target.closest('[data-fg-del]');
+        if (del) {
+            remove(parseInt(del.getAttribute('data-fg-del')));
+            return;
+        }
+        const edit = event.target.closest('[data-fg-edit]');
+        if (edit) {
+            const found = find(parseInt(edit.getAttribute('data-fg-edit')), funcs[current].nodes);
+            if (found) {
+                openPop(found.node);
+            }
+            return;
+        }
+        if (event.target.closest('[data-fg-func]')) {
+            openPop({ func: true });
+            return;
+        }
+        closePop();
+    });
+
+    canvas.addEventListener('input', event => {
+        if (pop && pop.contains(event.target) && !event.isComposing &&
+                (event.target.hasAttribute('data-fg-f') || event.target.hasAttribute('data-fg-p'))) {
+            if (event.target.tagName !== 'SELECT' && event.target.type !== 'checkbox') {
+                popChanged(event.target);
+            }
+        }
+    });
+
+    canvas.addEventListener('change', event => {
+        if (pop && pop.contains(event.target) &&
+                (event.target.tagName === 'SELECT' || event.target.type === 'checkbox')) {
+            popChanged(event.target);
+        }
+    });
+
+    canvas.addEventListener('compositionend', event => {
+        if (pop && pop.contains(event.target)) {
+            popChanged(event.target);
+        }
+    });
+
+    canvas.addEventListener('keydown', event => {
+        if (event.keyCode === 13 && event.target.tagName === 'INPUT') {
+            event.preventDefault();  // Enter must not submit the form.
+            if (pop && pop.contains(event.target)) {
+                closePop();
+            }
+        } else if (event.keyCode === 27 && (menu || pop)) {
+            event.stopPropagation();
+            closeMenu();
+            closePop();
+        }
+    });
+
+    // ----- The bar: functions, language, start over and help -----
+
+    let confirming = '';   // 'reset' or 'func' while a deletion is being confirmed.
+
+    function renderFuncs() {
+        const options = funcs.map((f, i) =>
+            `<option value="${i}"${i === current ? ' selected' : ''}>${esc(i === 0 ? L.main : (f.name || '?'))}</option>`).join('');
+        let buttons = '';
+        if (!readOnly && confirming === 'func') {
+            buttons = `<span class="fg-ask">${esc(L.delFuncAsk)}</span>
+<button type="button" class="fg-btn fg-danger" data-fg-act="func-del-yes">${esc(L.resetYes)}</button>
+<button type="button" class="fg-btn" data-fg-act="ask-no">${esc(L.cancel)}</button>`;
+        } else if (!readOnly) {
+            buttons = `<button type="button" class="fg-btn" data-fg-act="func-add">${PLUS_ICON}<span>${esc(L.addFunc)}</span></button>` +
+                (current > 0 ? `<button type="button" class="fg-btn" data-fg-act="func-props">${GEAR_ICON}<span>${esc(L.funcProps)}</span></button>` +
+                    `<button type="button" class="fg-btn" data-fg-act="func-del" title="${esc(L.delFunc)}" aria-label="${esc(L.delFunc)}">${X_ICON}</button>` : '');
+        }
+        funcsBar.innerHTML = `<label class="fg-lbl" for="${T}-fg-fsel">${esc(L.funcLabel)}</label><select id="${T}-fg-fsel" class="fg-sel" data-fg-act="func-sel">${options}</select>${buttons}`;
+    }
+
+    function renderTools() {
+        const options = Object.keys(I18N).map(code =>
+            `<option value="${code}"${code === lang ? ' selected' : ''}>${esc(I18N[code].name)}</option>`).join('');
+        let reset = '';
+        if (!readOnly && confirming === 'reset') {
+            reset = `<span class="fg-ask">${esc(L.resetAsk)}</span>
+<button type="button" class="fg-btn fg-danger" data-fg-act="reset-yes">${esc(L.resetYes)}</button>
+<button type="button" class="fg-btn" data-fg-act="ask-no">${esc(L.cancel)}</button>`;
+        } else if (!readOnly) {
+            reset = `<button type="button" class="fg-btn" data-fg-act="reset" title="${esc(L.resetTip)}">${RESET_ICON}<span>${esc(L.reset)}</span></button>`;
+        }
+        toolsBar.innerHTML = `<select class="fg-sel" data-fg-act="lang" aria-label="${esc(L.language)}" title="${esc(L.language)}">${options}</select>${reset}
+<button type="button" class="fg-btn" data-fg-act="help" aria-expanded="${helpWin.hidden ? 'false' : 'true'}">${HELP_ICON}<span>${esc(L.help)}</span></button>`;
+    }
+
+    function renderHelp() {
+        const code = t => t.split(' | ').map(part => `<code>${esc(part)}</code>`).join(' ');
+        const shapes = ORDER.map(type =>
+            `<div class="fg-hrow">${icon(type)}<div><b>${esc(L.kinds[type])}</b>${L.shapes[type][0] ? ' <code>' + esc(L.shapes[type][0]) + '</code>' : ''}<span class="fg-desc">${esc(L.shapes[type][1])}</span></div></div>`).join('');
+        const ops = L.ops.map(op =>
+            `<div class="fg-hrow fg-op"><b>${esc(op[0])}</b><div>${code(op[1])}${op[2] ? '<span class="fg-desc">' + esc(op[2]).replace('&amp;', '<code>&amp;</code>') + '</span>' : ''}</div></div>`).join('');
+        helpWin.setAttribute('aria-label', L.help);
+        helpWin.innerHTML = `<div class="fg-helphead"><span>${esc(L.help)}</span><button type="button" class="fg-round" data-fg-act="help-close" aria-label="${esc(L.close)}" title="${esc(L.close)}">${X_ICON}</button></div>
+<div class="fg-h">${esc(L.hShapes)}</div>${shapes}
+<div class="fg-h">${esc(L.hRules)}</div>${L.rules.map(r => '<p>• ' + esc(r) + '</p>').join('')}
+<div class="fg-h">${esc(L.hOps)}</div>${ops}
+<div class="fg-h">${esc(L.hFuncs)}</div><p>${esc(L.funcsText)}</p>
+<div class="fg-h">${esc(L.hMine)}</div><p>${esc(L.mineText)}</p>
+<div class="fg-h">${esc(L.hAdd)}</div><p>${esc(L.addText).replace('{plus}', '<span class="fg-mini fg-mini-plus">' + PLUS_ICON + '</span>')}</p>
+<div class="fg-h">${esc(L.hDel)}</div><p>${esc(L.delText).replace('{del}', '<span class="fg-mini fg-mini-del">' + X_ICON + '</span>')}</p>`;
+    }
+
+    function showHelp(show) {
+        helpWin.hidden = !show;
+        const button = toolsBar.querySelector('[data-fg-act="help"]');
+        if (button) {
+            button.setAttribute('aria-expanded', show ? 'true' : 'false');
+        }
+    }
+
+    function selectFunc(index) {
+        closeMenu();
+        if (pop) {
+            pop.remove();
+            pop = null;
+            editing = null;
+        }
+        current = Math.max(0, Math.min(index, funcs.length - 1));
+        confirming = '';
+        renderFuncs();
+        render();
+        makeRoom();
+    }
+
+    // The language chosen before by this person, if the browser kept it.
+    function rememberedLang() {
+        try {
+            return window.localStorage.getItem('unicv-fg-lang') || '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function setLang(code, chosen) {
+        lang = I18N[code] ? code : 'pt';
+        L = I18N[lang];
+        if (chosen) {
+            try {
+                window.localStorage.setItem('unicv-fg-lang', lang);
+            } catch (e) {
+                // The choice is just not remembered.
+            }
+            save();
+        }
+        closeMenu();
+        renderFuncs();
+        renderTools();
+        renderHelp();
+        if (pop && editing) {
+            openPop(editing);
+        } else {
+            render();
+        }
+    }
+
+    function barClick(event) {
+        const button = event.target.closest('button[data-fg-act]');
+        const act = button ? button.getAttribute('data-fg-act') : '';
+        if (act === 'help') {
+            showHelp(helpWin.hidden);
+            return;
+        }
+        if (readOnly || !act) {
+            return;
+        }
+        if (act === 'func-add') {
+            const used = funcs.map(f => f.name.toLowerCase());
+            let n = 1;
+            while (used.includes((L.newFunc + n).toLowerCase())) {
+                n++;
+            }
+            funcs.push(newFunc(L.newFunc + n));
+            save();
+            selectFunc(funcs.length - 1);
+            openPop({ func: true });
+        } else if (act === 'func-props') {
+            openPop({ func: true });
+        } else if (act === 'func-del') {
+            confirming = 'func';
+            renderFuncs();
+            funcsBar.querySelector('[data-fg-act="ask-no"]').focus();
+        } else if (act === 'func-del-yes') {
+            funcs.splice(current, 1);
+            save();
+            selectFunc(current - 1);
+        } else if (act === 'reset') {
+            // Nothing to confirm when there is nothing yet.
+            if (funcs.length > 1 || funcs[0].nodes.length) {
+                confirming = 'reset';
+                renderTools();
+                toolsBar.querySelector('[data-fg-act="ask-no"]').focus();
+            }
+        } else if (act === 'reset-yes') {
+            // Back to how the question is when first opened: only the start and the end.
+            confirming = '';
+            funcs = [newFunc('Main')];
+            save();
+            renderTools();
+            selectFunc(0);
+        } else if (act === 'ask-no') {
+            confirming = '';
+            renderFuncs();
+            renderTools();
+        }
+    }
+
+    funcsBar.addEventListener('click', barClick);
+    toolsBar.addEventListener('click', barClick);
+
+    funcsBar.addEventListener('change', event => {
+        if (event.target.getAttribute('data-fg-act') === 'func-sel') {
+            selectFunc(parseInt(event.target.value));
+        }
+    });
+
+    toolsBar.addEventListener('change', event => {
+        if (event.target.getAttribute('data-fg-act') === 'lang') {
+            setLang(event.target.value, true);
+        }
+    });
+
+    helpWin.addEventListener('click', event => {
+        if (event.target.closest('[data-fg-act="help-close"]')) {
+            showHelp(false);
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.keyCode === 27 && !helpWin.hidden) {
+            showHelp(false);
+        }
+    });
+
+    document.addEventListener('click', event => {
+        if (!event.target.isConnected) {
+            return;  // A button that has just been replaced (e.g. in the menu).
+        }
+        if (!helpWin.hidden && !helpWin.contains(event.target) && !toolsBar.contains(event.target)) {
+            showHelp(false);
+        }
+        if ((menu || pop) && !canvas.contains(event.target) && !funcsBar.contains(event.target) &&
+                !toolsBar.contains(event.target)) {
+            closeMenu();
+            closePop();
+        }
+    });
+
+    // The language is the one of the answer; otherwise the one this person
+    // chose before, and otherwise the one of the Moodle page.
+    load();
+    const pageLang = (document.documentElement.lang || '').slice(0, 2).toLowerCase();
+    setLang(answerLang || rememberedLang() || pageLang, false);
+
+})();
+</script>
+]]></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>
