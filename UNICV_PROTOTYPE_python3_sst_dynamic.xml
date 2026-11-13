@@ -1,0 +1,1091 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text>UNICV_PROTOTYPE_python3_sst_dynamic</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>The prototype for a question type that asks a student to step through the execution of a given bit of code line-by-line, updating the program state at each step in a given table.</p>
+<p>This is the UniCV variant of python3_sst with a <strong>dynamic table</strong>. The author and the student add steps ("Add step" under the table, or Enter in the last row) and variable columns ("+ Variable" in the table header) as they are needed, and can remove any step or variable with its "x" button, so neither the number of steps nor the variables have to be fixed (or revealed) in advance: the student identifies the variables and adds a column for each one.</p>
+<p>When grading, trailing rows with no line number and trailing columns with no name and no values are ignored, and the variable columns may be in any order. For a program with no variables, remove all the variable columns (or leave a single unnamed, empty one).</p>
+<p>To create a new question of this type:</p>
+<ol>
+<li>Create a new coderunner question of type python3_sst_dynamic</li>
+<li>Fill in the question name and question text and set the output for the first test case to OK.</li>
+<li>Save.</li>
+<li>Open the Answer Preload section.</li>
+<li>The columns grow automatically as you type. The "Table options" panel above the answer is optional: it sets the minimum column widths and turns the printed output column and the return value row on or off (width 0 = off).</li>
+<li>Fill in the answer SST with the required values, adding steps and variables as you go.</li>
+<li>In the Answer Preload section, set the table the student starts with (by default one step and one unnamed variable column; remove the column to start with none). The size of the preload table is independent of the answer. To give the variable names to the student, type them in the preload table.</li>
+<li>Save</li>
+</ol>
+<p> </p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3_sst_dynamic</coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>10</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[{"num_vars":["1"],"num_rows":["1"],"var_widths":["[100]"],"output_width":["100"],"return_width":["0"],"var_classes":[""],"variable_name":[""],"line_number":[""],"variable_value":[""],"output":[""]}]]></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA[import json
+import ast
+
+class BadLiteral(Exception): pass
+
+def partition(values, num_cols):
+    """Return the given list of values partitioned into a 2D array with given number of columns"""
+    if num_cols == 0:
+        return []  # A program with no variables.
+    num_rows = len(values) // num_cols
+    table = [[values[row * num_cols + col] for col in range(num_cols)] for row in range(num_rows)]
+    return table
+
+def first_error(got_cells, expected_cells):
+    """Return the index of the first difference"""
+    for i, (got, expect) in enumerate(zip(got_cells, expected_cells)):
+        if got != expect:
+            return i
+    return None  # Shouldn't happen
+
+
+def parse_literals(lits):
+    """Use ast.eval_literal to convert a list of string values into
+       a list of Python literal values, which is returned.
+       Any parse errors raise BadLiteral(bad_string).
+    """
+    values = []
+    for lit in lits:
+        if lit == '':
+            values.append(lit)
+        else:
+            try:
+                values.append(ast.literal_eval(lit))
+            except:
+                raise BadLiteral(lit)
+    return values
+    
+
+def check_return(got_return, expected_return):
+    """Return true if return value is correct, print and
+       error and return false otherwise
+    """
+    try:
+        expected_return_value = ast.literal_eval(expected_return)
+    except:
+        print("Naughty question author: invalid literal for expected return value")
+        return False
+        
+    try:
+        got_return_value = ast.literal_eval(got_return)
+    except:
+        print("Your return value is not valid. Missing quotes perhaps?")
+        
+    if type(got_return_value) != type(expected_return_value):
+        print("Your return value is of the wrong type.")
+        print(f"Expected {type(expected_return_value)}, got {type(got_return_value)}")
+        return False
+        
+    if got_return_value != expected_return_value:
+        print("Your return value is wrong")
+        return False
+    
+    return True
+
+def trim_trailing_rows(table):
+    """Remove, in place, the trailing rows of the table that have no line
+       number and no output. The table size is chosen by whoever fills it in
+       (rows are added on demand), so unused rows at the bottom are ignored.
+       If there is a return-value row, it is always the last one and is kept.
+    """
+    lines = table.get('line_number', [])
+    names = table.get('variable_name', [])
+    values = table.get('variable_value', [])
+    outputs = table.get('output')
+    num_cols = len(names)
+    body_rows = len(lines) - (1 if 'return_value' in table else 0)
+    while body_rows > 0:
+        row = body_rows - 1
+        if lines[row].strip() != '':
+            break
+        if outputs is not None and row < len(outputs) and outputs[row].strip() != '':
+            break
+        del lines[row]
+        del values[row * num_cols:(row + 1) * num_cols]
+        if outputs is not None and row < len(outputs):
+            del outputs[row]
+        body_rows -= 1
+
+
+def trim_trailing_columns(table):
+    """Remove, in place, the trailing variable columns of the table that have
+       no name and no values (columns are added on demand, so unused ones at
+       the right are ignored). A program with no variables has no columns.
+    """
+    names = table.get('variable_name', [])
+    while names and names[-1].strip() == '':
+        num_cols = len(names)
+        values = table.get('variable_value', [])
+        if any(v.strip() != '' for v in values[num_cols - 1::num_cols]):
+            break
+        table['variable_value'] = [v for i, v in enumerate(values) if i % num_cols != num_cols - 1]
+        names.pop()
+
+
+def reorder_columns(table, wanted_names):
+    """Reorder, in place, the variable columns of the table so that the
+       variable names are in the order given by wanted_names.
+    """
+    names = [s.strip() for s in table['variable_name']]
+    num_cols = len(names)
+    order = [names.index(name) for name in wanted_names]
+    values = table['variable_value']
+    new_values = []
+    for start in range(0, len(values), num_cols):
+        row = values[start:start + num_cols]
+        new_values.extend(row[i] for i in order)
+    table['variable_value'] = new_values
+    table['variable_name'] = list(wanted_names)
+
+
+got = json.loads("""{{ STUDENT_ANSWER | e('py') }}""")
+expected = json.loads("""{{ QUESTION.answer | e('py') }}""")
+for __table in (got, expected):
+    # A table with no variable columns has no variable fields at all.
+    __table.setdefault('variable_name', [])
+    __table.setdefault('variable_value', [])
+trim_trailing_rows(got)
+trim_trailing_rows(expected)
+trim_trailing_columns(got)
+trim_trailing_columns(expected)
+
+# The student chooses the columns, so they may be in any order.
+__got_names = [s.strip() for s in got['variable_name']]
+__expected_names = [s.strip() for s in expected['variable_name']]
+if (__got_names != __expected_names and sorted(__got_names) == sorted(__expected_names)
+        and len(set(__got_names)) == len(__got_names)):
+    reorder_columns(got, __expected_names)
+
+ok = True
+got_vars = [s.strip() for s in got['variable_name']]
+got_vars_lc = [s.lower() for s in got_vars]
+expected_vars = [s.strip() for s in expected['variable_name']]
+num_vars = len(expected_vars)
+expected_vars_lc = [s.lower() for s in expected_vars]
+has_output = 'output' in expected
+has_return = 'return_value' in expected
+
+if has_output:
+    expected_output = [s.strip() for s in expected['output']]
+    got_output = [s.strip() for s in got['output']]
+
+if has_return:
+    expected_return = expected['return_value'][0].strip()
+    got_return = got['return_value'][0].strip()
+
+if  got_vars != expected_vars:
+    # Deal with wrong list of variable names
+    if len(set(got_vars)) != len(got_vars):
+        print("The same variable appears in more than one column.")
+    elif set(got_vars) == set(expected_vars):
+        print("Your variable names are in the wrong order")
+    elif got_vars_lc == expected_vars_lc:
+        print('Variable names must be lower case')
+    else:
+        print("The variable names in the top row are not right.")
+        if '' in got_vars:
+            print("Every variable column must have a name.")
+    ok = False
+
+if ok:
+    # Process the list of line numbers
+    got_line_nums = [s.strip().lower() for s in got['line_number']]
+    expected_line_nums  = [s.strip().lower() for s in expected['line_number']]
+    if got_line_nums != expected_line_nums:
+        print("The sequence of line numbers is wrong.")
+        if len(got_line_nums) < len(expected_line_nums):
+            print("Your table has too few steps. Use 'Add step' to add more.")
+        elif len(got_line_nums) > len(expected_line_nums):
+            print("Your table has too many steps.")
+        ok = False
+
+if ok:
+    # Process the list of variables
+    got_values = partition([s.strip() for s in got['variable_value']], num_vars)
+    expected_values = partition([s.strip() for s in expected['variable_value']], num_vars)
+    for i, var in enumerate(got_vars):
+        try:
+            got_var_values = parse_literals([got_values[row][i] for row in range(len(got_values))])
+            expected_var_values = parse_literals([expected_values[row][i] for row in range(len(expected_values))])
+            if got_var_values != expected_var_values:
+                print(f"Your values for the variable '{var}' aren't right.")
+                line = first_error(got_var_values, expected_var_values)
+                print(f"The first error is at step {line + 1} (line number {got_line_nums[line]}).")
+                got = got_var_values[line]
+                expected = expected_var_values[line]
+                if type(got) != type(expected):
+                    print("Your value is of the wrong type.")
+                    print(f"Expected {type(expected)}, got {type(got)}")
+                ok = False
+        except BadLiteral as bl:
+            print(f"'{bl}' is an invalid value. Might be missing quotes?")
+            ok = False
+
+            
+if ok and has_output:
+    # Process the output
+    if got_output != expected_output:
+        print("The output table is wrong")
+        step = first_error(got_output, expected_output)
+        line_number = got_line_nums[step]
+        print(f"The first error is at step {step + 1} (line number {line_number}).")
+        ok = False
+
+if ok and has_return:
+    ok = check_return(got_return, expected_return)
+
+if ok:
+    print("OK")
+]]></template>
+    <iscombinatortemplate>0</iscombinatortemplate>
+    <allowmultiplestdins>0</allowmultiplestdins>
+    <answer><![CDATA[{"num_vars":["1"],"num_rows":["1"],"var_widths":["100"],"output_width":["100"],"return_width":["0"],"var_classes":[""],"variable_name":[""],"line_number":[""],"variable_value":[""],"output":[""]}]]></answer>
+    <validateonsave>0</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader>EqualityGrader</grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>1</twigall>
+    <uiplugin>html</uiplugin>
+    <uiparameters><![CDATA[{ "html_src": "prototypeextra" }]]></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra><![CDATA[<script>
+// If the DOM header does not already contain the style sheet for this
+// question type, insert it.
+if (document.getElementsByClassName('qtype-coderunner-sst2').length === 0) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+    table.cr-sst-ctl {
+        width: auto;
+    }
+
+    table.cr-sst-ctl td, table.cr-sst-ctl th {
+        padding: 8px;
+    }
+
+    div.sst2-box {
+        background: #ffffff;
+        border: 1px solid #c4cdd5;
+        border-radius: 8px;
+        padding: 16px;
+        color: #1d2125;
+    }
+
+    div.sst-ui {
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    table.sst2 {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: auto;
+        font-size: 14px;
+    }
+
+    table.sst2 th {
+        height: 44px;
+        padding: 0 4px;
+        font-weight: 600;
+        color: #48535e;
+        text-align: left;
+        white-space: nowrap;
+        border-bottom: 2px solid #1d2125;
+        background: transparent;
+    }
+
+    table.sst2 td {
+        height: 44px;
+        padding: 0 4px;
+        border: none;
+        background: transparent;
+    }
+
+    table.sst2 th.sst-step, table.sst2 td.sst-step,
+    table.sst2 th.sst-line, table.sst2 td.sst-line {
+        text-align: center;
+    }
+
+    table.sst2 td.sst-step {
+        min-width: 44px;
+        color: #48535e;
+    }
+
+    table.sst2 th.sst-gap, table.sst2 td.sst-gap {
+        width: 12px;
+        padding: 0;
+    }
+
+    table.sst2 tbody tr.sst-current td {
+        background: #fff4ce;
+    }
+
+    table.sst2 tbody tr.sst-current td.sst-step {
+        color: #1d2125;
+        font-weight: 700;
+    }
+
+    table.sst2 tbody tr.sst-current td:first-child {
+        border-radius: 4px 0 0 4px;
+    }
+
+    table.sst2 tbody tr.sst-current td:last-child {
+        border-radius: 0 4px 4px 0;
+    }
+
+    table.sst2 input {
+        box-sizing: border-box;
+        height: 34px;
+        margin: 0;
+        padding: 0 8px;
+        border: 1px solid #8f959e;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #1d2125;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 14px;
+    }
+
+    table.sst2 input.cr-linenumber {
+        text-align: center;
+    }
+
+    table.sst2 input.cr-variable-name {
+        font-weight: 700;
+    }
+
+    table.sst2 input.cr-variable.cr-undefined,
+    table.sst2 input.cr-output {
+        border-color: #c4cdd5;
+    }
+
+    table.sst2 input.cr-variable.cr-explicit {
+        border-color: #0f6cbf;
+        background: #dceafc;
+        font-weight: 700;
+    }
+
+    table.sst2 input.cr-variable.cr-filled-down {
+        border-color: #c4cdd5;
+        background: #f1f3f5;
+        color: #5f6b76;
+    }
+
+    table.sst2 .sst-varhead {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    table.sst2 button.sst-x {
+        width: 28px;
+        height: 34px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #5f6b76;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    table.sst2 button.sst-x:hover, table.sst2 button.sst-x:focus {
+        background: #f8d7da;
+        color: #a51d2a;
+    }
+
+    button.sst-add {
+        box-sizing: border-box;
+        height: 34px;
+        padding: 0 12px;
+        border: 1px dashed #0f6cbf;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #0f6cbf;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    button.sst-add:hover, button.sst-add:focus {
+        background: #dceafc;
+    }
+
+    table.sst2 .sst-empty {
+        margin-left: 12px;
+        font-size: 13px;
+        font-weight: 400;
+        color: #48535e;
+    }
+
+    table.sst2 td.sst-return {
+        border-top: 1px solid #c4cdd5;
+        font-weight: 600;
+        color: #48535e;
+        white-space: nowrap;
+    }
+
+    div.sst-footer {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 10px;
+    }
+
+    div.sst-footer .sst-hint, div.sst-legend {
+        font-size: 13px;
+        color: #48535e;
+    }
+
+    div.sst-legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 20px;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    div.sst-legend span.sst-key {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    div.sst-legend span.sst-swatch {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 18px;
+        height: 14px;
+        border-radius: 3px;
+        border: 1px solid #c4cdd5;
+    }
+`;
+    styleElement.classList.add('qtype-coderunner-sst2');
+    document.head.append(styleElement);
+}
+</script>
+
+<div id="___textareaId___-controlpanel" style="display:none">
+    <input id="___textareaId___-num_vars" type="hidden" name="num_vars" class="coderunner-ui-element" value="1">
+    <input id="___textareaId___-num_rows" type="hidden" name="num_rows" class="coderunner-ui-element" value="1">
+    <p><b>Table options</b> (optional). The table is sized with the buttons in it and
+    the columns grow automatically as you type; these are only minimum widths, in pixels.</p>
+    <table class="table table-bordered cr-sst-ctl">
+        <tr><th>Option</th><th>Minimum width</th></tr>
+    <tr><td>Variable columns</td><td><input id="___textareaId___-var_widths" type="text" name="var_widths" class="coderunner-ui-element" value="100"></td></tr>
+    <tr><td>Printed output column (0 = no output column)</td><td><input id="___textareaId___-output_width" type="text" name="output_width" class="coderunner-ui-element" value="100"></td></tr>
+    <tr><td>Return value row (0 = no return value row)</td><td><input id="___textareaId___-return_width" type="text" name="return_width" class="coderunner-ui-element" value="0"></td></tr>
+    </table>
+</div>
+<input type="hidden" id="___textareaId___-cr-var-classes" class="coderunner-ui-element" name="var_classes">
+<div class="sst2-box">
+    <div id="___textareaId___-sst-ui-div" class="sst-ui">
+    </div>
+    <div id="___textareaId___-sst-footer" class="sst-footer">
+        <button type="button" id="___textareaId___-sst-add-row" class="sst-add"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"></path></svg>Add step</button>
+        <span class="sst-hint">or press Enter in the last row</span>
+    </div>
+    <div class="sst-legend">
+        <span class="sst-key"><span class="sst-swatch" style="background:#dceafc;border-color:#0f6cbf"></span>Value you set in this step</span>
+        <span class="sst-key"><span class="sst-swatch" style="background:#f1f3f5"></span>Value carried over from the step above</span>
+        <span class="sst-key"><span class="sst-swatch" style="background:#fff4ce;border-color:#c9a227"></span>Step you are working on</span>
+    </div>
+</div>
+
+<script>
+(() => {
+
+    //jshint esversion: 6
+
+    // Every function takes the id of the textarea whose table it works on,
+    // because while authoring the script of the sample answer also rebuilds
+    // the table of the answer preload.
+
+    const PLUS_ICON = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"></path></svg>';
+    const X_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"></path></svg>';
+
+    function byId(id) {
+        return document.getElementById(id);
+    }
+
+    // Escape a value for use inside a double-quoted HTML attribute.
+    function esc(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /**
+     *  Return the value of the ith element of the attribute with the given name
+     *  from the data object, if it exists, or the empty string otherwise.
+     */
+    function getValue(data, name, i) {
+        if (data.hasOwnProperty(name) && data[name].length > i) {
+            return data[name][i];
+        } else {
+            return '';
+        }
+    }
+
+    // Given the value of the var-widths field return a list of the minimum
+    // widths of all variable columns. It might be an int or a json list of ints.
+    function getVariableWidths(field, num_vars) {
+        let widths = [];
+        let width = parseInt(field);
+        if (isNaN(width)) {
+            try {
+                widths = JSON.parse(field);
+                width = widths[widths.length - 1];
+            } catch (e) {
+                widths = [];
+                width = 100;  // Empty or invalid field: use the default.
+            }
+        }
+        while (widths.length < num_vars) {
+            widths.push(width);
+        }
+        return widths;
+    }
+
+    // Get a params record for the given textarea.
+    function getParams(textareaId) {
+        const num_vars = parseInt(byId(textareaId + '-num_vars').value) || 0;
+        return {
+            num_vars: num_vars,
+            num_rows: parseInt(byId(textareaId + '-num_rows').value) || 1,
+            output_width: parseInt(byId(textareaId + '-output_width').value) || 0,
+            return_width: parseInt(byId(textareaId + '-return_width').value) || 0,
+            var_widths: getVariableWidths(byId(textareaId + '-var_widths').value, num_vars)
+        };
+    }
+
+    // The number of step rows (all rows except the return-value row, if any).
+    function stepRows(params) {
+        return params.num_rows - (params.return_width > 0 ? 1 : 0);
+    }
+
+    // True if the answer cannot be edited (e.g. when reviewing an attempt).
+    function isReadOnly(textareaId) {
+        const textarea = byId(textareaId);
+        return !!(textarea && (textarea.readOnly || textarea.disabled));
+    }
+
+    // The display classes ('cr-explicit' or 'cr-filled-down') of the variable
+    // cells, keyed by 'cr-sst-var-<row>-<col>', as stored in the answer.
+    function getStates(textareaId) {
+        const value = byId(textareaId + '-cr-var-classes').value;
+        if (!value) {
+            return {};
+        }
+        try {
+            return JSON.parse(value);
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function setStates(textareaId, states) {
+        const value = JSON.stringify(states);
+        // An empty value keeps the serialisation of an empty answer empty.
+        byId(textareaId + '-cr-var-classes').value = value === '{}' ? '' : value;
+    }
+
+    // Renumber the stored display classes after a row or a column is removed.
+    // move(row, col) returns the new [row, col] of a cell, or null to drop it.
+    function moveStates(textareaId, move) {
+        const states = getStates(textareaId);
+        const moved = {};
+        for (const key in states) {
+            const bits = key.split('-');
+            const cell = move(parseInt(bits[bits.length - 2]), parseInt(bits[bits.length - 1]));
+            if (cell !== null) {
+                moved[`cr-sst-var-${cell[0]}-${cell[1]}`] = states[key];
+            }
+        }
+        setStates(textareaId, moved);
+    }
+
+    /**
+     * Return the HTML for the SST table element to insert into the DOM.
+     * A complication here is that this script runs *after* the HTML-UI has
+     * attempted to load all the fields with the values from the textarea.
+     * Since the table didn't exist at that time, all the values have been
+     * placed into the data-leftovers attribute of the HTML outer div and
+     * need to be fetched from there.
+     */
+    function buildTable(data, params, textareaId) {
+        const readOnly = isReadOnly(textareaId);
+        const lock = readOnly ? ' readonly' : '';
+        const has_output = params.output_width > 0;
+        const has_return = params.return_width > 0;
+        const num_steps = stepRows(params);
+        let html = '<table class="sst2"><thead><tr>' +
+            '<th class="sst-step">Step</th><th class="sst-line">Line</th><th class="sst-gap"></th>';
+
+        for (let j = 1; j <= params.num_vars; j++) {
+            const name = getValue(data, 'variable_name', j - 1);
+            html += `<th class="sst-var"><div class="sst-varhead">
+<input id="${textareaId}-cr-sst-var-0-${j}" class="coderunner-ui-element cr-variable-name" name="variable_name" value="${esc(name)}" placeholder="name" aria-label="Name of variable ${j}" style="width:${params.var_widths[j - 1]}px"${lock}>`;
+            if (!readOnly) {
+                html += `<button type="button" class="sst-x" data-sst-action="remove-var" data-col="${j}" aria-label="Remove variable ${j}" title="Remove this variable">${X_ICON}</button>`;
+            }
+            html += '</div></th>';
+        }
+        if (!readOnly) {
+            const hint = params.num_vars === 0 ?
+                '<span class="sst-empty">No variables yet. Add one for each variable in the program.</span>' : '';
+            html += `<th class="sst-addvar"><button type="button" id="${textareaId}-sst-add-var" class="sst-add" data-sst-action="add-var">${PLUS_ICON}Variable</button>${hint}</th>`;
+        }
+        if (has_output) {
+            html += '<th class="sst-gap"></th><th class="sst-out">Printed output</th>';
+        }
+        html += '<th class="sst-rowdel"></th></tr></thead><tbody>';
+
+        for (let i = 1; i <= params.num_rows; i++) {
+            const lineNumber = getValue(data, 'line_number', i - 1);
+            const lineCell = `<td class="sst-line"><input class="coderunner-ui-element cr-linenumber" name="line_number" value="${esc(lineNumber)}" aria-label="Line number of step ${i}"${lock}></td><td class="sst-gap"></td>`;
+            if (has_return && i === params.num_rows) {
+                const returnValue = getValue(data, 'return_value', 0);
+                const span = params.num_vars + (readOnly ? 0 : 1) + (has_output ? 2 : 0) + 1;
+                html += `<tr class="sst-return-row"><td class="sst-step">${i}</td>${lineCell}
+<td class="sst-return" colspan="${span}">Return value:&nbsp;
+<input class="coderunner-ui-element cr-return-value" name="return_value" value="${esc(returnValue)}" aria-label="Return value" style="width:${params.return_width}px"${lock}></td></tr>`;
+                continue;
+            }
+            html += `<tr data-row="${i}"><td class="sst-step">${i}</td>${lineCell}`;
+            for (let j = 1; j <= params.num_vars; j++) {
+                const value = getValue(data, 'variable_value', (i - 1) * params.num_vars + j - 1);
+                html += `<td class="sst-var"><input id="${textareaId}-cr-sst-var-${i}-${j}" class="coderunner-ui-element cr-variable cr-undefined" name="variable_value" value="${esc(value)}" aria-label="Value of variable ${j} at step ${i}" style="width:${params.var_widths[j - 1]}px"${lock}></td>`;
+            }
+            if (!readOnly) {
+                html += '<td class="sst-addvar"></td>';
+            }
+            if (has_output) {
+                const output = getValue(data, 'output', i - 1);
+                html += `<td class="sst-gap"></td><td class="sst-out"><input class="coderunner-ui-element cr-output" name="output" value="${esc(output)}" aria-label="Printed output of step ${i}" style="width:${params.output_width}px"${lock}></td>`;
+            }
+            html += '<td class="sst-rowdel">';
+            if (!readOnly && num_steps > 1) {
+                html += `<button type="button" class="sst-x" data-sst-action="remove-row" data-row="${i}" aria-label="Remove step ${i}" title="Remove this step">${X_ICON}</button>`;
+            }
+            html += '</td></tr>';
+        }
+        html += '</tbody></table>';
+        return html;
+    }
+
+    // Called when a variable value changes. Marks the cell as explicitly
+    // entered (or as undefined, if it is now empty) and fills its column down.
+    function varChanged(textareaId, element) {
+        element.classList.remove('cr-filled-down', 'cr-undefined', 'cr-explicit');
+        element.classList.add(element.value.trim() === '' ? 'cr-undefined' : 'cr-explicit');
+        const bits = element.id.split('-');
+        fillDownColumn(textareaId, parseInt(bits[bits.length - 1]));
+    }
+
+    // Work down the given variable column from top to bottom, filling down
+    // each explicitly-entered value until the next one, and record the
+    // display classes ('cr-undefined', 'cr-filled-down' or 'cr-explicit').
+    function fillDownColumn(textareaId, colNum) {
+        const states = getStates(textareaId);
+        let fillValue = '';
+        for (let rowNum = 1; ; rowNum++) {
+            const input = byId(`${textareaId}-cr-sst-var-${rowNum}-${colNum}`);
+            if (input === null) {
+                break;
+            }
+            const key = `cr-sst-var-${rowNum}-${colNum}`;
+            if (input.classList.contains('cr-undefined') && input.value.trim() !== '') {
+                // A value with no recorded display class: treat it as explicit.
+                input.classList.remove('cr-undefined');
+                input.classList.add('cr-explicit');
+            }
+            let displayClass;
+            if (input.classList.contains('cr-explicit')) {
+                fillValue = input.value;
+                displayClass = 'cr-explicit';
+            } else {
+                input.value = fillValue;
+                displayClass = fillValue === '' ? 'cr-undefined' : 'cr-filled-down';
+                input.classList.remove('cr-filled-down', 'cr-undefined', 'cr-explicit');
+                input.classList.add(displayClass);
+            }
+            if (displayClass === 'cr-undefined') {
+                delete states[key];
+            } else {
+                states[key] = displayClass;
+            }
+        }
+        setStates(textareaId, states);
+    }
+
+    // Set the display class of each variable cell from the stored classes.
+    function loadClasses(textareaId) {
+        const states = getStates(textareaId);
+        for (const key in states) {
+            const input = byId(`${textareaId}-${key}`);
+            if (input) { // Ignore unmatchable cells, which happen during editing.
+                input.classList.remove('cr-undefined');
+                input.classList.add(states[key]);
+            }
+        }
+    }
+
+    // Make the columns of the table wide enough for their contents. The widths
+    // in the options panel are only minimum widths; every input in a column
+    // gets the width of its longest value.
+    function autoSize(textareaId) {
+        const params = getParams(textareaId);
+        const sst_div = byId(textareaId + '-sst-ui-div');
+        const fit = (inputs, minWidth) => {
+            let longest = 0;
+            inputs.forEach(input => { longest = Math.max(longest, input.value.length); });
+            inputs.forEach(input => { input.style.width = `max(${minWidth}px, ${longest + 2}ch)`; });
+        };
+        for (let j = 1; j <= params.num_vars; j++) {
+            const inputs = [];
+            for (let i = 0; ; i++) {
+                const input = byId(`${textareaId}-cr-sst-var-${i}-${j}`);
+                if (input === null) {
+                    break;
+                }
+                inputs.push(input);
+            }
+            fit(inputs, params.var_widths[j - 1]);
+        }
+        fit(sst_div.querySelectorAll('.cr-output'), params.output_width);
+        fit(sst_div.querySelectorAll('.cr-return-value'), params.return_width);
+        fit(sst_div.querySelectorAll('.cr-linenumber'), 48);
+    }
+
+    // Return the current contents of the table for the given textarea, in the
+    // same format as the serialised answer: a map from element name to the
+    // list of values of all elements with that name.
+    function collectData(textareaId) {
+        const data = {};
+        const elements = byId(textareaId + '-sst-ui-div').querySelectorAll('.coderunner-ui-element');
+        for (let i = 0; i < elements.length; i++) {
+            const name = elements[i].name;
+            if (!data.hasOwnProperty(name)) {
+                data[name] = [];
+            }
+            data[name].push(elements[i].value);
+        }
+        return data;
+    }
+
+    // Rebuild the table from the given data, then fill down and resize.
+    function rebuild(textareaId, data) {
+        buildUI(textareaId, data);
+        const params = getParams(textareaId);
+        for (let j = 1; j <= params.num_vars; j++) {
+            fillDownColumn(textareaId, j);
+        }
+        autoSize(textareaId);
+    }
+
+    // Add a step row at the end of the table (above the return-value row, if
+    // any), keeping the contents of the other rows, and move to it.
+    function addRow(textareaId) {
+        const params = getParams(textareaId);
+        const data = collectData(textareaId);
+        if (params.return_width > 0) {
+            const lineNumbers = data.line_number || [];
+            const returnLine = lineNumbers.pop();
+            lineNumbers.push('', returnLine === undefined ? '' : returnLine);
+            data.line_number = lineNumbers;
+        }
+        byId(textareaId + '-num_rows').value = params.num_rows + 1;
+        rebuild(textareaId, data);
+        const lineInputs = byId(textareaId + '-sst-ui-div').querySelectorAll('tr[data-row] .cr-linenumber');
+        if (lineInputs.length) {
+            lineInputs[lineInputs.length - 1].focus();
+        }
+    }
+
+    // Remove the given step row (1-based), keeping the contents of the others.
+    // Values that were carried over from it are recalculated.
+    function removeRow(textareaId, row) {
+        const params = getParams(textareaId);
+        if (stepRows(params) <= 1 || row < 1 || row > stepRows(params)) {
+            return;  // Always keep at least one step row.
+        }
+        const data = collectData(textareaId);
+        (data.line_number || []).splice(row - 1, 1);
+        (data.variable_value || []).splice((row - 1) * params.num_vars, params.num_vars);
+        (data.output || []).splice(row - 1, 1);
+        moveStates(textareaId, (r, c) => r === row ? null : [r > row ? r - 1 : r, c]);
+        byId(textareaId + '-num_rows').value = params.num_rows - 1;
+        rebuild(textareaId, data);
+    }
+
+    // Add a variable column at the right, keeping the contents of the others,
+    // and move to its name.
+    function addVar(textareaId) {
+        const params = getParams(textareaId);
+        const data = collectData(textareaId);
+        const values = data.variable_value || [];
+        const newValues = [];
+        for (let r = 0; r < stepRows(params); r++) {
+            const rowValues = values.slice(r * params.num_vars, (r + 1) * params.num_vars);
+            rowValues.push('');
+            newValues.push(...rowValues);
+        }
+        data.variable_value = newValues;
+        data.variable_name = (data.variable_name || []).concat(['']);
+        byId(textareaId + '-num_vars').value = params.num_vars + 1;
+        rebuild(textareaId, data);
+        const nameInput = byId(`${textareaId}-cr-sst-var-0-${params.num_vars + 1}`);
+        if (nameInput) {
+            nameInput.focus();
+        }
+    }
+
+    // Remove the given variable column (1-based), keeping the others.
+    // A program with no variables has no variable columns at all.
+    function removeVar(textareaId, col) {
+        const params = getParams(textareaId);
+        if (col < 1 || col > params.num_vars) {
+            return;
+        }
+        const data = collectData(textareaId);
+        const values = data.variable_value || [];
+        const newValues = [];
+        for (let r = 0; r < stepRows(params); r++) {
+            const rowValues = values.slice(r * params.num_vars, (r + 1) * params.num_vars);
+            rowValues.splice(col - 1, 1);
+            newValues.push(...rowValues);
+        }
+        data.variable_value = newValues;
+        (data.variable_name || []).splice(col - 1, 1);
+        moveStates(textareaId, (r, c) => c === col ? null : [r, c > col ? c - 1 : c]);
+        byId(textareaId + '-num_vars').value = params.num_vars - 1;
+        rebuild(textareaId, data);
+    }
+
+    // Set up, once per table, the handlers for everything inside it. They are
+    // attached to the enclosing div, so they survive rebuilding the table.
+    function addHandlers(textareaId, sst_div) {
+        if (sst_div.crSst2Set) {
+            return;
+        }
+        sst_div.crSst2Set = 1;
+
+        sst_div.addEventListener('click', event => {
+            const button = event.target.closest('[data-sst-action]');
+            if (!button || isReadOnly(textareaId)) {
+                return;
+            }
+            const action = button.getAttribute('data-sst-action');
+            if (action === 'add-var') {
+                addVar(textareaId);
+            } else if (action === 'remove-var') {
+                removeVar(textareaId, parseInt(button.getAttribute('data-col')));
+            } else if (action === 'remove-row') {
+                removeRow(textareaId, parseInt(button.getAttribute('data-row')));
+            }
+        });
+
+        sst_div.addEventListener('change', event => {
+            if (event.target.classList.contains('cr-variable')) {
+                varChanged(textareaId, event.target);
+            }
+            autoSize(textareaId);
+        });
+
+        // Widen the columns as the user types.
+        sst_div.addEventListener('input', () => autoSize(textareaId));
+
+        // Enter never submits the form. In a variable cell it confirms the
+        // value; in the last step row it adds the next step; in any other
+        // step row it moves to the row below.
+        sst_div.addEventListener('keydown', event => {
+            if (event.keyCode !== 13 || event.target.tagName !== 'INPUT') {
+                return;
+            }
+            event.preventDefault();
+            const input = event.target;
+            if (input.classList.contains('cr-variable')) {
+                varChanged(textareaId, input);
+                autoSize(textareaId);
+            }
+            const tr = input.closest('tr[data-row]');
+            if (!tr || isReadOnly(textareaId)) {
+                return;
+            }
+            const row = parseInt(tr.getAttribute('data-row'));
+            if (row === stepRows(getParams(textareaId))) {
+                addRow(textareaId);
+            } else {
+                const next = sst_div.querySelector(`tr[data-row="${row + 1}"] .cr-linenumber`);
+                if (next) {
+                    next.focus();
+                }
+            }
+        });
+
+        // Highlight the step that is being worked on.
+        sst_div.addEventListener('focusin', event => {
+            const tr = event.target.closest('tbody tr');
+            sst_div.querySelectorAll('tbody tr.sst-current').forEach(row => {
+                if (row !== tr) {
+                    row.classList.remove('sst-current');
+                }
+            });
+            if (tr) {
+                tr.classList.add('sst-current');
+            }
+        });
+    }
+
+    // Construct the SST table. If no data is given, the table contents are
+    // taken from the current table if there is one (so that rebuilding it
+    // keeps what has been typed) or else from the data-leftovers attribute.
+    function buildUI(textareaId, data) {
+        const params = getParams(textareaId);
+        const sst_div = byId(textareaId + '-sst-ui-div');
+        if (data === undefined) {
+            if (sst_div.querySelector('table.sst2')) {
+                data = collectData(textareaId);
+            } else {
+                const outerDiv = byId("qtype-coderunner-outer-div-" + textareaId);
+                const dataLeftovers = outerDiv ? outerDiv.getAttribute('data-leftovers') : '';
+                data = dataLeftovers ? JSON.parse(dataLeftovers) : {};
+            }
+        }
+        sst_div.innerHTML = '';  // Purge any existing contents
+        sst_div.insertAdjacentHTML('beforeend', buildTable(data, params, textareaId));
+        loadClasses(textareaId);
+        addHandlers(textareaId, sst_div);
+        autoSize(textareaId);
+    }
+
+    // Rebuild both the answer and answer preload tables. Called only from the
+    // options panel event handlers, which exist only in the sample answer.
+    function buildBothUis() {
+        buildUI('id_answer');
+        if (byId('id_answerpreload-sst-ui-div')) {
+            // Copy the options to the answer preload and rebuild that table too.
+            // Its numbers of rows and of variables are its own.
+            ['var_widths', 'output_width', 'return_width'].forEach(name => {
+                byId('id_answerpreload-' + name).value = byId('id_answer-' + name).value;
+            });
+            buildUI('id_answerpreload');
+        }
+    }
+
+    // The return-value row is an extra last row of the table, so when it is
+    // turned on or off (in the options panel, while authoring) a row is added
+    // to or removed from both the answer and the preload tables.
+    // Nothing is rebuilt unless an option really changed, so that leaving a
+    // field of the panel by clicking a button of a table does not lose the click.
+    const optionsNow = () => ['var_widths', 'output_width', 'return_width']
+        .map(name => byId('___textareaId___-' + name).value).join('|');
+    let lastOptions = optionsNow();
+    let hadReturn = getParams('___textareaId___').return_width > 0;
+    function optionsChanged() {
+        if (optionsNow() === lastOptions) {
+            return;
+        }
+        lastOptions = optionsNow();
+        const hasReturn = getParams('___textareaId___').return_width > 0;
+        if (hasReturn !== hadReturn) {
+            ['id_answer', 'id_answerpreload'].forEach(id => {
+                const rowsInput = byId(id + '-num_rows');
+                if (rowsInput) {
+                    rowsInput.value = Math.max(1, (parseInt(rowsInput.value) || 1) + (hasReturn ? 1 : -1));
+                }
+            });
+            hadReturn = hasReturn;
+        }
+        buildBothUis();
+    }
+
+    buildUI('___textareaId___');  // The initial load of the UI.
+
+    if (isReadOnly('___textareaId___')) {
+        byId('___textareaId___-sst-footer').style.display = 'none';
+    } else {
+        byId('___textareaId___-sst-add-row').addEventListener('click', () => addRow('___textareaId___'));
+    }
+
+    // Show the options panel only in the sample answer.
+    if ("___textareaId___" === "id_answer") {
+        byId('___textareaId___-controlpanel').style.display = "block";
+        ['var_widths', 'output_width', 'return_width'].forEach(name => {
+            // Rebuild as the author types, and again on change just in case.
+            byId('___textareaId___-' + name).oninput = optionsChanged;
+            byId('___textareaId___-' + name).onchange = optionsChanged;
+        });
+    }
+
+})();
+</script>]]></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text></text>
+      </stdin>
+      <expected>
+                <text>OK</text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+    </testcases>
+  </question>
+
+</quiz>

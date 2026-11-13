@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text>UNICV_PROTOTYPE_python3_w_function_check</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>UniCV prototype for questions in which the student writes a Python 3 program with a <strong>required function</strong>.</p>
+<p>Before the tests are run, the student's code is analysed statically (without running it) to check that the required function is defined and called. If any requirement is not met, the tests are not run and the student sees the list of unmet requirements. As in the python3_w_input type, values read with input() are echoed to the output, as on a console.</p>
+<p>Template parameters (JSON, in the <em>Template params</em> field):</p>
+<ul>
+<li><strong>function</strong>: name of the required function (mandatory).</li>
+<li><strong>num_params</strong>: exact number of parameters (optional).</li>
+<li><strong>require_return</strong>: the function must return a value (default: true).</li>
+<li><strong>require_call</strong>: the function must be called from outside itself, after its definition (default: true).</li>
+<li><strong>forbid_input_in_function</strong>: the function must not call input() (default: true).</li>
+<li><strong>forbid_print_in_function</strong>: the function must not call print() (default: false).</li>
+<li><strong>only_in_function</strong>: list of strings that may appear only inside the function, e.g. ["math.sqrt"] (optional).</li>
+<li><strong>lang</strong>: language of the feedback messages, "en" (default) or "pt".</li>
+</ul>
+<p>Example:</p>
+<pre>{"function": "distancia_pontos", "num_params": 4, "only_in_function": ["math.sqrt"], "lang": "pt"}</pre>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3_w_function_check</coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA[""" UniCV prototype: a Python 3 program with a required function.
+    Before running the tests, the student's code is analysed statically
+    (without running it) to check that the required function is defined
+    and called.
+    Template parameters:
+      function                  name of the required function (mandatory)
+      num_params                exact number of parameters (optional)
+      require_return            the function must return a value (default: true)
+      require_call              the function must be called from outside itself,
+                                after its definition (default: true)
+      forbid_input_in_function  the function must not call input() (default: true)
+      forbid_print_in_function  the function must not call print() (default: false)
+      only_in_function          list of strings that may appear only inside the
+                                function, e.g. ["math.sqrt"] (optional)
+      lang                      language of the feedback messages: "en" (default) or "pt"
+"""
+import ast
+import json
+import sys
+
+__code__ = """{{ STUDENT_ANSWER | e('py') }}"""
+__test__ = """{{ TEST.testcode | e('py') }}"""
+__params__ = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+
+__MESSAGES__ = {
+    'en': {
+        'no_param': "Question error: the template parameter 'function' is missing. Please tell your teacher.",
+        'syntax': "Syntax error on line {line}: {msg}",
+        'not_defined': "No function called '{name}' has been defined.",
+        'not_top': "The function '{name}' must be defined at the top level of the program "
+                   "(not inside another function or block).",
+        'num_params': "The function '{name}' must have {num} parameter(s); yours has {has}.",
+        'no_return': "The function '{name}' must return its result with a return statement.",
+        'input': "The function '{name}' must not read data with input(); "
+                 "reading is done in the main program.",
+        'print': "The function '{name}' must not write with print(); "
+                 "writing is done in the main program.",
+        'not_called': "The function '{name}' is defined but never called in the main program.",
+        'called_before': "The function '{name}' is called before it is defined.",
+        'only_in': "'{text}' must be used only inside the function '{name}'.",
+        'header': "*** Requirements not met ***",
+        'footer': "The tests were not run.",
+    },
+    'pt': {
+        'no_param': "Erro na pergunta: falta o parâmetro de modelo 'function'. Avise o docente.",
+        'syntax': "Erro de sintaxe na linha {line}: {msg}",
+        'not_defined': "Não foi definida nenhuma função chamada '{name}'.",
+        'not_top': "A função '{name}' deve ser definida no nível principal do programa "
+                   "(não dentro de outra função nem de um bloco).",
+        'num_params': "A função '{name}' deve ter {num} parâmetro(s); a sua tem {has}.",
+        'no_return': "A função '{name}' deve devolver o resultado com a instrução return.",
+        'input': "A função '{name}' não deve ler dados com input(); "
+                 "a leitura é feita no programa principal.",
+        'print': "A função '{name}' não deve escrever com print(); "
+                 "a escrita é feita no programa principal.",
+        'not_called': "A função '{name}' está definida, mas nunca é chamada no programa principal.",
+        'called_before': "A função '{name}' é chamada antes de ser definida.",
+        'only_in': "'{text}' só deve ser usado dentro da função '{name}'.",
+        'header': "*** Requisitos não cumpridos ***",
+        'footer': "Os testes não foram executados.",
+    },
+}
+__msg__ = __MESSAGES__.get(__params__.get('lang', 'en'), __MESSAGES__['en'])
+
+
+def __calls__(node, name):
+    """All calls to 'name' inside the given node."""
+    return [n for n in ast.walk(node)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == name]
+
+
+def __check__(code, params):
+    """Return the list of unmet requirements (empty if all is well)."""
+    name = params.get('function', '')
+    if not name:
+        return [__msg__['no_param']]
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        return [__msg__['syntax'].format(line=e.lineno, msg=e.msg)]
+
+    all_defs = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == name]
+    top_defs = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == name]
+    if not all_defs:
+        return [__msg__['not_defined'].format(name=name)]
+    if not top_defs:
+        return [__msg__['not_top'].format(name=name)]
+    func = top_defs[-1]
+    errors = []
+
+    num = params.get('num_params')
+    if num is not None:
+        a = func.args
+        has = len(a.posonlyargs) + len(a.args) + len(a.kwonlyargs)
+        if has != num or a.vararg or a.kwarg:
+            errors.append(__msg__['num_params'].format(name=name, num=num, has=has))
+
+    if params.get('require_return', True):
+        returns = [n for n in ast.walk(func) if isinstance(n, ast.Return) and n.value is not None]
+        if not returns:
+            errors.append(__msg__['no_return'].format(name=name))
+
+    if params.get('forbid_input_in_function', True) and __calls__(func, 'input'):
+        errors.append(__msg__['input'].format(name=name))
+
+    if params.get('forbid_print_in_function', False) and __calls__(func, 'print'):
+        errors.append(__msg__['print'].format(name=name))
+
+    lines = code.splitlines()
+    inside = set()
+    for f in all_defs:
+        inside.update(range(f.lineno, f.end_lineno + 1))
+
+    if params.get('require_call', True):
+        outside = [c for c in __calls__(tree, name) if c.lineno not in inside]
+        if not outside:
+            errors.append(__msg__['not_called'].format(name=name))
+        elif all(c.lineno < func.lineno for c in outside):
+            errors.append(__msg__['called_before'].format(name=name))
+
+    rest = '\n'.join(l for i, l in enumerate(lines, 1) if i not in inside)
+    for text in params.get('only_in_function', []):
+        if text in rest:
+            errors.append(__msg__['only_in'].format(text=text, name=name))
+    return errors
+
+
+__errors__ = __check__(__code__, __params__)
+if __errors__:
+    print(__msg__['header'])
+    for __e__ in __errors__:
+        print("- " + __e__)
+    print(__msg__['footer'])
+    sys.exit(0)
+
+
+def __echo_input__(prompt=''):
+    """Like input(), but also echoes the value read, as on a console."""
+    s = __original_input__(prompt)
+    print(s)
+    return s
+
+
+__original_input__ = input
+__ns__ = {'__name__': '__main__', 'input': __echo_input__}
+exec(compile(__code__, 'program.py', 'exec'), __ns__)
+if __test__.strip():
+    exec(compile(__test__, 'test.py', 'exec'), __ns__)
+]]></template>
+    <iscombinatortemplate>0</iscombinatortemplate>
+    <allowmultiplestdins>0</allowmultiplestdins>
+    <answer></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader>EqualityGrader</grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin>ace</uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>
