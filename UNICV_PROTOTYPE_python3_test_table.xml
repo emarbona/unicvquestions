@@ -1,0 +1,1356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 21973  -->
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[UNICV_PROTOTYPE_python3_test_table]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>UniCV prototype for <strong>test-table questions</strong> in Python (based on python3_test_table, with a new interface and a new grader). The student completes a table of tests for a function or a program described in the question: the test code (or the standard input) and the exact output it should produce. Each test is run with the teacher's reference solution; a row is valid when the solution prints exactly the expected output. Optionally, the student's tests must also catch some <strong>wrong versions</strong> of the code, so that the student has to think of the important cases.</p>
+<h4>How to write a question</h4>
+<ol>
+<li>In the <em>Question text</em>, describe the function or program to be tested (e.g. <code>is_even(number)</code> returns True if the number is even) and ask the student to complete the table.</li>
+<li>Open <strong>Answer preload</strong> and build the table there: choose whether the tests are <em>Python code that calls a function</em> or <em>the standard input of a program</em>, add the rows and write the cells. Cells with text are <strong>given</strong>; leave a cell <strong>empty</strong> for the student to fill in, or write <code>???</code> in it for the parts the student must complete (e.g. <code>print(is_even(???))</code>). You can also let students add some tests of their own.</li>
+<li>Save (<em>Save changes and continue editing</em>). The table now appears in the <strong>Answer</strong> field: fill in the open cells correctly, and write the <strong>reference solution</strong> in the box below the table.</li>
+<li>Optionally, add <strong>wrong versions</strong> after the reference solution, each starting with a line <code>#### wrong: description</code>. The description is shown to the student when their tests do not catch that mistake.</li>
+<li>Keep <em>Validate on save</em> ticked: the teacher's answer must be valid (and catch every wrong version). No test cases are needed, and <em>Twig all</em> is not needed.</li>
+</ol>
+<p>Example of reference solution with two wrong versions:</p>
+<pre>def is_even(number):
+    return number % 2 == 0
+#### wrong: does not work for negative numbers
+def is_even(number):
+    return number &gt; 0 and number % 2 == 0
+#### wrong: says that 0 is odd
+def is_even(number):
+    return number != 0 and number % 2 == 0</pre>
+<h4>What the student gets</h4>
+<ul>
+<li>A table with numbered rows: the given cells in grey, the cells to fill in white, and for <code>???</code> cells a reminder of the part to complete. The cells grow as the student types.</li>
+<li>A counter of the cells filled in, a <em>Help</em> panel, a <em>Start again</em> button (with confirmation) and, if allowed, <em>Add a test</em> to add tests of their own.</li>
+<li>After <strong>Check</strong>, each of the student's rows is marked ✓ or ✗ with the reason (empty cell, ??? not replaced, the test is not in the required form, the test gives an error, or the expected output is not what the test prints). If all tests are valid but some wrong version is not caught, the student is told which mistakes their tests miss.</li>
+</ul>
+<h4>Grading</h4>
+<ul>
+<li>With <em>All-or-nothing grading</em> (the default), the mark is 1 only if all the student's rows are valid and all the wrong versions are caught.</li>
+<li>Otherwise the mark is the fraction of the student's rows that are valid, multiplied by the fraction of wrong versions caught.</li>
+<li>Only the student's own tests (rows whose test cell the student wrote) count for catching wrong versions. A wrong version is caught when one of those tests prints something different, or gives an error, with it.</li>
+</ul>
+<h4>Limitations</h4>
+<ul>
+<li>The output is compared exactly, line by line (spaces at the end of lines are ignored).</li>
+<li>For function tests, each test is run on its own after the reference solution, so the test code must print what it checks (e.g. <code>print(is_even(4))</code>).</li>
+<li>The given cells always come from the Answer preload: if a student changes them in the page, the grader ignores those changes. If the table is changed after students have answered, their answers are matched row by row.</li>
+<li>The reference solution and the wrong versions are stored in the teacher's Answer, which students do not see during the quiz (but, as with any question, it is shown in the review if <em>Right answer</em> is enabled).</li>
+</ul>
+<h4>Differences from python3_test_table</h4>
+<ul>
+<li>New interface: the table is built in the Answer preload with buttons (add, move and delete rows), and the Answer shows the same table plus the reference solution. There is no need to copy serialised data with Ctrl+Alt+M.</li>
+<li>Tests for <strong>programs</strong> (standard input and output), not only for functions.</li>
+<li><strong>Wrong versions</strong> that the student's tests must catch, a new way to assess the quality of the tests.</li>
+<li>Students can add tests of their own, and each row is marked ✓ or ✗ in the table with the reason.</li>
+<li>New self-contained grader: no support files and no pylint, a time limit per test (endless loops are reported) and clear messages.</li>
+</ul>
+<p><strong>Note on input():</strong> for program tests, by default <code>input()</code> behaves as on the keyboard: the prompt and the value read (followed by a new line) appear in the output, so they must be in the expected output. For example, with <code>a = int(input("a? "))</code> and input 3 the output starts with <code>a? 3</code>. Set <code>echostandardinput</code> to false to get plain Python behaviour.</p>
+<h4>Template parameters (all optional)</h4>
+<ul>
+<li><strong>testre</strong> (default ""): a regular expression that every test written by the student must contain (searched with re.DOTALL). Explain the required form in the question text. Example: <code>{"testre": "print\\(is_even\\(-?\\d+\\)\\)"}</code>.</li>
+<li><strong>showexpected</strong> (default false): if true, when an expected output is wrong the student is shown what the test really prints (useful for practice, not for tests).</li>
+<li><strong>echostandardinput</strong> (default true): see the note on input() above.</li>
+<li><strong>timeout</strong> (default 3): time limit in seconds for each test.</li>
+<li><strong>strictwhitespace</strong> (default true): if false, differences in spaces inside lines are ignored.</li>
+<li><strong>proscribedbuiltins</strong> (default ["exec", "eval", "open", "compile"]): built-in functions the tests cannot use.</li>
+<li><strong>maxoutputlength</strong> (default 10000): longer outputs are cut.</li>
+</ul>
+<p><strong>Note:</strong> Moodle's emoticon filter turns some short texts in brackets, such as the letters n, y or i between round brackets, into icons in the question text. Avoid one-letter parameter names in the text of your questions (write <code>is_even(number)</code>, not <code>is_even</code> with the parameter n), or turn off the emoticon filter for the course.</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype><![CDATA[unicv_python3_test_table]]></coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>5</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA["""Grader for the UniCV test-table prototype (unicv_python3_test_table).
+
+The student completes a table of tests for a function (or a program) that the
+question author has written. Each row is a test: the test code (or the
+standard input, for a program) and the output that test should produce.
+
+The table, and which of its cells the student must fill, come from the
+question's Answer preload. The reference solution, and optionally some wrong
+versions of it, come from the question's Answer (the teacher's answer), so
+students never see them. A row is valid when running its test with the
+reference solution prints exactly the expected output written in the row.
+The student's own tests must also catch every wrong version: at least one of
+them must give a different result with it.
+
+Each row's result is written in the feedback as
+<span class="unicv-tt-row" data-row="N" data-ok="1|0">message</span>, which
+the interface uses to mark that row.
+"""
+import builtins
+import html
+import io
+import json
+import re
+import signal
+import sys
+import traceback
+
+STUDENT_ANSWER = """{{ STUDENT_ANSWER | e('py') }}"""
+QUESTION_ANSWER = """{{ QUESTION.answer | e('py') }}"""
+QUESTION_PRELOAD = """{{ QUESTION.answerpreload | e('py') }}"""
+ALL_OR_NOTHING = "{{ QUESTION.allornothing }}" == "1"
+IS_PRECHECK = "{{ IS_PRECHECK }}" == "1"
+
+try:
+    PARAMS = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+except ValueError:
+    PARAMS = {}
+if not isinstance(PARAMS, dict):  # Twig encodes an empty set of parameters as []
+    PARAMS = {}
+
+TESTRE = PARAMS.get('testre', '')
+SHOW_EXPECTED = PARAMS.get('showexpected', False)
+ECHO_INPUT = PARAMS.get('echostandardinput', True)
+TIMEOUT = float(PARAMS.get('timeout', 3))
+MAX_OUTPUT = int(PARAMS.get('maxoutputlength', 10000))
+STRICT_WHITESPACE = PARAMS.get('strictwhitespace', True)
+PROSCRIBED_BUILTINS = PARAMS.get('proscribedbuiltins', ['exec', 'eval', 'open', 'compile'])
+WRONG_MARKER = re.compile(r'^####\s*wrong\s*:?\s*(.*)$', re.I | re.M)
+
+
+# ---------------------------------------------------------------------------
+# Reading the table
+# ---------------------------------------------------------------------------
+
+def read_table(answer):
+    """The table stored in an answer or in the preload, as a dict (empty if none)."""
+    try:
+        data = json.loads(answer)
+        raw = data.get('table', [''])
+        raw = raw[0] if isinstance(raw, list) else raw
+        table = json.loads(raw) if raw else {}
+        return table if isinstance(table, dict) else {}
+    except (ValueError, TypeError, AttributeError):
+        return {}
+
+
+def cell(rows, i, j):
+    try:
+        return str(rows[i][j])
+    except (IndexError, TypeError, KeyError):
+        return ''
+
+
+def is_open(text):
+    """True if a cell of the preload is for the student (empty, or with ??? to complete)."""
+    return text.strip() == '' or '???' in text
+
+
+def pattern_for(text):
+    """A regular expression for a preload cell with ??? parts."""
+    return '^' + re.escape(text.strip()).replace(re.escape('???'), '.+') + '$'
+
+
+def split_solution(code):
+    """The reference solution and the list of (description, code) wrong versions."""
+    parts = WRONG_MARKER.split(code)
+    reference = parts[0]
+    wrongs = []
+    for k in range(1, len(parts), 2):
+        description = parts[k].strip() or f'wrong version {len(wrongs) + 1}'
+        wrongs.append((description, parts[k + 1]))
+    return reference, wrongs
+
+
+# ---------------------------------------------------------------------------
+# Running code
+# ---------------------------------------------------------------------------
+
+class TimeLimit(Exception):
+    pass
+
+
+class OutOfInput(Exception):
+    pass
+
+
+def on_alarm(signum, frame):
+    raise TimeLimit()
+
+
+def forbidden(name):
+    def stub(*args, **kwargs):
+        raise NameError(f"'{name}' cannot be used in this question")
+    return stub
+
+
+def run(code, testcode='', stdin=''):
+    """Run the code and then the test code; return (output, error message or '')."""
+    out = io.StringIO()
+    names = dict(vars(builtins))
+
+    def echo_input(prompt=''):
+        out.write(str(prompt))
+        line = sys.stdin.readline()
+        if not line:
+            raise OutOfInput()
+        line = line.rstrip('\n')
+        if ECHO_INPUT:
+            out.write(line + '\n')
+        return line
+
+    def to_out(*values, sep=' ', end='\n', file=None, flush=False):
+        out.write((sep if sep is not None else ' ').join(str(v) for v in values) + (end if end is not None else '\n'))
+
+    names['input'] = echo_input
+    names['print'] = to_out
+    for name in PROSCRIBED_BUILTINS:
+        names[name] = forbidden(name)
+    scope = {'__name__': '__main__', '__builtins__': names}
+
+    error = ''
+    saved = sys.stdin, sys.stdout, sys.stderr
+    sys.stdin, sys.stdout, sys.stderr = io.StringIO(stdin), out, out
+    signal.signal(signal.SIGALRM, on_alarm)
+    signal.setitimer(signal.ITIMER_REAL, TIMEOUT)
+    try:
+        exec(compile(code, 'solution.py', 'exec'), scope)
+        if testcode.strip():
+            exec(compile(testcode, 'test', 'exec'), scope)
+    except TimeLimit:
+        error = 'the test takes too long (endless loop?)'
+    except OutOfInput:
+        error = 'input() was called but there is no more input data'
+    except SystemExit:
+        pass
+    except SyntaxError as err:
+        where = 'the test' if err.filename == 'test' else 'the solution'
+        error = f'syntax error in {where}: {err.msg}'
+    except BaseException:
+        kind, value, tb = sys.exc_info()
+        error = traceback.format_exception_only(kind, value)[-1].strip()
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        sys.stdin, sys.stdout, sys.stderr = saved
+    text = out.getvalue()
+    if len(text) > MAX_OUTPUT:
+        text = text[:MAX_OUTPUT] + '\n*** Output too long: cut ***\n'
+    return text, error
+
+
+def normalise(text):
+    lines = [line.rstrip() for line in text.replace('\r\n', '\n').rstrip().split('\n')]
+    if not STRICT_WHITESPACE:
+        lines = [' '.join(line.split()) for line in lines]
+    return '\n'.join(lines).strip('\n')
+
+
+# ---------------------------------------------------------------------------
+# Grading
+# ---------------------------------------------------------------------------
+
+def row_marker(i, ok, message):
+    return (f'<span class="unicv-tt-row" data-row="{i}" data-ok="{1 if ok else 0}" style="display:none">'
+            f'{html.escape(message)}</span>')
+
+
+def pre(text):
+    return f'<pre style="margin:0;white-space:pre-wrap">{html.escape(text)}</pre>'
+
+
+def main():
+    preload = read_table(QUESTION_PRELOAD)
+    answer = read_table(STUDENT_ANSWER)
+    teacher = read_table(QUESTION_ANSWER)
+    program = preload.get('kind') == 'program'
+    given_rows = preload.get('rows', [])
+    extra_allowed = int(preload.get('addrows', 0) or 0)
+    student_rows = answer.get('rows', [])
+    solution_code = teacher.get('solution', '') or answer.get('solution', '')
+    outcome = {'fraction': 0.0}
+
+    if not solution_code.strip():
+        outcome['prologuehtml'] = ("<div class='coderunner-test-results bad'><h3>This question has no reference solution</h3>"
+                                   "<p>The teacher must write it in the Answer, in the box <em>Reference solution</em>. "
+                                   "Please tell your teacher.</p></div>")
+        return outcome
+    reference, wrongs = split_solution(solution_code)
+
+    # The rows to grade: the preload's cells where they are given, the student's where they are open,
+    # then the rows the student added (at most extra_allowed, and not empty).
+    rows = []      # (test, expected, test is the student's, expected is the student's, test pattern)
+    index = []     # The position of each graded row in the student's table.
+    for i, given in enumerate(given_rows):
+        t0, e0 = cell(given_rows, i, 0), cell(given_rows, i, 1)
+        t = cell(student_rows, i, 0) if is_open(t0) else t0
+        e = cell(student_rows, i, 1) if is_open(e0) else e0
+        rows.append((t, e, is_open(t0), is_open(e0), pattern_for(t0) if '???' in t0 else ''))
+        index.append(i)
+    added = 0
+    for i in range(len(given_rows), len(student_rows)):
+        t, e = cell(student_rows, i, 0), cell(student_rows, i, 1)
+        if not t.strip() and not e.strip():
+            continue
+        added += 1
+        if added > extra_allowed:
+            break
+        rows.append((t, e, True, True, ''))
+        index.append(i)
+
+    test_name = 'input' if program else 'test'
+    results = []   # (ok, message)
+    problems = 0
+    for i, (t, e, t_mine, e_mine, pattern) in enumerate(rows):
+        if (t_mine and not t.strip() and not program) or (e_mine and not e.strip()):
+            results.append((False, 'Fill in this row.'))
+            continue
+        if (t_mine and '???' in t) or (e_mine and '???' in e):
+            results.append((False, 'Replace the ??? in this row.'))
+            continue
+        if t_mine and pattern and not re.search(pattern, t.strip(), re.S):
+            results.append((False, f'Only the ??? parts of the {test_name} may be changed.'))
+            continue
+        if t_mine and TESTRE and not program and not re.search(TESTRE, t, re.S):
+            results.append((False, 'This test is not in the form asked for in the question.'))
+            continue
+        if program:
+            got, error = run(reference, '', t if t.endswith('\n') else t + '\n')
+        else:
+            got, error = run(reference, t)
+        if error:
+            results.append((False, f'Running this {test_name} gives an error: {error}'))
+        elif normalise(got) == normalise(e):
+            results.append((True, 'Valid test'))
+        else:
+            message = 'The expected output is not what this test prints.'
+            if SHOW_EXPECTED:
+                message += ' It prints:\n' + got.rstrip('\n')
+            results.append((False, message))
+    mine = [k for k, r in enumerate(rows) if r[2] or r[3]]
+    valid_mine = [k for k in mine if results[k][0]]
+    problems = len(mine) - len(valid_mine)
+
+    # The wrong versions that the student's tests do not catch.
+    missed = []
+    own_tests = [k for k, r in enumerate(rows) if r[2] and results[k][0]]
+    if wrongs and not problems:
+        for description, code in wrongs:
+            caught = False
+            for k in own_tests:
+                t = rows[k][0]
+                if program:
+                    got, error = run(code, '', t if t.endswith('\n') else t + '\n')
+                else:
+                    got, error = run(code, t)
+                if error or normalise(got) != normalise(rows[k][1]):
+                    caught = True
+                    break
+            if not caught:
+                missed.append(description)
+
+    if IS_PRECHECK:
+        outcome['fraction'] = 1.0 if not problems else 0.0
+    elif not mine:
+        outcome['fraction'] = 1.0
+    else:
+        valid_part = len(valid_mine) / len(mine)
+        caught_part = 1.0 if not wrongs or problems else (len(wrongs) - len(missed)) / len(wrongs)
+        if ALL_OR_NOTHING:
+            outcome['fraction'] = 1.0 if not problems and not missed else 0.0
+        else:
+            outcome['fraction'] = valid_part * caught_part
+
+    # Feedback: a summary, the table of results and the markers for the interface.
+    head = 'Input' if program else 'Test'
+    parts = []
+    if not problems and not missed:
+        parts.append("<div class='coderunner-test-results good'><h3>All your tests are valid.</h3>")
+        if wrongs:
+            parts.append(f'<p>They also catch all the {len(wrongs)} wrong version{"s" if len(wrongs) > 1 else ""} of the code.</p>')
+        parts.append('</div>')
+    elif problems:
+        what = f'{problems} of your {len(mine)} tests' if len(mine) > 1 else 'Your test'
+        verb = 'is' if problems == 1 else 'are'
+        parts.append(f"<div class='coderunner-test-results bad'><h3>{what} {verb} not valid</h3>"
+                     "<p>The rows marked \u2717 need to be corrected.</p></div>")
+    else:
+        parts.append("<div class='coderunner-test-results bad'><h3>Your tests are valid, but not enough</h3>"
+                     "<p>Your tests do not catch these mistakes, which a wrong program could make. Add or change tests so that "
+                     "at least one of them would give a different result:</p><ul>")
+        parts.extend(f'<li>{html.escape(d)}</li>' for d in missed)
+        parts.append('</ul>')
+        if added < extra_allowed:
+            free = extra_allowed - added
+            parts.append(f"<p>You can still add {free} test{'s' if free > 1 else ''} of your own with <em>Add a test</em>.</p>")
+        parts.append('</div>')
+    style = 'style="border:1px solid #c4cdd5;padding:4px 8px;vertical-align:top"'
+    parts.append(f'<table style="border-collapse:collapse;margin-top:8px"><tr><th {style}>#</th><th {style}>{head}</th>'
+                 f'<th {style}>Expected output</th><th {style}></th></tr>')
+    for k, ((t, e, t_mine, e_mine, _), (ok, message)) in enumerate(zip(rows, results)):
+        if not (t_mine or e_mine):
+            mark = ''
+        else:
+            mark = '<span style="color:#2f7d32;font-weight:700">\u2713</span>' if ok else \
+                f'<span style="color:#a51d2a;font-weight:700">\u2717</span> {html.escape(message.splitlines()[0])}'
+        parts.append(f'<tr><td {style}>{index[k] + 1}</td><td {style}>{pre(t)}</td><td {style}>{pre(e)}</td><td {style}>{mark}</td></tr>')
+    parts.append('</table>')
+    for k, ((t, e, t_mine, e_mine, _), (ok, message)) in enumerate(zip(rows, results)):
+        if t_mine or e_mine:
+            parts.append(row_marker(index[k], ok, message))
+    outcome['prologuehtml'] = ''.join(parts)
+    return outcome
+
+
+print(json.dumps(main()))
+]]></template>
+    <iscombinatortemplate><![CDATA[1]]></iscombinatortemplate>
+    <allowmultiplestdins><![CDATA[0]]></allowmultiplestdins>
+    <answer></answer>
+    <validateonsave>0</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader><![CDATA[TemplateGrader]]></grader>
+    <cputimelimitsecs><![CDATA[20]]></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson><![CDATA[0]]></extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald></templateparamsevald>
+    <twigall><![CDATA[0]]></twigall>
+    <uiplugin><![CDATA[html]]></uiplugin>
+    <uiparameters><![CDATA[{"html_src": "prototypeextra"}]]></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra><![CDATA[<script>
+// If the DOM header does not already contain the style sheet for this
+// question type, insert it.
+if (document.getElementsByClassName('qtype-coderunner-unicv-tt').length === 0) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+    div.tt-box {
+        background: #ffffff;
+        border: 1px solid #c4cdd5;
+        border-radius: 8px;
+        color: #1d2125;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+    }
+
+    div.tt-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-bottom: 1px solid #e3e7eb;
+        border-radius: 8px 8px 0 0;
+        background: #f6f8fa;
+        font-size: 13px;
+        color: #48535e;
+    }
+
+    div.tt-bar .tt-mode {
+        font-weight: 600;
+        color: #0f6cbf;
+    }
+
+    div.tt-box button.tt-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        margin: 0;
+        padding: 0 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    div.tt-box button.tt-btn:hover,
+    div.tt-box button.tt-btn:focus {
+        background: #e7f0fa;
+        border-color: #0f6cbf;
+    }
+
+    div.tt-box button.tt-btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+    }
+
+    div.tt-box button.tt-btn[aria-expanded="true"] {
+        background: #0f6cbf;
+        border-color: #0f6cbf;
+        color: #ffffff;
+    }
+
+    div.tt-box button.tt-btn.tt-danger {
+        background: #a51d2a;
+        border-color: #a51d2a;
+        color: #ffffff;
+    }
+
+    div.tt-help {
+        padding: 10px 14px;
+        border-bottom: 1px solid #e3e7eb;
+        background: #f3f8fd;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    div.tt-help ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    div.tt-help code,
+    div.tt-settings code,
+    div.tt-solution code {
+        color: #a51d2a;
+    }
+
+    div.tt-body {
+        padding: 12px;
+        overflow-x: auto;
+    }
+
+    table.tt-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0;
+    }
+
+    table.tt-table th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #c4cdd5;
+        background: transparent;
+        color: #48535e;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    table.tt-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #e3e7eb;
+        vertical-align: top;
+    }
+
+    table.tt-table td.tt-num {
+        width: 28px;
+        padding-top: 12px;
+        color: #8f959e;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 12px;
+        text-align: right;
+    }
+
+    table.tt-table td.tt-status {
+        width: 1%;
+        padding-top: 10px;
+        white-space: nowrap;
+    }
+
+    table.tt-table tr.tt-bad td {
+        background: #fdf0f1;
+    }
+
+    table.tt-table tr.tt-good td {
+        background: #f1f8f1;
+    }
+
+    div.tt-given {
+        box-sizing: border-box;
+        min-height: 34px;
+        margin: 0;
+        padding: 6px 10px;
+        border: 1px dashed #c4cdd5;
+        border-radius: 6px;
+        background: #f1f3f5;
+        color: #48535e;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 20px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    div.tt-given.tt-empty {
+        color: #8f959e;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-style: italic;
+    }
+
+    textarea.tt-cell,
+    textarea.tt-code {
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+        min-width: 160px;
+        min-height: 34px;
+        margin: 0;
+        padding: 6px 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 20px;
+        resize: vertical;
+        overflow: hidden;
+        white-space: pre;
+        overflow-wrap: normal;
+    }
+
+    textarea.tt-cell:focus,
+    textarea.tt-code:focus {
+        outline: 2px solid #0f6cbf;
+        outline-offset: 0;
+        border-color: #0f6cbf;
+    }
+
+    textarea.tt-cell.tt-todo {
+        border-color: #0f6cbf;
+        background: #f7fbff;
+    }
+
+    tr.tt-bad textarea.tt-cell {
+        border-color: #a51d2a;
+    }
+
+    div.tt-hint {
+        margin-top: 3px;
+        color: #48535e;
+        font-size: 12px;
+    }
+
+    div.tt-hint code {
+        padding: 0 3px;
+        border-radius: 3px;
+        background: #fff3cd;
+        color: #6b4a00;
+    }
+
+    div.tt-msg {
+        margin-top: 4px;
+        color: #8a1622;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: pre-wrap;
+    }
+
+    span.tt-ok {
+        color: #2f7d32;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    span.tt-ko {
+        color: #a51d2a;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    span.tt-tools {
+        display: inline-flex;
+        gap: 2px;
+    }
+
+    span.tt-tools button {
+        width: 26px;
+        height: 26px;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #c4cdd5;
+        border-radius: 4px;
+        background: #ffffff;
+        color: #48535e;
+        font-size: 12px;
+        line-height: 24px;
+        cursor: pointer;
+    }
+
+    span.tt-tools button:hover,
+    span.tt-tools button:focus {
+        border-color: #0f6cbf;
+        background: #e7f0fa;
+        color: #0f6cbf;
+    }
+
+    span.tt-tools button:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+
+    div.tt-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        color: #48535e;
+        font-size: 13px;
+    }
+
+    div.tt-settings {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #e3e7eb;
+        font-size: 13px;
+    }
+
+    div.tt-settings label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    div.tt-settings input[type="number"] {
+        width: 56px;
+        height: 28px;
+        padding: 0 6px;
+        border: 1px solid #8f959e;
+        border-radius: 4px;
+    }
+
+    div.tt-settings .tt-note {
+        flex-basis: 100%;
+        color: #48535e;
+    }
+
+    div.tt-solution {
+        padding: 10px 12px 12px;
+        border-top: 1px solid #e3e7eb;
+        background: #fffdf5;
+        border-radius: 0 0 8px 8px;
+    }
+
+    div.tt-solution .tt-title {
+        margin-bottom: 4px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    div.tt-solution .tt-note {
+        margin-bottom: 6px;
+        color: #48535e;
+        font-size: 12px;
+    }
+
+    textarea.tt-code {
+        min-height: 120px;
+        overflow: auto;
+    }
+
+    div.tt-warn {
+        padding: 8px 12px;
+        border-top: 1px solid #e5a5ac;
+        background: #fbe3e5;
+        color: #5c0f17;
+        font-size: 13px;
+    }
+
+    .tt-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+`;
+    styleElement.classList.add('qtype-coderunner-unicv-tt');
+    document.head.append(styleElement);
+}
+</script>
+
+<input type="hidden" id="___textareaId___-tt" class="coderunner-ui-element" name="table">
+<div class="tt-box" id="___textareaId___-tt-box"></div>
+
+<script>
+(() => {
+
+    //jshint esversion: 6
+
+    const T = '___textareaId___';
+    const store = document.getElementById(T + '-tt');
+    const box = document.getElementById(T + '-tt-box');
+    const textarea = document.getElementById(T);
+    const readOnly = !!(textarea && (textarea.readOnly || textarea.disabled));
+
+    // Three modes:
+    //  - AUTHOR: the Answer preload field of the question form, where the teacher builds the table;
+    //  - TEACHER: the Answer field of the question form: the teacher's answer and the reference solution;
+    //  - STUDENT: the question as the student sees it.
+    const MODE = T === 'id_answerpreload' ? 'author' : (T === 'id_answer' ? 'teacher' : 'student');
+
+    const HELP_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="6"></circle><path d="M5.3 5.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.3M7 10.3v.1"></path></svg>';
+    const RESET_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7a4.5 4.5 0 1 0 1.4-3.3"></path><path d="M2.2 1.6v2.6h2.6"></path></svg>';
+    const PLUS_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 2.5v9M2.5 7h9"></path></svg>';
+
+    function esc(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function isOpen(text) {
+        // A cell of the preload is for the student if it is empty or has ??? to complete.
+        return String(text).trim() === '' || String(text).indexOf('???') >= 0;
+    }
+
+    function parseTable(raw) {
+        // raw is the value of a field: the JSON of the UI, {"table": ["<json>"]}, or the inner JSON itself.
+        if (!raw) {
+            return null;
+        }
+        try {
+            let data = JSON.parse(raw);
+            if (data && data.table !== undefined) {
+                const inner = Array.isArray(data.table) ? data.table[0] : data.table;
+                data = inner ? JSON.parse(inner) : null;
+            }
+            return data && typeof data === 'object' ? data : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function cleanRows(rows) {
+        return (Array.isArray(rows) ? rows : []).map(r => [String((r && r[0]) || ''), String((r && r[1]) || '')]);
+    }
+
+    function savedValue() {
+        if (store.value) {
+            return store.value;
+        }
+        const outer = document.getElementById('qtype-coderunner-outer-div-' + T);
+        const leftovers = outer ? outer.getAttribute('data-leftovers') : '';
+        if (leftovers) {
+            try {
+                const data = JSON.parse(leftovers);
+                return data.table ? data.table[0] : '';
+            } catch (e) {
+                return '';
+            }
+        }
+        return '';
+    }
+
+    // ----- The state -----
+    // spec: the table as the author made it: {kind, addrows, rows: [[test, expected], ...]}.
+    // rows: the cells as they are now (for the student and the teacher).
+    // solution: the reference solution (teacher only).
+
+    let spec = { kind: 'function', addrows: 0, rows: [['', ''], ['', ''], ['', '']] };
+    let rows = [];
+    let solution = '';
+    let mismatch = false;
+
+    function specFrom(data) {
+        return {
+            kind: data.kind === 'program' ? 'program' : 'function',
+            addrows: Math.max(0, Math.min(20, parseInt(data.addrows) || 0)),
+            rows: cleanRows(data.given || data.rows)
+        };
+    }
+
+    function startRows() {
+        // The student's starting cells: the given cells as they are, the open ones with their ??? text.
+        return spec.rows.map(r => [isOpen(r[0]) ? r[0] : r[0], isOpen(r[1]) ? r[1] : r[1]]);
+    }
+
+    function load() {
+        const saved = parseTable(savedValue());
+        if (MODE === 'author') {
+            if (saved) {
+                spec = specFrom(saved);
+                if (!spec.rows.length) {
+                    spec.rows = [['', '']];
+                }
+            }
+            return;
+        }
+        if (MODE === 'teacher') {
+            // The structure always comes from the Answer preload field as it is now.
+            const preloadField = document.getElementById('id_answerpreload');
+            const pre = parseTable(preloadField ? preloadField.value : '');
+            if (pre) {
+                spec = specFrom(pre);
+            } else {
+                spec = { kind: 'function', addrows: 0, rows: [] };
+            }
+            solution = saved && saved.solution ? String(saved.solution) : '';
+            const mine = saved ? cleanRows(saved.rows) : [];
+            rows = startRows();
+            mine.forEach((r, i) => {
+                if (i < rows.length) {
+                    if (isOpen(spec.rows[i][0])) {
+                        rows[i][0] = r[0];
+                    }
+                    if (isOpen(spec.rows[i][1])) {
+                        rows[i][1] = r[1];
+                    }
+                } else if (i < spec.rows.length + spec.addrows) {
+                    rows.push(r);
+                }
+            });
+            return;
+        }
+        // Student. The first time, the saved value is the preload itself (it has no "given").
+        if (saved && saved.given) {
+            spec = specFrom(saved);
+            const mine = cleanRows(saved.rows);
+            rows = startRows();
+            mine.forEach((r, i) => {
+                if (i < rows.length) {
+                    rows[i] = [isOpen(spec.rows[i][0]) ? r[0] : spec.rows[i][0], isOpen(spec.rows[i][1]) ? r[1] : spec.rows[i][1]];
+                } else if (i < spec.rows.length + spec.addrows) {
+                    rows.push(r);
+                }
+            });
+        } else if (saved) {
+            spec = specFrom(saved);
+            rows = startRows();
+        } else {
+            spec = { kind: 'function', addrows: 0, rows: [] };
+            rows = [];
+            mismatch = true;
+        }
+    }
+
+    function save() {
+        if (readOnly) {
+            return;
+        }
+        if (MODE === 'author') {
+            store.value = JSON.stringify({ kind: spec.kind, addrows: spec.addrows, rows: spec.rows });
+        } else if (MODE === 'teacher') {
+            store.value = JSON.stringify({ rows: rows, solution: solution });
+        } else {
+            const changed = rows.length !== spec.rows.length || rows.some((r, i) => r[0] !== spec.rows[i][0] || r[1] !== spec.rows[i][1]);
+            store.value = changed ? JSON.stringify({ kind: spec.kind, addrows: spec.addrows, given: spec.rows, rows: rows }) : '';
+        }
+    }
+
+    // ----- Results of the last Check -----
+    // The grader writes <span class="unicv-tt-row" data-row="N" data-ok="1|0">message</span>.
+
+    const marks = {};
+
+    function readMarks() {
+        if (MODE !== 'student') {
+            return;
+        }
+        const question = box.closest('.que') || document;
+        question.querySelectorAll('.unicv-tt-row').forEach(el => {
+            const n = parseInt(el.getAttribute('data-row'));
+            if (n >= 0) {
+                marks[n] = { ok: el.getAttribute('data-ok') === '1', text: el.textContent.trim() };
+            }
+        });
+    }
+
+    // ----- Drawing -----
+
+    let helpOpen = false;
+    let confirming = false;
+
+    function lines(text) {
+        return Math.max(1, String(text).split('\n').length);
+    }
+
+    function cellEditor(i, j, value, todo, label) {
+        return `<textarea class="tt-cell${todo ? ' tt-todo' : ''}" data-tt-row="${i}" data-tt-col="${j}" rows="${lines(value)}" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="${esc(label)}"${readOnly ? ' readonly' : ''}>${esc(value)}</textarea>`;
+    }
+
+    function givenCell(value) {
+        return value.trim() === '' ? '<div class="tt-given tt-empty">(none)</div>' : `<div class="tt-given">${esc(value)}</div>`;
+    }
+
+    function headers() {
+        return spec.kind === 'program' ? ['Standard input', 'Expected output'] : ['Test code', 'Expected output'];
+    }
+
+    function openCells() {
+        let total = 0, done = 0;
+        rows.forEach((r, i) => {
+            [0, 1].forEach(j => {
+                const open = i >= spec.rows.length || isOpen(spec.rows[i][j]);
+                if (!open || (j === 0 && spec.kind === 'program' && i >= spec.rows.length)) {
+                    return;
+                }
+                total += 1;
+                if (r[j].trim() !== '' && r[j].indexOf('???') < 0) {
+                    done += 1;
+                }
+            });
+        });
+        return { total: total, done: done };
+    }
+
+    function barHtml() {
+        let left;
+        if (MODE === 'author') {
+            left = `<span class="tt-mode">Building the test table</span><span>${spec.rows.length} row${spec.rows.length === 1 ? '' : 's'}</span>`;
+        } else if (MODE === 'teacher') {
+            left = '<span class="tt-mode">Teacher\'s answer</span><span>Fill in the open cells and the reference solution</span>';
+        } else {
+            const c = openCells();
+            left = `<span>${c.done} of ${c.total} cell${c.total === 1 ? '' : 's'} filled in</span>`;
+        }
+        let right = `<button type="button" class="tt-btn" data-tt-bar="help" aria-expanded="${helpOpen}" aria-controls="${T}-tt-help">${HELP_ICON}<span>Help</span></button>`;
+        if (MODE === 'student' && !readOnly) {
+            if (confirming) {
+                right = `<span style="font-weight:600;color:#1d2125">Clear all your cells and start again?</span>
+<button type="button" class="tt-btn tt-danger" data-tt-bar="reset-yes">Yes, start again</button>
+<button type="button" class="tt-btn" data-tt-bar="reset-no">Cancel</button>`;
+            } else {
+                right += ` <button type="button" class="tt-btn" data-tt-bar="reset">${RESET_ICON}<span>Start again</span></button>`;
+            }
+        }
+        return `<div class="tt-bar"><span style="display:flex;gap:12px;flex-wrap:wrap">${left}</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${right}</span></div>`;
+    }
+
+    function helpHtml() {
+        if (!helpOpen) {
+            return '';
+        }
+        let items;
+        const what = spec.kind === 'program' ? 'the standard input (what is typed on the keyboard)' : 'the test code';
+        if (MODE === 'author') {
+            items = [
+                'Each row is a test: ' + (spec.kind === 'program' ? 'the <strong>standard input</strong> given to the program' : 'the <strong>test code</strong> (e.g. <code>print(area(2, 3))</code>)') + ' and the <strong>expected output</strong> it prints.',
+                'Cells with text are <strong>given</strong> to the student. <strong>Leave a cell empty</strong> for the student to fill in, or write <code>???</code> in it for the parts the student must complete (e.g. <code>print(area(???, ???))</code>).',
+                'Then go to the <strong>Answer</strong> field: fill in the open cells correctly and write the <strong>reference solution</strong>, the code the tests are run with.',
+                'Students never see the reference solution. Tick <em>Validate on save</em>: the teacher\'s answer must be valid.'
+            ];
+        } else if (MODE === 'teacher') {
+            items = [
+                'The table comes from the <strong>Answer preload</strong> field. If you change it there, save the question and the change appears here.',
+                'Fill in the open cells as a good student would.',
+                'In <strong>Reference solution</strong>, write the correct code. Each test is run with it, and a row is valid if it prints exactly the expected output.',
+                'Optional: add <strong>wrong versions</strong> after the solution, each starting with a line <code>#### wrong: description</code>. The student\'s tests must catch each of them (at least one test must give a different result), so the student has to think of cases such as 0, negative numbers or empty lists.'
+            ];
+        } else {
+            items = [
+                'Each row is a test of the program described in the question: ' + what + ' and the <strong>expected output</strong>, exactly as it would be printed.',
+                'Grey cells are given. Fill in the white ones; where you see <code>???</code>, replace it and keep the rest.',
+                spec.addrows ? `You can add up to ${spec.addrows} test${spec.addrows === 1 ? '' : 's'} of your own with <strong>Add a test</strong>.` : '',
+                'After <strong>Check</strong>, each of your rows is marked ✓ (valid) or ✗ (not valid, with the reason). A test is valid when the correct program prints exactly its expected output.',
+                'Think of different cases: small and large values, 0, negative numbers, the limits of each condition…'
+            ].filter(t => t);
+        }
+        return `<div class="tt-help" id="${T}-tt-help"><ul>${items.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+    }
+
+    function settingsHtml() {
+        if (MODE !== 'author') {
+            return '';
+        }
+        return `<div class="tt-settings">
+<span>The tests are:</span>
+<label><input type="radio" name="${T}-tt-kind" value="function"${spec.kind === 'function' ? ' checked' : ''}${readOnly ? ' disabled' : ''}> Python code that calls a function</label>
+<label><input type="radio" name="${T}-tt-kind" value="program"${spec.kind === 'program' ? ' checked' : ''}${readOnly ? ' disabled' : ''}> the standard input of a program</label>
+<label>Students can add up to <input type="number" min="0" max="20" data-tt-set="addrows" value="${spec.addrows}"${readOnly ? ' disabled' : ''}> tests of their own</label>
+<span class="tt-note">Leave a cell <strong>empty</strong> for the student to fill in, or write <code>???</code> for the parts to complete. Cells with other text are given.</span>
+</div>`;
+    }
+
+    function authorTable() {
+        const [h0, h1] = headers();
+        const body = spec.rows.map((r, i) => {
+            const tools = readOnly ? '' : `<span class="tt-tools">
+<button type="button" data-tt-act="up" data-tt-row="${i}" aria-label="Move row ${i + 1} up" title="Move up"${i === 0 ? ' disabled' : ''}>↑</button>
+<button type="button" data-tt-act="down" data-tt-row="${i}" aria-label="Move row ${i + 1} down" title="Move down"${i === spec.rows.length - 1 ? ' disabled' : ''}>↓</button>
+<button type="button" data-tt-act="delete" data-tt-row="${i}" aria-label="Delete row ${i + 1}" title="Delete row"${spec.rows.length === 1 ? ' disabled' : ''}>✕</button></span>`;
+            const tag = j => isOpen(r[j]) ? `<div class="tt-hint">${r[j].trim() ? 'The student completes the <code>???</code>' : 'The student fills in this cell'}</div>` : '';
+            return `<tr><td class="tt-num">${i + 1}</td>
+<td>${cellEditor(i, 0, r[0], isOpen(r[0]), `Row ${i + 1}, ${h0}`)}${tag(0)}</td>
+<td>${cellEditor(i, 1, r[1], isOpen(r[1]), `Row ${i + 1}, ${h1}`)}${tag(1)}</td>
+<td class="tt-status">${tools}</td></tr>`;
+        }).join('');
+        const foot = readOnly ? '' : `<div class="tt-foot"><button type="button" class="tt-btn" data-tt-act="add">${PLUS_ICON}<span>Add a row</span></button></div>`;
+        return `<table class="tt-table"><thead><tr><th>#</th><th>${h0}</th><th>${h1}</th><th></th></tr></thead><tbody>${body}</tbody></table>${foot}`;
+    }
+
+    function answerTable() {
+        const [h0, h1] = headers();
+        const body = rows.map((r, i) => {
+            const extra = i >= spec.rows.length;
+            const mark = marks[i];
+            const cls = mark ? (mark.ok ? 'tt-good' : 'tt-bad') : '';
+            const cellHtml = j => {
+                const open = extra || isOpen(spec.rows[i][j]);
+                if (!open) {
+                    return givenCell(r[j]);
+                }
+                const hint = !extra && spec.rows[i][j].indexOf('???') >= 0 ?
+                    `<div class="tt-hint">Complete: <code>${esc(spec.rows[i][j])}</code></div>` : '';
+                return cellEditor(i, j, r[j], true, `Row ${i + 1}, ${j === 0 ? h0 : h1}`) + hint;
+            };
+            let status = '';
+            if (mark) {
+                status = mark.ok ? '<span class="tt-ok" title="Valid test" aria-label="Valid test">✓</span>' :
+                    '<span class="tt-ko" title="Not valid" aria-label="Not valid">✗</span>';
+            }
+            if (extra && !readOnly) {
+                status += ` <span class="tt-tools"><button type="button" data-tt-act="remove" data-tt-row="${i}" aria-label="Remove test ${i + 1}" title="Remove this test">✕</button></span>`;
+            }
+            const msg = mark && !mark.ok ? `<div class="tt-msg" role="note">${esc(mark.text)}</div>` : '';
+            return `<tr class="${cls}" data-tt-tr="${i}"><td class="tt-num">${i + 1}</td><td>${cellHtml(0)}</td><td>${cellHtml(1)}${msg}</td><td class="tt-status">${status}</td></tr>`;
+        }).join('');
+        let foot = '';
+        if (!readOnly && spec.addrows) {
+            const extras = rows.length - spec.rows.length;
+            foot = `<div class="tt-foot"><button type="button" class="tt-btn" data-tt-act="addtest"${extras >= spec.addrows ? ' disabled' : ''}>${PLUS_ICON}<span>Add a test</span></button>
+<span>${extras} of ${spec.addrows} test${spec.addrows === 1 ? '' : 's'} of your own</span></div>`;
+        }
+        const empty = rows.length ? '' : '<p style="color:#6a737b">This question has no test table yet. The teacher builds it in the <em>Answer preload</em> field.</p>';
+        return empty || `<table class="tt-table"><thead><tr><th>#</th><th>${h0}</th><th>${h1}</th><th></th></tr></thead><tbody>${body}</tbody></table>${foot}`;
+    }
+
+    function solutionHtml() {
+        if (MODE !== 'teacher') {
+            return '';
+        }
+        return `<div class="tt-solution"><div class="tt-title"><label for="${T}-tt-sol">Reference solution (hidden from students)</label></div>
+<div class="tt-note">The correct ${spec.kind === 'program' ? 'program' : 'function'}. Optionally, add wrong versions after it, each starting with a line <code>#### wrong: description</code>: the student's tests must catch each of them.</div>
+<textarea class="tt-code" id="${T}-tt-sol" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.max(6, lines(solution) + 1)}"${readOnly ? ' readonly' : ''}>${esc(solution)}</textarea></div>`;
+    }
+
+    function warnHtml() {
+        if (MODE === 'student' && mismatch && !readOnly) {
+            return '<div class="tt-warn">The table of this question could not be loaded. Please tell your teacher.</div>';
+        }
+        if (MODE === 'teacher' && !spec.rows.length) {
+            return '<div class="tt-warn">Build the test table first in the <strong>Answer preload</strong> field, save the question and come back here.</div>';
+        }
+        return '';
+    }
+
+    function render(focus) {
+        box.innerHTML = barHtml() + helpHtml() + settingsHtml() +
+            `<div class="tt-body">${MODE === 'author' ? authorTable() : answerTable()}</div>` + solutionHtml() + warnHtml() +
+            `<div class="tt-sr" aria-live="polite" id="${T}-tt-live"></div>`;
+        box.querySelectorAll('textarea.tt-cell').forEach(fit);
+        if (focus) {
+            const el = box.querySelector(focus);
+            if (el) {
+                el.focus();
+            }
+        }
+    }
+
+    function renderBar() {
+        const old = box.querySelector('.tt-bar');
+        const tmp = document.createElement('div');
+        tmp.innerHTML = barHtml();
+        old.replaceWith(tmp.firstChild);
+    }
+
+    function fit(el) {
+        el.rows = lines(el.value);
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight + 2) + 'px';
+    }
+
+    function announce(text) {
+        const live = document.getElementById(T + '-tt-live');
+        if (live) {
+            live.textContent = text;
+        }
+    }
+
+    // ----- Events -----
+
+    box.addEventListener('input', event => {
+        const el = event.target;
+        if (el.classList.contains('tt-cell')) {
+            const i = +el.getAttribute('data-tt-row'), j = +el.getAttribute('data-tt-col');
+            if (MODE === 'author') {
+                const wasOpen = isOpen(spec.rows[i][j]);
+                spec.rows[i][j] = el.value;
+                save();
+                fit(el);
+                if (wasOpen !== isOpen(el.value)) {
+                    // Redraw the hint under the cell, keeping the cursor where it is.
+                    const pos = el.selectionStart;
+                    render(`textarea[data-tt-row="${i}"][data-tt-col="${j}"]`);
+                    const again = box.querySelector(`textarea[data-tt-row="${i}"][data-tt-col="${j}"]`);
+                    again.setSelectionRange(pos, pos);
+                }
+                renderBar();
+                return;
+            }
+            rows[i][j] = el.value;
+            fit(el);
+            if (marks[i]) {
+                delete marks[i];
+                const tr = el.closest('tr');
+                tr.classList.remove('tt-good', 'tt-bad');
+                const msg = tr.querySelector('.tt-msg');
+                if (msg) {
+                    msg.remove();
+                }
+                const st = tr.querySelector('.tt-ok, .tt-ko');
+                if (st) {
+                    st.remove();
+                }
+            }
+            save();
+            renderBar();
+        } else if (el.classList.contains('tt-code')) {
+            solution = el.value;
+            save();
+        } else if (el.getAttribute('data-tt-set') === 'addrows') {
+            spec.addrows = Math.max(0, Math.min(20, parseInt(el.value) || 0));
+            save();
+        }
+    });
+
+    box.addEventListener('change', event => {
+        const el = event.target;
+        if (MODE === 'author' && el.name === T + '-tt-kind') {
+            spec.kind = el.value === 'program' ? 'program' : 'function';
+            save();
+            render(`input[name="${T}-tt-kind"][value="${spec.kind}"]`);
+        }
+    });
+
+    box.addEventListener('keydown', event => {
+        const el = event.target;
+        if (el.classList.contains('tt-code') && event.key === 'Tab' && !event.shiftKey && !readOnly) {
+            // Tab inserts four spaces in the reference solution.
+            event.preventDefault();
+            const s = el.selectionStart, e = el.selectionEnd;
+            el.value = el.value.slice(0, s) + '    ' + el.value.slice(e);
+            el.setSelectionRange(s + 4, s + 4);
+            solution = el.value;
+            save();
+        }
+    });
+
+    box.addEventListener('click', event => {
+        const button = event.target.closest('button');
+        if (!button) {
+            return;
+        }
+        const bar = button.getAttribute('data-tt-bar');
+        if (bar === 'help') {
+            helpOpen = !helpOpen;
+            render('[data-tt-bar="help"]');
+            return;
+        }
+        if (readOnly) {
+            return;
+        }
+        if (bar === 'reset') {
+            confirming = true;
+            render('[data-tt-bar="reset-no"]');
+            return;
+        } else if (bar === 'reset-no') {
+            confirming = false;
+            render('[data-tt-bar="reset"]');
+            return;
+        } else if (bar === 'reset-yes') {
+            confirming = false;
+            rows = startRows();
+            Object.keys(marks).forEach(k => delete marks[k]);
+            save();
+            render('textarea.tt-cell');
+            announce('Started again');
+            return;
+        }
+        const act = button.getAttribute('data-tt-act');
+        const i = parseInt(button.getAttribute('data-tt-row'));
+        if (MODE === 'author') {
+            if (act === 'add') {
+                spec.rows.push(['', '']);
+                save();
+                render(`textarea[data-tt-row="${spec.rows.length - 1}"][data-tt-col="0"]`);
+                announce(`Row ${spec.rows.length} added`);
+            } else if (act === 'delete' && spec.rows.length > 1) {
+                spec.rows.splice(i, 1);
+                save();
+                render(`[data-tt-act="add"]`);
+                announce(`Row ${i + 1} deleted`);
+            } else if ((act === 'up' && i > 0) || (act === 'down' && i < spec.rows.length - 1)) {
+                const to = act === 'up' ? i - 1 : i + 1;
+                [spec.rows[i], spec.rows[to]] = [spec.rows[to], spec.rows[i]];
+                save();
+                render(`[data-tt-act="${act}"][data-tt-row="${to}"]:not(:disabled)`);
+                announce(`Moved to row ${to + 1}`);
+            }
+        } else if (act === 'addtest' && rows.length < spec.rows.length + spec.addrows) {
+            rows.push(['', '']);
+            save();
+            render(`textarea[data-tt-row="${rows.length - 1}"][data-tt-col="0"]`);
+            announce('Test added');
+        } else if (act === 'remove' && i >= spec.rows.length) {
+            rows.splice(i, 1);
+            // Marks after this row no longer match their rows.
+            Object.keys(marks).forEach(k => { if (+k >= i) { delete marks[k]; } });
+            save();
+            render('[data-tt-act="addtest"]');
+            announce('Test removed');
+        }
+    });
+
+    load();
+    save();
+    readMarks();
+    render();
+    if (document.readyState === 'loading') {
+        // The feedback of the last Check may come after this question in the page.
+        document.addEventListener('DOMContentLoaded', () => {
+            readMarks();
+            render();
+        });
+    }
+    window.addEventListener('resize', () => box.querySelectorAll('textarea.tt-cell').forEach(fit));
+
+})();
+</script>
+]]></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>
