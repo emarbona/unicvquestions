@@ -38,7 +38,7 @@
 <h4>Grading</h4>
 <ul>
 <li>Each test is passed when the output of the flowchart is exactly the expected output. With <em>All-or-nothing grading</em> (the default), the mark is 1 only if every test is passed.</li>
-<li>The requirements in <code>exigir</code>, <code>proibir</code> and <code>funcoes</code> (see below) are checked before running the tests.</li>
+<li>The requirements in <code>require</code>, <code>forbid</code> and <code>functions</code> (see below) are checked before running the tests.</li>
 </ul>
 <h4>Limitations</h4>
 <ul>
@@ -48,12 +48,13 @@
 </ul>
 <h4>Template parameters (all optional)</h4>
 <ul>
-<li><strong>exigir</strong> / <strong>proibir</strong>: lists of shapes that the flowchart must use / must not use, among "entrada", "saida", "declarar", "atribuicao", "chamar", "se", "enquanto", "para", "fazer", "comentario" and "ciclo" (any loop). The English names are also accepted.</li>
-<li><strong>funcoes</strong>: list of the names of the functions the student must define, e.g. <code>["Quadrado"]</code>.</li>
-<li><strong>max_passos</strong> (default 100000): largest number of shapes run in each test, to detect endless loops.</li>
+<li><strong>require</strong> / <strong>forbid</strong>: lists of shapes that the flowchart must use / must not use, among "input", "output", "declare", "assign", "call", "if", "while", "for", "do", "comment" and "loop" (any loop).</li>
+<li><strong>functions</strong>: list of the names of the functions the student must define, e.g. <code>["Square"]</code>.</li>
+<li><strong>max_steps</strong> (default 100000): largest number of shapes run in each test, to detect endless loops.</li>
 <li><strong>lang</strong> (default "pt"): language of the error messages when the student has not chosen another one in the editor: "pt", "en" or "es".</li>
 </ul>
-<p>Example: <code>{"exigir": ["para"], "funcoes": ["Fatorial"]}</code></p>
+<p>Example: <code>{"require": ["for"], "functions": ["Factorial"]}</code></p>
+<p>Only these names, in English, are accepted. A parameter with another name, or a shape type that does not exist, is reported as a question error (and <em>Validate on save</em> rejects the question), so typing mistakes are not silently ignored.</p>
 ]]></text>
     </questiontext>
     <generalfeedback format="html">
@@ -81,13 +82,13 @@
     executa-o com os dados de cada caso de teste, comparando o que ele escreve
     com a saída esperada.
 
-    Parâmetros do modelo (todos opcionais):
-      max_passos   número máximo de figuras executadas por teste (por omissão 100000)
-      exigir       lista de figuras que o fluxograma tem de usar: "entrada", "saida",
-                   "declarar", "atribuicao", "chamar", "se", "enquanto", "para",
-                   "fazer", "comentario" e "ciclo" (qualquer um dos três ciclos)
-      proibir      lista de figuras que o fluxograma não pode usar
-      funcoes      lista de nomes de funções que o estudante tem de definir
+    Parâmetros do modelo (todos opcionais; só se aceitam estes nomes, em inglês):
+      max_steps    número máximo de figuras executadas por teste (por omissão 100000)
+      require      lista de figuras que o fluxograma tem de usar: "input", "output",
+                   "declare", "assign", "call", "if", "while", "for", "do",
+                   "comment" e "loop" (qualquer um dos três ciclos)
+      forbid       lista de figuras que o fluxograma não pode usar
+      functions    lista de nomes de funções que o estudante tem de definir
       lang         língua das mensagens quando o estudante não escolheu outra
                    no editor: "pt" (por omissão), "en" ou "es"
 """
@@ -99,6 +100,10 @@ import sys
 
 __answer__ = """{{ STUDENT_ANSWER | e('py') }}"""
 __params__ = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+if not isinstance(__params__, dict):  # Twig dá [] quando não há parâmetros.
+    __params__ = {}
+# Os nomes dos parâmetros e dos tipos de figura são em inglês.
+PARAMETROS = ('require', 'forbid', 'functions', 'max_steps', 'lang')
 
 MENSAGENS = {
     'pt': {
@@ -162,6 +167,8 @@ MENSAGENS = {
         'retorno_nome': "A função {f} devolve um valor, mas falta indicar a variável devolvida.",
         'exigir': "O fluxograma deve usar pelo menos uma figura {nome}.",
         'proibir': "Neste exercício o fluxograma não pode usar figuras {nome}.",
+        'parametro': "Erro na pergunta: o parâmetro do modelo «{p}» não existe (os parâmetros são require, forbid, functions, max_steps, lang). Avise o docente.",
+        'valor': "Erro na pergunta: «{v}» não é um valor válido no parâmetro {p} (use input, output, declare, assign, call, if, while, for, do, comment, loop). Avise o docente.",
         'exigir_funcao': "O fluxograma deve definir uma função chamada {n}.",
     },
     'en': {
@@ -225,6 +232,8 @@ MENSAGENS = {
         'retorno_nome': "The function {f} returns a value, but the return variable is missing.",
         'exigir': "The flowchart must use at least one {nome} shape.",
         'proibir': "In this exercise the flowchart cannot use {nome} shapes.",
+        'parametro': "Question error: there is no template parameter '{p}' (the parameters are require, forbid, functions, max_steps, lang). Please tell your teacher.",
+        'valor': "Question error: '{v}' is not a valid value for the parameter {p} (use input, output, declare, assign, call, if, while, for, do, comment, loop). Please tell your teacher.",
         'exigir_funcao': "The flowchart must define a function called {n}.",
     },
     'es': {
@@ -288,6 +297,8 @@ MENSAGENS = {
         'retorno_nome': "La función {f} devuelve un valor, pero falta indicar la variable devuelta.",
         'exigir': "El diagrama debe usar al menos una figura {nome}.",
         'proibir': "En este ejercicio el diagrama no puede usar figuras {nome}.",
+        'parametro': "Error en la pregunta: el parámetro de plantilla «{p}» no existe (los parámetros son require, forbid, functions, max_steps, lang). Avise al docente.",
+        'valor': "Error en la pregunta: «{v}» no es un valor válido en el parámetro {p} (use input, output, declare, assign, call, if, while, for, do, comment, loop). Avise al docente.",
         'exigir_funcao': "El diagrama debe definir una función llamada {n}.",
     },
 }
@@ -1102,23 +1113,26 @@ FIGURAS_PARAMETRO = {'entrada': {'input'}, 'saida': {'output'}, 'declarar': {'de
                      'atribuicao': {'assign'}, 'chamar': {'call'}, 'se': {'if'}, 'enquanto': {'while'},
                      'para': {'for'}, 'fazer': {'do'}, 'comentario': {'comment'},
                      'ciclo': {'while', 'for', 'do'}}
-# Os mesmos nomes noutras línguas.
+# Os tipos de figura dos parâmetros 'require' e 'forbid' (em inglês).
 OUTROS_NOMES = {'input': 'entrada', 'output': 'saida', 'declare': 'declarar', 'assign': 'atribuicao',
                 'call': 'chamar', 'if': 'se', 'while': 'enquanto', 'for': 'para', 'do': 'fazer',
-                'comment': 'comentario', 'loop': 'ciclo', 'salida': 'saida', 'asignar': 'atribuicao',
-                'llamar': 'chamar', 'si': 'se', 'mientras': 'enquanto', 'hacer': 'fazer',
-                'comentario': 'comentario', 'bucle': 'ciclo'}
+                'comment': 'comentario', 'loop': 'ciclo'}
 
 
 def verificar_parametros(funcoes, params):
     usadas = {f.tipo for fn in funcoes for f in todas(fn.figuras)}
     nomes = MENSAGENS[LINGUA]['figuras']
-    for chave in ('exigir', 'proibir'):
-        for tipo in params.get(chave, []):
-            tipo = str(tipo).lower()
-            tipo = OUTROS_NOMES.get(tipo, tipo)
-            if tipo not in FIGURAS_PARAMETRO:
-                continue
+    for nome in params:
+        if nome not in PARAMETROS and not str(nome).startswith('_'):
+            raise Erro('parametro', True, p=nome)
+    for chave, parametro in (('exigir', 'require'), ('proibir', 'forbid')):
+        valores = params.get(parametro, [])
+        if not isinstance(valores, list):
+            valores = [valores]
+        for tipo in valores:
+            if str(tipo).lower() not in OUTROS_NOMES:
+                raise Erro('valor', True, v=tipo, p=parametro)
+            tipo = OUTROS_NOMES[str(tipo).lower()]
             aceites = FIGURAS_PARAMETRO[tipo]
             nome = MENSAGENS[LINGUA]['ciclo'] if tipo == 'ciclo' else nomes[next(iter(aceites))]
             if chave == 'exigir' and not (aceites & usadas):
@@ -1126,7 +1140,7 @@ def verificar_parametros(funcoes, params):
             if chave == 'proibir' and (aceites & usadas):
                 raise Erro('proibir', True, nome=nome)
     definidas = {f.nome.lower() for f in funcoes[1:]}
-    for nome in params.get('funcoes', []):
+    for nome in params.get('functions', []):
         if str(nome).lower() not in definidas:
             raise Erro('exigir_funcao', True, n=nome)
 
@@ -1135,7 +1149,7 @@ __maquina__ = None
 try:
     __funcoes__ = carregar(__answer__)
     verificar_parametros(__funcoes__, __params__)
-    __maquina__ = Maquina(__funcoes__, sys.stdin.read().splitlines(), int(__params__.get('max_passos', 100000)))
+    __maquina__ = Maquina(__funcoes__, sys.stdin.read().splitlines(), int(__params__.get('max_steps', 100000)))
     __maquina__.executar(__funcoes__[0].figuras, {})
     print(''.join(__maquina__.saida), end='')
 except (Erro, Fim, RecursionError) as __erro__:

@@ -41,12 +41,12 @@
     <cputimelimitsecs></cputimelimitsecs>
     <memlimitmb></memlimitmb>
     <sandboxparams></sandboxparams>
-    <templateparams><![CDATA[{"exigir": ["ciclo"], "lang": "en"}]]></templateparams>
+    <templateparams><![CDATA[{"require": ["loop"], "lang": "en"}]]></templateparams>
     <hoisttemplateparams>1</hoisttemplateparams>
     <extractcodefromjson>1</extractcodefromjson>
     <templateparamslang>None</templateparamslang>
     <templateparamsevalpertry>0</templateparamsevalpertry>
-    <templateparamsevald><![CDATA[{"exigir":["ciclo"]}]]></templateparamsevald>
+    <templateparamsevald><![CDATA[{"require":["loop"],"lang":"en"}]]></templateparamsevald>
     <twigall>0</twigall>
     <uiplugin></uiplugin>
     <uiparameters></uiparameters>

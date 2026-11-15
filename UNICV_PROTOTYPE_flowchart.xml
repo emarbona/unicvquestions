@@ -38,7 +38,7 @@
 <h4>Grading</h4>
 <ul>
 <li>Each test is passed when the output of the flowchart is exactly the expected output. With <em>All-or-nothing grading</em> (the default), the mark is 1 only if every test is passed.</li>
-<li>The requirements in <code>exigir</code> and <code>proibir</code> (see below) are checked before running the tests.</li>
+<li>The requirements in <code>require</code> and <code>forbid</code> (see below) are checked before running the tests.</li>
 </ul>
 <h4>Limitations</h4>
 <ul>
@@ -48,12 +48,13 @@
 </ul>
 <h4>Template parameters (all optional)</h4>
 <ul>
-<li><strong>exigir</strong>: list of block types that the flowchart must use, among "entrada", "saida", "atribuicao", "se", "enquanto", "para", "fazer" and "ciclo" (any of the three loops). The English names are also accepted: "input", "output", "assign", "if", "while", "for", "do", "loop".</li>
-<li><strong>proibir</strong>: list of block types that the flowchart must not use (same names).</li>
-<li><strong>max_passos</strong> (default 10000): largest number of blocks run in each test, to detect endless loops.</li>
+<li><strong>require</strong>: list of block types that the flowchart must use, among "input", "output", "assign", "if", "while", "for", "do" and "loop" (any of the three loops).</li>
+<li><strong>forbid</strong>: list of block types that the flowchart must not use (same names). For example, <code>{"require": ["loop"], "forbid": ["do"]}</code> accepts a For or a While loop, but not a Do loop.</li>
+<li><strong>max_steps</strong> (default 10000): largest number of blocks run in each test, to detect endless loops.</li>
 <li><strong>lang</strong> (default "pt"): language of the question, "pt", "en" or "es". It sets how logical values are written in the output (Verdadeiro/Falso, True/False, Verdadero/Falso) and the language of the error messages when the student has not chosen another one.</li>
 </ul>
-<p>Example: <code>{"exigir": ["ciclo"], "proibir": ["fazer"]}</code></p>
+<p>Example: <code>{"require": ["loop", "if"], "forbid": ["do"]}</code></p>
+<p>Only these names, in English, are accepted. A parameter with another name, or a shape type that does not exist, is reported as a question error (and <em>Validate on save</em> rejects the question), so typing mistakes are not silently ignored.</p>
 ]]></text>
     </questiontext>
     <generalfeedback format="html">
@@ -82,12 +83,12 @@
     os dados de cada caso de teste, comparando o que o fluxograma escreve com
     a saída esperada.
 
-    Parâmetros do modelo (todos opcionais):
-      max_passos   número máximo de blocos executados por teste (por omissão 10000)
-      exigir       lista de tipos de bloco que o fluxograma tem de usar, de
-                   entre "entrada", "saida", "atribuicao", "se", "enquanto",
-                   "para", "fazer" e "ciclo" (qualquer um dos três ciclos)
-      proibir      lista de tipos de bloco que o fluxograma não pode usar
+    Parâmetros do modelo (todos opcionais; só se aceitam estes nomes, em inglês):
+      max_steps    número máximo de blocos executados por teste (por omissão 10000)
+      require      lista de tipos de bloco que o fluxograma tem de usar, de
+                   entre "input", "output", "assign", "if", "while", "for",
+                   "do" e "loop" (qualquer um dos três ciclos)
+      forbid       lista de tipos de bloco que o fluxograma não pode usar
       lang         língua da pergunta: "pt" (por omissão), "en" ou "es". Define
                    como se escrevem os valores lógicos (Verdadeiro/Falso,
                    True/False, Verdadero/Falso) e a língua das mensagens quando
@@ -101,6 +102,10 @@ import sys
 
 __answer__ = """{{ STUDENT_ANSWER | e('py') }}"""
 __params__ = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+if not isinstance(__params__, dict):  # Twig dá [] quando não há parâmetros.
+    __params__ = {}
+# Os nomes dos parâmetros e dos tipos de figura são em inglês.
+PARAMETROS = ('require', 'forbid', 'max_steps', 'lang')
 
 
 TIPOS = {'input': 'entrada', 'output': 'saida', 'process': 'atribuicao', 'if': 'se',
@@ -108,8 +113,11 @@ TIPOS = {'input': 'entrada', 'output': 'saida', 'process': 'atribuicao', 'if': '
 # Nomes de tipos aceites nos parâmetros 'exigir' e 'proibir', além dos de cima.
 GRUPOS = {'ciclo': {'enquanto', 'para', 'fazer'}, 'decisao': {'se'}, 'processo': {'atribuicao'},
           'entrada_saida': {'entrada', 'saida', 'entrada_saida'}}
-# Os mesmos tipos, escritos noutras línguas.
+# Os tipos de figura dos parâmetros 'require' e 'forbid' (em inglês).
 OUTROS_NOMES = {'input': 'entrada', 'output': 'saida', 'assign': 'atribuicao', 'if': 'se',
+                'while': 'enquanto', 'for': 'para', 'do': 'fazer', 'loop': 'ciclo'}
+
+NOMES = {'input': 'entrada', 'output': 'saida', 'assign': 'atribuicao', 'if': 'se',
                 'while': 'enquanto', 'for': 'para', 'do': 'fazer', 'loop': 'ciclo',
                 'salida': 'saida', 'asignacion': 'atribuicao', 'si': 'se',
                 'mientras': 'enquanto', 'hacer': 'fazer', 'bucle': 'ciclo'}
@@ -160,6 +168,8 @@ MENSAGENS = {
         'vazio': "O fluxograma está vazio: acrescente figuras entre o Início e o Fim.",
         'exigir': "O fluxograma deve usar pelo menos uma figura {nome}.",
         'proibir': "Neste exercício o fluxograma não pode usar figuras {nome}.",
+        'parametro': "Erro na pergunta: o parâmetro do modelo «{p}» não existe (os parâmetros são require, forbid, max_steps, lang). Avise o docente.",
+        'valor': "Erro na pergunta: «{v}» não é um valor válido no parâmetro {p} (use input, output, assign, if, while, for, do, loop). Avise o docente.",
     },
     'en': {
         'em': "{onde}: {erro}.",
@@ -191,6 +201,8 @@ MENSAGENS = {
         'vazio': "The flowchart is empty: add shapes between Start and End.",
         'exigir': "The flowchart must use at least one {nome} shape.",
         'proibir': "In this exercise the flowchart cannot use {nome} shapes.",
+        'parametro': "Question error: there is no template parameter '{p}' (the parameters are require, forbid, max_steps, lang). Please tell your teacher.",
+        'valor': "Question error: '{v}' is not a valid value for the parameter {p} (use input, output, assign, if, while, for, do, loop). Please tell your teacher.",
     },
     'es': {
         'em': "{onde}: {erro}.",
@@ -222,6 +234,8 @@ MENSAGENS = {
         'vazio': "El diagrama está vacío: añada figuras entre Inicio y Fin.",
         'exigir': "El diagrama debe usar al menos una figura {nome}.",
         'proibir': "En este ejercicio el diagrama no puede usar figuras {nome}.",
+        'parametro': "Error en la pregunta: el parámetro de plantilla «{p}» no existe (los parámetros son require, forbid, max_steps, lang). Avise al docente.",
+        'valor': "Error en la pregunta: «{v}» no es un valor válido en el parámetro {p} (use input, output, assign, if, while, for, do, loop). Avise al docente.",
     },
 }
 
@@ -613,18 +627,34 @@ def carregar(resposta):
 def verificar_tipos(blocos, params):
     usados = {TIPOS[b.tipo] for b in todos(blocos)}
     nomes = NOMES[LINGUA]
-    for chave, falha in (('exigir', lambda aceites: not (aceites & usados)),
-                         ('proibir', lambda aceites: bool(aceites & usados))):
-        for tipo in params.get(chave, []):
-            tipo = OUTROS_NOMES.get(str(tipo).lower(), str(tipo).lower())
-            if tipo in nomes and falha(GRUPOS.get(tipo, {tipo})):
+    for chave, parametro, falha in (('exigir', 'require', lambda aceites: not (aceites & usados)),
+                                    ('proibir', 'forbid', lambda aceites: bool(aceites & usados))):
+        for tipo in params.get(parametro, []):
+            tipo = OUTROS_NOMES[str(tipo).lower()]
+            if falha(GRUPOS.get(tipo, {tipo})):
                 raise ErroFluxograma(chave, True, nome=nomes[tipo])
 
 
+def verificar_parametros(params):
+    """Os nomes dos parâmetros e os tipos de figura têm de ser os previstos."""
+    for nome in params:
+        if nome not in PARAMETROS and not str(nome).startswith('_'):
+            raise ErroFluxograma('parametro', True, p=nome)
+    for nome in ('require', 'forbid'):
+        valores = params.get(nome, [])
+        if not isinstance(valores, list):
+            valores = [valores]
+            params[nome] = valores
+        for valor in valores:
+            if str(valor).lower() not in OUTROS_NOMES:
+                raise ErroFluxograma('valor', True, v=valor, p=nome)
+
+
 try:
+    verificar_parametros(__params__)
     __blocos__ = carregar(__answer__)
     verificar_tipos(__blocos__, __params__)
-    Maquina(sys.stdin.read().splitlines(), int(__params__.get('max_passos', 10000))).executar(__blocos__)
+    Maquina(sys.stdin.read().splitlines(), int(__params__.get('max_steps', 10000))).executar(__blocos__)
 except ErroFluxograma as __erro__:
     print(f"*** {__erro__}")
 ]]></template>
