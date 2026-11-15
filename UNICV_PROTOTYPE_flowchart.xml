@@ -5,35 +5,56 @@
       <text>UNICV_PROTOTYPE_flowchart</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[<p>Protótipo da UniCV para perguntas em que o estudante <strong>constrói um fluxograma</strong>, com blocos e regras parecidos com os do Flowgorithm. O corretor executa o fluxograma com os dados de cada caso de teste e compara o que ele escreve com a saída esperada, como numa pergunta de programação.</p>
-<p>O estudante insere blocos clicando num "+" sobre uma seta e escreve o conteúdo dentro de cada bloco. Os blocos disponíveis são:</p>
-<ul>
-<li><strong>Entrada</strong> (Ler): uma ou mais variáveis, separadas por vírgulas. Cada variável recebe uma linha da entrada do teste.</li>
-<li><strong>Saída</strong> (Escrever): uma expressão, por exemplo <code>"Total: " &amp; soma</code>. Cada bloco escreve uma linha.</li>
-<li><strong>Atribuição</strong>: <code>variável = expressão</code>.</li>
-<li><strong>Se</strong>: uma condição, com um ramo Verdadeiro e um ramo Falso que voltam a juntar-se.</li>
-<li><strong>Enquanto</strong>: repete os blocos do ciclo enquanto a condição for verdadeira (testa antes).</li>
-<li><strong>Para</strong>: <code>i = 1 até 10</code>, opcionalmente com <code>passo 2</code> (ou um passo negativo, para contar para trás).</li>
-<li><strong>Fazer</strong>: executa os blocos do ciclo e repete enquanto a condição for verdadeira (testa depois).</li>
-</ul>
-<p>Por cima do desenho, à direita, há uma lista para escolher a <strong>língua</strong> do editor (português, inglês ou espanhol; por omissão é a da página do Moodle), um botão <strong>Recomeçar</strong>, que elimina todas as figuras e deixa só o Início e o Fim, e um botão <strong>Ajuda</strong>, que abre uma pequena janela com as figuras, os operadores e a forma de adicionar e de eliminar figuras. As cores das figuras são as do Flowgorithm. As palavras <code>e</code>, <code>ou</code>, <code>não</code>, <code>verdadeiro</code> e <code>falso</code> só são reconhecidas com o editor em português (em espanhol, <code>verdadero</code> e <code>falso</code>); <code>and</code>, <code>or</code>, <code>not</code>, <code>true</code> e <code>false</code> funcionam em todas as línguas.</p>
-<p>Nas expressões aceitam-se números, textos entre aspas, <code>+ - * / ^</code>, <code>mod</code> (ou <code>%</code>), <code>div</code>, o operador <code>&amp;</code> para juntar textos e valores, as comparações <code>= == != &lt;&gt; &lt; &gt; &lt;= &gt;=</code>, os operadores lógicos <code>e</code>, <code>ou</code>, <code>não</code> (ou <code>and</code>, <code>or</code>, <code>not</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>!</code>), os valores <code>verdadeiro</code> e <code>falso</code> e as funções <code>Abs</code>, <code>Sqrt</code>/<code>Raiz</code>, <code>Int</code>, <code>Round</code>/<code>Arred</code>, <code>Max</code>, <code>Min</code>, <code>Len</code>, <code>ToInteger</code>, <code>ToReal</code> e <code>ToString</code>. Os números reais com parte decimal nula são escritos sem casas decimais (por exemplo, 4 e não 4.0). As variáveis não precisam de ser declaradas.</p>
-<p>Para criar uma pergunta deste tipo:</p>
+      <text><![CDATA[<p>UniCV prototype for questions in which the student <strong>builds a flowchart</strong>, with blocks and rules similar to those of Flowgorithm but simpler: variables are not declared and there are no functions or arrays (for those, use <code>unicv_flowgorithm</code>). The grader runs the flowchart with the input of each test case and compares what it writes with the expected output, as in a programming question.</p>
+<h4>How to write a question</h4>
 <ol>
-<li>Crie uma pergunta CodeRunner do tipo unicv_flowchart, escreva o nome e o enunciado e guarde.</li>
-<li>Em cada caso de teste, ponha os dados em <em>Standard Input</em> (um valor por linha) e a saída esperada em <em>Expected output</em>. Deixe <em>Test code</em> vazio.</li>
-<li>Construa o fluxograma de solução no campo <em>Answer</em> e guarde com <em>Validate on save</em> ligado, para confirmar que passa nos testes.</li>
-<li>Para fluxogramas altos, aumente o número de linhas da caixa de resposta (<em>Answer box, Rows</em>), por exemplo para 30.</li>
+<li>Create a CodeRunner question of type <code>unicv_flowchart</code>, write the name and the question text, and save.</li>
+<li>In each test case, put the input data in <em>Standard Input</em> (one value per line) and the expected output in <em>Expected output</em>. Leave <em>Test code</em> empty.</li>
+<li>Build the solution flowchart in the <strong>Answer</strong> field and save with <em>Validate on save</em> ticked, to check that it passes the tests.</li>
+<li>For tall flowcharts, increase the number of rows of the answer box (<em>Answer box, Rows</em>), e.g. to 30.</li>
 </ol>
-<p>Parâmetros do modelo (opcionais, em JSON no campo <em>Template params</em>):</p>
+<h4>What the student gets</h4>
 <ul>
-<li><strong>exigir</strong>: lista de tipos de bloco que o fluxograma tem de usar, de entre "entrada", "saida", "atribuicao", "se", "enquanto", "para", "fazer" e "ciclo" (qualquer um dos três ciclos).</li>
-<li><strong>proibir</strong>: lista de tipos de bloco que o fluxograma não pode usar.</li>
-<li><strong>max_passos</strong>: número máximo de blocos executados em cada teste (por omissão 10000), para detetar ciclos infinitos.</li>
-<li><strong>lang</strong>: língua da pergunta, "pt" (por omissão), "en" ou "es". Define como se escrevem os valores lógicos na saída (Verdadeiro/Falso, True/False, Verdadero/Falso) e a língua das mensagens de erro quando o estudante não escolheu outra. Em "exigir" e "proibir" também se aceitam os nomes em inglês ("input", "output", "assign", "if", "while", "for", "do", "loop").</li>
+<li>An editor with the Start and End blocks. A block is inserted by clicking the "+" on an arrow, and its content is written inside the block. The available blocks are:
+<ul>
+<li><strong>Input</strong> (Read): one or more variables, separated by commas. Each variable gets one line of the test input.</li>
+<li><strong>Output</strong> (Write): an expression, e.g. <code>"Total: " &amp; soma</code>. Each block writes one line.</li>
+<li><strong>Assignment</strong>: <code>variable = expression</code>.</li>
+<li><strong>If</strong>: a condition, with a True branch and a False branch that join again.</li>
+<li><strong>While</strong>: repeats the blocks of the loop while the condition is true (tested before).</li>
+<li><strong>For</strong>: <code>i = 1 até 10</code> (or <code>to</code>), optionally with <code>passo 2</code> (or <code>step</code>; a negative step counts down).</li>
+<li><strong>Do</strong>: runs the blocks of the loop and repeats while the condition is true (tested after).</li>
+</ul></li>
+<li>Above the drawing, on the right: a list to choose the <strong>language</strong> of the editor (Portuguese, English or Spanish; by default that of the Moodle page), a <strong>Start again</strong> button that removes every block except Start and End, and a <strong>Help</strong> button with the blocks, the operators and how to add and remove blocks. The colours of the blocks are those of Flowgorithm.</li>
+<li>After <strong>Check</strong>, the usual CodeRunner table of tests (input, expected output and the output of the flowchart), and the reason when the flowchart cannot run (e.g. an empty block, a loop that never ends, or a block that the question requires and is missing).</li>
 </ul>
-<p>Exemplo:</p>
-<pre>{"exigir": ["ciclo"], "proibir": ["fazer"]}</pre>]]></text>
+<h4>Expressions</h4>
+<ul>
+<li>Numbers, texts between quotes, <code>+ - * / ^</code>, <code>mod</code> (or <code>%</code>), <code>div</code>, <code>&amp;</code> to join texts and values, the comparisons <code>= == != &lt;&gt; &lt; &gt; &lt;= &gt;=</code>, the logical operators <code>e</code>, <code>ou</code>, <code>não</code> (or <code>and</code>, <code>or</code>, <code>not</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>!</code>) and the values <code>verdadeiro</code> and <code>falso</code>.</li>
+<li>Functions: <code>Abs</code>, <code>Sqrt</code>/<code>Raiz</code>, <code>Int</code>, <code>Round</code>/<code>Arred</code>, <code>Max</code>, <code>Min</code>, <code>Len</code>, <code>ToInteger</code>, <code>ToReal</code> and <code>ToString</code>.</li>
+<li>The words <code>e</code>, <code>ou</code>, <code>não</code>, <code>verdadeiro</code> and <code>falso</code> are recognised only with the editor in Portuguese (in Spanish, <code>verdadero</code> and <code>falso</code>); <code>and</code>, <code>or</code>, <code>not</code>, <code>true</code> and <code>false</code> work in every language.</li>
+<li>Real numbers with no decimal part are written without decimals (4, not 4.0).</li>
+</ul>
+<h4>Grading</h4>
+<ul>
+<li>Each test is passed when the output of the flowchart is exactly the expected output. With <em>All-or-nothing grading</em> (the default), the mark is 1 only if every test is passed.</li>
+<li>The requirements in <code>exigir</code> and <code>proibir</code> (see below) are checked before running the tests.</li>
+</ul>
+<h4>Limitations</h4>
+<ul>
+<li>Variables are not declared and have no fixed type; there are no arrays and no functions defined by the student (use <code>unicv_flowgorithm</code>).</li>
+<li>Each Output block writes a whole line; it is not possible to write several values on the same line with several blocks (join them with <code>&amp;</code>).</li>
+<li>The flowchart is stored as JSON in the answer; it cannot be imported from or exported to Flowgorithm (.fprg) files.</li>
+</ul>
+<h4>Template parameters (all optional)</h4>
+<ul>
+<li><strong>exigir</strong>: list of block types that the flowchart must use, among "entrada", "saida", "atribuicao", "se", "enquanto", "para", "fazer" and "ciclo" (any of the three loops). The English names are also accepted: "input", "output", "assign", "if", "while", "for", "do", "loop".</li>
+<li><strong>proibir</strong>: list of block types that the flowchart must not use (same names).</li>
+<li><strong>max_passos</strong> (default 10000): largest number of blocks run in each test, to detect endless loops.</li>
+<li><strong>lang</strong> (default "pt"): language of the question, "pt", "en" or "es". It sets how logical values are written in the output (Verdadeiro/Falso, True/False, Verdadero/Falso) and the language of the error messages when the student has not chosen another one.</li>
+</ul>
+<p>Example: <code>{"exigir": ["ciclo"], "proibir": ["fazer"]}</code></p>
+]]></text>
     </questiontext>
     <generalfeedback format="html">
       <text></text>

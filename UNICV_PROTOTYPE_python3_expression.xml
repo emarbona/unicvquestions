@@ -1,0 +1,1126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 21973  -->
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[UNICV_PROTOTYPE_python3_expression]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>UniCV prototype for <strong>"write the expression"</strong> questions in Python. Each item is a statement in words, such as <em>"the values a, b and c can be the sides of a triangle"</em> or <em>"at least one of the two people is an adult"</em>, and the student writes <strong>one Python expression</strong> for it. The expression is tested with many combinations of values and compared with the teacher's correct expression, so any expression that is equivalent is accepted (e.g. <code>a == b == c</code> or <code>a == b and b == c</code>). When an expression is wrong, the student can be shown a <strong>counterexample</strong>: values for which it gives a wrong result.</p>
+<h4>How to write a question</h4>
+<ol>
+<li>Write the statements in the <strong>Global extra</strong> field, one block per statement:
+<ul>
+<li><code>## statement</code>: the text shown to the student. Write code between backquotes, e.g. <code>`ano`</code>.</li>
+<li><code>vars: a, b, c in 0..20</code>: the variables and their values. Possible values: integers <code>0..20</code>, real numbers <code>0.0..10.0</code> (with a decimal point), a list of values <code>"Ana", "Rui", ""</code>, or <code>bool</code> (True and False). Write one <code>vars:</code> line for each kind of variable.</li>
+<li>Optional: <code>allow: len, abs</code> (functions that may be called: abs, len, min, max, round, int, float, str, bool, sum, sorted; by default none), <code>forbid: not, if</code> (operators or functions that may not be used) and <code>require: chain</code> (operators that must be used).</li>
+</ul>
+Operators that can be named in <code>forbid</code> and <code>require</code>: <code>and</code>, <code>or</code>, <code>not</code>, <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>in</code>, <code>not in</code>, <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>, <code>**</code>, <code>if</code> (conditional expression), <code>chain</code> (a chained comparison such as <code>0 &lt;= x &lt;= 10</code>) and function names.</li>
+<li>Save (<em>Save changes and continue editing</em>). The statements now appear in the <strong>Answer</strong> field: write the <strong>correct expression</strong> for each one. Students do not see these expressions during the quiz (as with any question, they are shown in the review if <em>Right answer</em> is enabled).</li>
+<li>Keep <em>Validate on save</em> ticked: saving checks that every correct expression is valid. No test cases are needed.</li>
+</ol>
+<p>Example of Global extra:</p>
+<pre>## The values `a`, `b` and `c` can be the sides of a triangle.
+vars: a, b, c in 0..20
+## The triangle with sides `a`, `b` and `c` is equilateral.
+vars: a, b, c in 1..20
+## At least one of the two people is an adult (18 or older).
+vars: idade1, idade2 in 0..100
+## The year `ano` is a leap year.
+vars: ano in 1800..2400
+forbid: if
+## `x` is between 0 and 10, both included, written as a chained comparison.
+vars: x in -5.0..15.0
+require: chain</pre>
+<p>with the correct expressions <code>a + b &gt; c and a + c &gt; b and b + c &gt; a</code>, <code>a == b == c</code>, <code>idade1 &gt;= 18 or idade2 &gt;= 18</code>, <code>ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)</code> and <code>0 &lt;= x &lt;= 10</code>.</p>
+<h4>What the student gets</h4>
+<ul>
+<li>A card for each statement, with the variables and their values, the constraints (<em>You may use</em>, <em>Do not use</em>, <em>You must use</em>) and a box for the expression.</li>
+<li>While typing, warnings for unknown names, brackets that are not closed and a single <code>=</code> used to compare.</li>
+<li>A counter of the expressions written, a <em>Help</em> panel and a <em>Start again</em> button (with confirmation).</li>
+<li>After <strong>Check</strong>, each card is marked in green or red; for a wrong expression the reason is given (e.g. <em>"With idade1 = 0, idade2 = 18, your expression gives False, but it should give True."</em>).</li>
+</ul>
+<h4>How expressions are tested</h4>
+<ul>
+<li>The student's expression and the correct expression are evaluated for many combinations of values of the variables and their results are compared, like a truth table with one row per combination; the first row where they differ is the counterexample. With <code>bool</code> variables it is exactly a truth table (2<sup>n</sup> rows).</li>
+<li>When <strong>all</strong> the combinations are tried (see below), the check is exhaustive: within the declared values, a correct mark proves that the expression is right. Otherwise it is a well-chosen sample, very reliable but not a proof. Choose small ranges that still include the interesting cases (<code>0..20</code> is enough for a triangle) to get an exhaustive check.</li>
+<li>Every value of the integer ranges is tried when the number of combinations is not too large (by default up to 20000). Otherwise the values tried are the ends of the ranges, 0 and 1, the values around each number in the correct expression (for <code>idade1 &gt;= 18</code>: 17, 18 and 19), multiples of those numbers (for <code>ano % 400 == 0</code>: 2000), random values, and combinations with equal values (for equilateral and isosceles triangles).</li>
+<li>Values for which the correct expression gives an error (e.g. a division by zero) are skipped. If the correct expression gives True or False, the student's expression must give True or False too (<code>len(nome)</code> is not accepted for "the name is not empty").</li>
+<li>Real numbers are compared with a tiny tolerance.</li>
+<li>The mark is the fraction of correct expressions, unless <em>All-or-nothing grading</em> is ticked.</li>
+<li>With <em>Precheck</em> enabled, the student can check that the expressions are well written (syntax, names and constraints) without testing them.</li>
+</ul>
+<h4>Limitations</h4>
+<ul>
+<li>An expression must fit on one line. Lambdas, assignments (<code>:=</code>) and comprehensions are not accepted, and methods (e.g. <code>nome.upper()</code>) can only be called if <code>allow</code> contains <code>methods</code>.</li>
+<li>Testing many values does not prove that two expressions are equivalent: choose ranges that include the interesting cases (the borderline values are added automatically).</li>
+<li>Random values can be used: choose them in <em>Template params</em> with Twig (e.g. <code>{"age": &#123;&#123; random(16, 21) &#125;&#125;}</code>), tick <em>Twig all</em>, and write <code>&#123;&#123; age &#125;&#125;</code> both in the statement in Global extra and in the correct expression (e.g. <code>idade &gt; &#123;&#123; age &#125;&#125;</code>).</li>
+<li>Moodle's emoticon filter turns some short texts in brackets, such as the letters n, y or i between round brackets, into icons in the question text. Avoid them in the question text, or turn off the emoticon filter for the course. The statements in Global extra are shown by the interface and are not affected.</li>
+</ul>
+<h4>Template parameters (all optional)</h4>
+<ul>
+<li><strong>showcounterexample</strong> (default true): if false, a wrong expression is only reported as wrong, without the values for which it fails (useful for tests).</li>
+<li><strong>maxcases</strong> (default 20000): the largest number of combinations of values tried for each statement.</li>
+<li><strong>timeout</strong> (default 10): time limit in seconds for testing all the expressions.</li>
+</ul>
+<p>Example: <code>{"showcounterexample": false}</code></p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype><![CDATA[unicv_python3_expression]]></coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing><![CDATA[0]]></allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>5</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA["""Grader for the UniCV "write the expression" prototype (unicv_python3_expression).
+
+Each item of the question is a statement in words (e.g. "a, b and c can be the
+sides of a triangle") and the variables the student may use. The student writes
+one Python expression per item. The teacher's correct expressions are in the
+question's Answer (never sent to the student's page).
+
+An expression is correct when, for every combination of values tested, it gives
+the same result as the teacher's expression. The values tested include all the
+combinations of small domains, the boundary values around the constants of the
+teacher's expression (17, 18 and 19 for ">= 18"), equal values, and random
+values. When an expression is wrong, the feedback shows a counterexample.
+
+Global extra format, one block per item:
+    ## The statement shown to the student (`code` between backquotes)
+    vars: a, b, c in 0..20           integers from 0 to 20
+    vars: x in 0.0..10.0             real numbers
+    vars: name in "Ana", "Rui", ""   a list of values
+    vars: done in bool               True and False
+    allow: len, abs                  functions that may be called (default: none)
+    forbid: not, ==                  operators or functions that may not be used
+    require: chain                   operators that must be used
+
+The answers are {"exprs": ["[expr1, expr2, ...]"]}. The result of each item is
+written in the feedback as <span class="unicv-ex-item" data-item="N" data-ok="1|0">.
+"""
+import ast
+import html
+import itertools
+import json
+import math
+import random
+import re
+import signal
+
+STUDENT_ANSWER = """{{ STUDENT_ANSWER | e('py') }}"""
+QUESTION_ANSWER = """{{ QUESTION.answer | e('py') }}"""
+GLOBAL_EXTRA = """{{ QUESTION.globalextra | e('py') }}"""
+ALL_OR_NOTHING = "{{ QUESTION.allornothing }}" == "1"
+IS_PRECHECK = "{{ IS_PRECHECK }}" == "1"
+
+try:
+    PARAMS = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+except ValueError:
+    PARAMS = {}
+if not isinstance(PARAMS, dict):  # Twig encodes an empty set of parameters as []
+    PARAMS = {}
+
+SHOW_COUNTEREXAMPLE = PARAMS.get('showcounterexample', True)
+MAX_CASES = int(PARAMS.get('maxcases', 20000))
+TIMEOUT = float(PARAMS.get('timeout', 10))
+
+# Names of operators that can be used in forbid: and require:
+OPERATORS = {
+    'and': ast.And, 'or': ast.Or, 'not': ast.Not,
+    '==': ast.Eq, '!=': ast.NotEq, '<': ast.Lt, '<=': ast.LtE, '>': ast.Gt, '>=': ast.GtE,
+    'in': ast.In, 'not in': ast.NotIn, 'is': ast.Is,
+    '+': ast.Add, '-': ast.Sub, '*': ast.Mult, '/': ast.Div, '//': ast.FloorDiv, '%': ast.Mod, '**': ast.Pow,
+    'if': ast.IfExp,
+}
+SAFE_FUNCTIONS = {'abs': abs, 'len': len, 'min': min, 'max': max, 'round': round, 'int': int,
+                  'float': float, 'str': str, 'bool': bool, 'sum': sum, 'sorted': sorted}
+
+
+# ---------------------------------------------------------------------------
+# Reading the question
+# ---------------------------------------------------------------------------
+
+def expand(text):
+    def value(match):
+        name = match.group(1)
+        if name in PARAMS:
+            v = PARAMS[name]
+            return v if isinstance(v, str) else json.dumps(v)
+        return match.group(0)
+    return re.sub(r'\{\{\s*([A-Za-z_]\w*)\s*\}\}', value, text)
+
+
+def parse_domain(text):
+    """The kind and the values of a domain: ('int', lo, hi), ('float', lo, hi), ('list', values) or ('bool',)."""
+    text = text.strip()
+    if text.lower() == 'bool':
+        return ('list', [True, False])
+    match = re.fullmatch(r'(-?\d+(?:\.\d+)?)\s*\.\.\s*(-?\d+(?:\.\d+)?)', text)
+    if match:
+        lo, hi = match.group(1), match.group(2)
+        if '.' in lo or '.' in hi:
+            return ('float', float(lo), float(hi))
+        return ('int', int(lo), int(hi))
+    values = ast.literal_eval('[' + text + ']')
+    return ('list', list(values))
+
+
+def parse(text):
+    """The list of items: {statement, vars: [(name, domain)], allow, forbid, require}."""
+    items = []
+    current = None
+    for line in expand(text).replace('\r\n', '\n').split('\n'):
+        stripped = line.strip()
+        if stripped.startswith('##'):
+            current = {'statement': stripped[2:].strip(), 'vars': [], 'allow': [], 'forbid': [], 'require': []}
+            items.append(current)
+            continue
+        if current is None or not stripped:
+            continue
+        match = re.match(r'^(vars|allow|forbid|require)\s*:\s*(.*)$', stripped, re.I)
+        if not match:
+            current['statement'] += ' ' + stripped
+            continue
+        key, rest = match.group(1).lower(), match.group(2)
+        if key == 'vars':
+            names, _, domain = rest.partition(' in ')
+            parsed = parse_domain(domain)
+            for name in names.split(','):
+                if name.strip():
+                    current['vars'].append((name.strip(), parsed))
+        else:
+            current[key].extend(x.strip() for x in rest.split(',') if x.strip())
+    return items
+
+
+def read_exprs(answer):
+    try:
+        data = json.loads(answer)
+        raw = data.get('exprs', [''])
+        raw = raw[0] if isinstance(raw, list) else raw
+        exprs = json.loads(raw) if raw else []
+        return [str(e) for e in exprs]
+    except (ValueError, TypeError, AttributeError):
+        return []
+
+
+# ---------------------------------------------------------------------------
+# Checking an expression before running it
+# ---------------------------------------------------------------------------
+
+def check(expr, item):
+    """(compiled code, None) or (None, message)."""
+    text = expr.strip()
+    if not text:
+        return None, 'Write an expression.'
+    if '\n' in text:
+        return None, 'The expression must be on one line.'
+    try:
+        tree = ast.parse(text, mode='eval')
+    except SyntaxError as err:
+        return None, f'Syntax error: {err.msg}.'
+    names = {name for name, _ in item['vars']}
+    allowed = set(item['allow'])
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name):
+            if node.id in names or node.id in ('True', 'False', 'None'):
+                continue
+            if node.id in allowed and node.id in SAFE_FUNCTIONS:
+                continue
+            if node.id in SAFE_FUNCTIONS:
+                return None, f'You may not use the function {node.id}() in this expression.'
+            return None, f'Unknown name {node.id}: the variables are {", ".join(sorted(names))}.'
+        if isinstance(node, ast.Attribute) and node.attr.startswith('_'):
+            return None, 'Names starting with _ may not be used.'
+        if isinstance(node, (ast.Lambda, ast.NamedExpr, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            return None, 'Write a simple expression (no lambda, := or comprehensions).'
+        if isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name) and func.id not in allowed:
+                return None, f'You may not call {func.id}() in this expression.'
+            if isinstance(func, ast.Attribute) and 'methods' not in allowed:
+                return None, f'You may not call methods such as .{func.attr}() in this expression.'
+    used = used_operators(tree)
+    for op in item['forbid']:
+        if op in used:
+            return None, f'You may not use {op} in this expression.'
+    for op in item['require']:
+        if op not in used:
+            what = 'a chained comparison (such as 0 < x < 10)' if op == 'chain' else op
+            return None, f'Your expression must use {what}.'
+    return compile(tree, 'expression', 'eval'), None
+
+
+def used_operators(tree):
+    used = set()
+    for node in ast.walk(tree):
+        for name, cls in OPERATORS.items():
+            if isinstance(node, cls):
+                used.add(name)
+        if isinstance(node, ast.Compare) and len(node.ops) > 1:
+            used.add('chain')
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            used.add(node.func.id)
+    return used
+
+
+# ---------------------------------------------------------------------------
+# The values tested
+# ---------------------------------------------------------------------------
+
+def constants(tree):
+    found = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)) and not isinstance(node.value, bool):
+            found.add(node.value)
+    return found
+
+
+def candidates(domain, consts, rng):
+    kind = domain[0]
+    if kind == 'list':
+        return list(domain[1])
+    lo, hi = domain[1], domain[2]
+    if kind == 'int':
+        if hi - lo <= 40:
+            return list(range(lo, hi + 1))
+        values = {lo, lo + 1, hi - 1, hi, 0, 1, -1, 2}
+        for c in consts:
+            for d in (-1, 0, 1):
+                values.add(int(c) + d)
+        values.update(rng.randint(lo, hi) for _ in range(20))
+        for c in consts:   # Multiples of the constants (divisibility: ano % 400 == 0).
+            c = abs(int(c))
+            if c >= 2:
+                first, last = -(-lo // c), hi // c
+                if first <= last:
+                    values.update(c * rng.randint(first, last) for _ in range(4))
+                    values.update({c * first, c * last})
+        return sorted(v for v in values if lo <= v <= hi)
+    values = {lo, hi, (lo + hi) / 2, 0.0, 0.5, 1.0}
+    for c in consts:
+        for d in (-0.5, -0.01, 0, 0.01, 0.5):
+            values.add(float(c) + d)
+    values.update(round(rng.uniform(lo, hi), 2) for _ in range(12))
+    return sorted(v for v in values if lo <= v <= hi)
+
+
+def cases(item, ref_tree):
+    rng = random.Random(12345)
+    names = [name for name, _ in item['vars']]
+    consts = constants(ref_tree)
+    pools = [candidates(domain, consts, rng) for _, domain in item['vars']]
+    # Use every value of the integer ranges when the number of combinations allows it.
+    full = [list(range(d[1], d[2] + 1)) if d[0] == 'int' else pool for (_, d), pool in zip(item['vars'], pools)]
+    total_full = 1
+    for pool in full:
+        total_full *= max(1, len(pool))
+    if total_full <= MAX_CASES:
+        pools = full
+    total = 1
+    for pool in pools:
+        total *= max(1, len(pool))
+    if total <= MAX_CASES:
+        combos = list(itertools.product(*pools))
+    else:
+        combos = [tuple(rng.choice(pool) for pool in pools) for _ in range(MAX_CASES)]
+        # Equal values matter (equilateral, isosceles...): add combinations with repeated values.
+        numeric = [k for k, (_, d) in enumerate(item['vars']) if d[0] in ('int', 'float')]
+        for k1, k2 in itertools.combinations(numeric, 2):
+            for v in pools[k1]:
+                if v in pools[k2]:
+                    for _ in range(3):
+                        combo = [rng.choice(pool) for pool in pools]
+                        combo[k1] = combo[k2] = v
+                        combos.append(tuple(combo))
+        for v in pools[numeric[0]] if numeric else []:
+            combo = [rng.choice(pool) for pool in pools]
+            for k in numeric:
+                if v in pools[k]:
+                    combo[k] = v
+            combos.append(tuple(combo))
+    return names, combos
+
+
+# ---------------------------------------------------------------------------
+# Comparing
+# ---------------------------------------------------------------------------
+
+class TimeLimit(Exception):
+    pass
+
+
+def on_alarm(signum, frame):
+    raise TimeLimit()
+
+
+def evaluate(code, scope):
+    try:
+        return eval(code, scope), ''
+    except TimeLimit:
+        raise
+    except Exception as exc:
+        return None, type(exc).__name__
+
+
+def same(a, b):
+    if isinstance(a, bool) or isinstance(b, bool):
+        return type(a) is type(b) and a == b
+    if isinstance(a, float) or isinstance(b, float):
+        try:
+            return math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-9)
+        except TypeError:
+            return False
+    return type(a) is type(b) and a == b
+
+
+def show_values(names, combo):
+    return ', '.join(f'{n} = {v!r}' for n, v in zip(names, combo))
+
+
+def compare(ref_code, ref_tree, code, item):
+    """(ok, message, number of cases tested)."""
+    names, combos = cases(item, ref_tree)
+    builtins = {name: SAFE_FUNCTIONS[name] for name in item['allow'] if name in SAFE_FUNCTIONS}
+    tested = 0
+    for combo in combos:
+        scope = {'__builtins__': builtins}
+        scope.update(zip(names, combo))
+        expected, ref_error = evaluate(ref_code, dict(scope))
+        if ref_error:
+            continue   # Values for which the teacher's expression is not defined.
+        got, error = evaluate(code, dict(scope))
+        tested += 1
+        where = show_values(names, combo)
+        if error:
+            return False, f'With {where}, your expression gives an error ({error}).', tested
+        if isinstance(expected, bool) and not isinstance(got, bool):
+            return False, f'Your expression must give True or False, but with {where} it gives {got!r}.', tested
+        if not same(got, expected):
+            return False, f'With {where}, your expression gives {got!r}, but it should give {expected!r}.', tested
+    return True, '', tested
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def mark(i, ok, text):
+    return (f'<span class="unicv-ex-item" data-item="{i}" data-ok="{1 if ok else 0}" style="display:none">'
+            f'{html.escape(text)}</span>')
+
+
+def main():
+    items = parse(GLOBAL_EXTRA)
+    outcome = {'fraction': 0.0}
+    if not items:
+        outcome['prologuehtml'] = "<div class='coderunner-test-results bad'><h3>This question has no items</h3><p>Please tell your teacher.</p></div>"
+        return outcome
+    refs = [expand(r) for r in read_exprs(QUESTION_ANSWER)]
+    exprs = read_exprs(STUDENT_ANSWER)
+
+    problems = []
+    ref_codes = []
+    for k, item in enumerate(items):
+        ref = refs[k] if k < len(refs) else ''
+        code, message = check(ref, item) if ref.strip() else (None, 'missing')
+        if code is None:
+            problems.append(f'item {k + 1}: the correct expression in the Answer is {"missing" if message == "missing" else "not valid (" + message + ")"}')
+        ref_codes.append((code, ast.parse(ref, mode='eval') if code else None))
+    if problems:
+        outcome['prologuehtml'] = ("<div class='coderunner-test-results bad'><h3>This question has a problem</h3><ul>" +
+                                   ''.join(f'<li>{html.escape(p)}</li>' for p in problems) +
+                                   '</ul><p>Please tell your teacher.</p></div>')
+        return outcome
+
+    if IS_PRECHECK:
+        found = []
+        for k, item in enumerate(items):
+            expr = exprs[k] if k < len(exprs) else ''
+            if expr.strip():
+                message = check(expr, item)[1]
+                if message:
+                    found.append(f'Expression {k + 1}: {message}')
+        outcome['fraction'] = 0.0 if found else 1.0
+        outcome['prologuehtml'] = ("<div class='coderunner-test-results bad'><h3>Precheck</h3><ul>" +
+                                   ''.join(f'<li>{html.escape(f)}</li>' for f in found) + '</ul></div>' if found else
+                                   "<p class='precheckresult'>Precheck: your expressions are well written (they have not been tested yet).</p>")
+        return outcome
+
+    signal.signal(signal.SIGALRM, on_alarm)
+    signal.setitimer(signal.ITIMER_REAL, TIMEOUT)
+    results = []
+    try:
+        for k, item in enumerate(items):
+            expr = exprs[k] if k < len(exprs) else ''
+            code, message = check(expr, item)
+            if code is None:
+                results.append((False, message))
+                continue
+            ok, message, tested = compare(ref_codes[k][0], ref_codes[k][1], code, item)
+            if not ok and not SHOW_COUNTEREXAMPLE:
+                message = 'Not correct: for some values your expression gives a wrong result.'
+            results.append((ok, message or f'Correct (checked with {tested} combinations of values).'))
+    except TimeLimit:
+        results += [(False, 'Testing took too long.')] * (len(items) - len(results))
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+
+    right = sum(1 for ok, _ in results if ok)
+    total = len(items)
+    outcome['fraction'] = (1.0 if right == total else 0.0) if ALL_OR_NOTHING else right / total
+    good = right == total
+    style = 'style="border:1px solid #c4cdd5;padding:4px 8px;vertical-align:top"'
+    parts = [f"<div class='coderunner-test-results {'good' if good else 'bad'}'><h3>"
+             f"{'All your expressions are correct.' if good else f'{right} of your {total} expressions {"is" if right == 1 else "are"} correct.'}</h3></div>",
+             f'<table style="border-collapse:collapse;margin-top:8px"><tr><th {style}>#</th><th {style}>Your expression</th><th {style}></th></tr>']
+    for k, (ok, message) in enumerate(results):
+        expr = exprs[k] if k < len(exprs) else ''
+        sign = '<span style="color:#2f7d32;font-weight:700">✓</span>' if ok else \
+            f'<span style="color:#a51d2a;font-weight:700">✗</span> {html.escape(message)}'
+        parts.append(f'<tr><td {style}>{k + 1}</td><td {style}><code>{html.escape(expr)}</code></td><td {style}>{sign}</td></tr>')
+    parts.append('</table>')
+    parts.extend(mark(k, ok, message) for k, (ok, message) in enumerate(results))
+    outcome['prologuehtml'] = ''.join(parts)
+    return outcome
+
+
+print(json.dumps(main()))
+]]></template>
+    <iscombinatortemplate><![CDATA[1]]></iscombinatortemplate>
+    <allowmultiplestdins><![CDATA[0]]></allowmultiplestdins>
+    <answer></answer>
+    <validateonsave>0</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader><![CDATA[TemplateGrader]]></grader>
+    <cputimelimitsecs><![CDATA[30]]></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson><![CDATA[0]]></extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald></templateparamsevald>
+    <twigall><![CDATA[0]]></twigall>
+    <uiplugin><![CDATA[html]]></uiplugin>
+    <uiparameters><![CDATA[{"html_src": "prototypeextra"}]]></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra><![CDATA[<script>
+// If the DOM header does not already contain the style sheet for this
+// question type, insert it.
+if (document.getElementsByClassName('qtype-coderunner-unicv-ex').length === 0) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+    div.ex-box {
+        background: #ffffff;
+        border: 1px solid #c4cdd5;
+        border-radius: 8px;
+        color: #1d2125;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+    }
+
+    div.ex-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-bottom: 1px solid #e3e7eb;
+        border-radius: 8px 8px 0 0;
+        background: #f6f8fa;
+        font-size: 13px;
+        color: #48535e;
+    }
+
+    div.ex-box button.ex-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        margin: 0;
+        padding: 0 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    div.ex-box button.ex-btn:hover,
+    div.ex-box button.ex-btn:focus {
+        background: #e7f0fa;
+        border-color: #0f6cbf;
+    }
+
+    div.ex-box button.ex-btn[aria-expanded="true"] {
+        background: #0f6cbf;
+        border-color: #0f6cbf;
+        color: #ffffff;
+    }
+
+    div.ex-box button.ex-btn.ex-danger {
+        background: #a51d2a;
+        border-color: #a51d2a;
+        color: #ffffff;
+    }
+
+    div.ex-help {
+        padding: 10px 14px;
+        border-bottom: 1px solid #e3e7eb;
+        background: #f3f8fd;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    div.ex-help ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    div.ex-box code {
+        padding: 0 3px;
+        border-radius: 3px;
+        background: #f1f3f5;
+        color: #a51d2a;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+    }
+
+    div.ex-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    div.ex-card {
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        gap: 4px 10px;
+        padding: 10px 12px;
+        border: 1px solid #e3e7eb;
+        border-radius: 6px;
+    }
+
+    div.ex-card.ex-good {
+        border-color: #2f7d32;
+        background: #fafdfa;
+    }
+
+    div.ex-card.ex-bad {
+        border-color: #a51d2a;
+        background: #fffafa;
+    }
+
+    div.ex-num {
+        grid-row: span 4;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #e7f0fa;
+        color: #0f6cbf;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 26px;
+        text-align: center;
+    }
+
+    div.ex-card.ex-good div.ex-num {
+        background: #2f7d32;
+        color: #ffffff;
+    }
+
+    div.ex-card.ex-bad div.ex-num {
+        background: #a51d2a;
+        color: #ffffff;
+    }
+
+    div.ex-statement {
+        font-size: 15px;
+        line-height: 1.45;
+    }
+
+    div.ex-info {
+        color: #48535e;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    div.ex-info span.ex-tag {
+        display: inline-block;
+        margin: 2px 6px 0 0;
+        padding: 0 6px;
+        border-radius: 10px;
+        background: #f1f3f5;
+        font-size: 12px;
+    }
+
+    div.ex-info span.ex-tag.ex-no {
+        background: #fdf0f1;
+        color: #8a1622;
+    }
+
+    div.ex-info span.ex-tag.ex-yes {
+        background: #eef6ee;
+        color: #22602a;
+    }
+
+    div.ex-box input.ex-in {
+        box-sizing: border-box;
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 36px;
+        margin: 4px 0 0 0;
+        padding: 6px 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 14px;
+        line-height: 22px;
+    }
+
+    div.ex-box input.ex-in:focus {
+        outline: 2px solid #0f6cbf;
+        outline-offset: 0;
+        border-color: #0f6cbf;
+    }
+
+    div.ex-box input.ex-in.ex-good {
+        border: 2px solid #2f7d32;
+        background: #f1f8f1;
+    }
+
+    div.ex-box input.ex-in.ex-bad {
+        border: 2px solid #a51d2a;
+        background: #fdf0f1;
+    }
+
+    div.ex-msg {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: pre-wrap;
+    }
+
+    div.ex-msg.ex-good { color: #2f7d32; }
+    div.ex-msg.ex-bad { color: #8a1622; }
+    div.ex-msg.ex-warn { color: #8a5a00; font-weight: 500; }
+
+    div.ex-note {
+        padding: 10px 12px;
+        border: 1px solid #e3e7eb;
+        border-radius: 6px;
+        background: #fffdf5;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .ex-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+`;
+    styleElement.classList.add('qtype-coderunner-unicv-ex');
+    document.head.append(styleElement);
+}
+</script>
+
+<input type="hidden" id="___textareaId___-ex" class="coderunner-ui-element" name="exprs">
+<div class="ex-box" id="___textareaId___-ex-box"></div>
+
+<script>
+(() => {
+
+    //jshint esversion: 6
+
+    const T = '___textareaId___';
+    const store = document.getElementById(T + '-ex');
+    const box = document.getElementById(T + '-ex-box');
+    const textarea = document.getElementById(T);
+    const readOnly = !!(textarea && (textarea.readOnly || textarea.disabled));
+    const MODE = T === 'id_answerpreload' ? 'author' : (T === 'id_answer' ? 'teacher' : 'student');
+
+    const KEYWORDS = ['and', 'or', 'not', 'in', 'is', 'if', 'else', 'True', 'False', 'None'];
+    const FUNCTIONS = ['abs', 'len', 'min', 'max', 'round', 'int', 'float', 'str', 'bool', 'sum', 'sorted'];
+    const OPNAMES = { chain: 'a chained comparison (e.g. <code>0 &lt; x &lt; 10</code>)', if: '<code>if</code> … <code>else</code>' };
+
+    const HELP_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="6"></circle><path d="M5.3 5.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.3M7 10.3v.1"></path></svg>';
+    const RESET_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7a4.5 4.5 0 1 0 1.4-3.3"></path><path d="M2.2 1.6v2.6h2.6"></path></svg>';
+
+    function esc(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Text of a statement: `code` between backquotes is shown as code.
+    function rich(text) {
+        return esc(text).replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    // ----- The items, from Global extra (already expanded by Twig) -----
+
+    function describe(domain) {
+        domain = domain.trim();
+        if (/^bool$/i.test(domain)) {
+            return 'True or False';
+        }
+        const m = domain.match(/^(-?\d+(?:\.\d+)?)\s*\.\.\s*(-?\d+(?:\.\d+)?)$/);
+        if (m) {
+            const real = m[1].indexOf('.') >= 0 || m[2].indexOf('.') >= 0;
+            return `${real ? 'real numbers' : 'integers'} from ${m[1]} to ${m[2]}`;
+        }
+        return 'one of ' + domain;
+    }
+
+    function parse(text) {
+        const items = [];
+        let current = null;
+        String(text || '').replace(/\r\n/g, '\n').split('\n').forEach(line => {
+            const s = line.trim();
+            if (s.indexOf('##') === 0) {
+                current = { statement: s.slice(2).trim(), vars: [], groups: [], allow: [], forbid: [], require: [] };
+                items.push(current);
+                return;
+            }
+            if (!current || !s) {
+                return;
+            }
+            const m = s.match(/^(vars|allow|forbid|require)\s*:\s*(.*)$/i);
+            if (!m) {
+                current.statement += ' ' + s;
+                return;
+            }
+            const key = m[1].toLowerCase();
+            if (key === 'vars') {
+                const k = m[2].indexOf(' in ');
+                const names = (k >= 0 ? m[2].slice(0, k) : m[2]).split(',').map(x => x.trim()).filter(x => x);
+                current.vars.push(...names);
+                current.groups.push({ names: names, text: k >= 0 ? describe(m[2].slice(k + 4)) : '' });
+            } else {
+                current[key].push(...m[2].split(',').map(x => x.trim()).filter(x => x));
+            }
+        });
+        return items;
+    }
+
+    const Q = parse(textarea.getAttribute('data-globalextra'));
+    let exprs = Q.map(() => '');
+
+    function savedValue() {
+        if (store.value) {
+            return store.value;
+        }
+        const outer = document.getElementById('qtype-coderunner-outer-div-' + T);
+        const leftovers = outer ? outer.getAttribute('data-leftovers') : '';
+        if (leftovers) {
+            try {
+                const data = JSON.parse(leftovers);
+                return data.exprs ? data.exprs[0] : '';
+            } catch (e) {
+                return '';
+            }
+        }
+        return '';
+    }
+
+    function load() {
+        const raw = savedValue();
+        if (!raw) {
+            return;
+        }
+        try {
+            JSON.parse(raw).forEach((e, i) => {
+                if (i < exprs.length) {
+                    exprs[i] = String(e || '');
+                }
+            });
+        } catch (e) {
+            // Leave the expressions empty.
+        }
+    }
+
+    function save() {
+        if (readOnly) {
+            return;
+        }
+        if (MODE === 'author') {
+            store.value = '';
+            return;
+        }
+        store.value = exprs.some(e => e.trim() !== '') ? JSON.stringify(exprs) : '';
+    }
+
+    // ----- Checks while typing (the grader does the real checks) -----
+
+    function hints(expr, item) {
+        const found = [];
+        const code = expr.replace(/"(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?/g, '""');
+        const pairs = { ')': '(', ']': '[', '}': '{' };
+        const stack = [];
+        for (const ch of code) {
+            if ('([{'.indexOf(ch) >= 0) {
+                stack.push(ch);
+            } else if (pairs[ch]) {
+                if (stack.pop() !== pairs[ch]) {
+                    found.push('A bracket is closed but was not opened.');
+                    break;
+                }
+            }
+        }
+        if (!found.length && stack.length) {
+            found.push(stack.length === 1 ? 'A bracket is not closed.' : 'Some brackets are not closed.');
+        }
+        const unknown = [];
+        const re = /(\.\s*)?\b([A-Za-z_]\w*)\b/g;
+        let m;
+        while ((m = re.exec(code)) !== null) {
+            const name = m[2];
+            if (m[1] || /^\d/.test(name) || KEYWORDS.includes(name) || item.vars.includes(name) ||
+                    (item.allow.includes(name) && FUNCTIONS.includes(name)) || unknown.includes(name)) {
+                continue;
+            }
+            unknown.push(name);
+        }
+        if (unknown.length) {
+            found.push(`Unknown name${unknown.length > 1 ? 's' : ''}: ${unknown.join(', ')}. ` +
+                `Use only ${item.vars.join(', ')}${item.allow.length ? ' and ' + item.allow.map(f => f + '()').join(', ') : ''}.`);
+        }
+        if (!item.allow.includes('methods') && /\.\s*[A-Za-z_]\w*\s*\(/.test(code)) {
+            found.push('Methods such as .upper() cannot be used in this expression.');
+        }
+        if (/(^|[^=!<>])=($|[^=])/.test(code)) {
+            found.push('To compare, use == (a single = gives a value to a variable).');
+        }
+        return found;
+    }
+
+    // ----- Marks from the last Check -----
+
+    const marks = {};
+
+    function readMarks() {
+        const question = box.closest('.que') || document;
+        question.querySelectorAll('.unicv-ex-item').forEach(el => {
+            marks[el.getAttribute('data-item')] = { ok: el.getAttribute('data-ok') === '1', text: el.textContent.trim() };
+        });
+    }
+
+    // ----- Drawing -----
+
+    let helpOpen = false;
+    let confirming = false;
+
+    function barHtml() {
+        let left = '';
+        if (MODE === 'student') {
+            const done = exprs.filter(e => e.trim() !== '').length;
+            left = `<span>${done} of ${Q.length} expression${Q.length === 1 ? '' : 's'} written</span>`;
+        } else if (MODE === 'teacher') {
+            left = '<span style="font-weight:600;color:#0f6cbf">Teacher\'s answer: the correct expressions</span>';
+        }
+        let right = `<button type="button" class="ex-btn" data-ex-bar="help" aria-expanded="${helpOpen}" aria-controls="${T}-ex-help">${HELP_ICON}<span>Help</span></button>`;
+        if (MODE === 'student' && !readOnly) {
+            right = confirming ? `<span style="font-weight:600;color:#1d2125">Clear all your expressions?</span>
+<button type="button" class="ex-btn ex-danger" data-ex-bar="reset-yes">Yes, clear them</button>
+<button type="button" class="ex-btn" data-ex-bar="reset-no">Cancel</button>` :
+                right + ` <button type="button" class="ex-btn" data-ex-bar="reset">${RESET_ICON}<span>Start again</span></button>`;
+        }
+        return `<div class="ex-bar"><span>${left}</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${right}</span></div>`;
+    }
+
+    function helpHtml() {
+        if (!helpOpen) {
+            return '';
+        }
+        let items;
+        if (MODE === 'student') {
+            items = [
+                'For each statement, write <strong>one Python expression</strong> that is <code>True</code> exactly when the statement is true (or that computes the value asked for).',
+                'Use only the variables of the statement. Do not give them values: your expression is tested with many values (including the borderline ones).',
+                'Combine comparisons (<code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>) with <code>and</code>, <code>or</code> and <code>not</code>. Brackets help to make the order clear.',
+                'A comparison can be chained: <code>0 &lt;= x &lt;= 10</code> means <code>0 &lt;= x and x &lt;= 10</code>.',
+                'After <strong>Check</strong>, if an expression is wrong you are shown values for which it gives a wrong result.'
+            ];
+        } else {
+            items = [
+                'The statements are written in <strong>Global extra</strong>, one block per statement: a line <code>## statement</code>, then <code>vars: a, b, c in 0..20</code> and, optionally, <code>allow:</code>, <code>forbid:</code> and <code>require:</code>.',
+                'In this field write the <strong>correct expression</strong> for each statement. Students never see it during the quiz; it is used to compute the right result for each combination of values.',
+                'Keep <em>Validate on save</em> ticked: saving checks that each correct expression is valid.'
+            ];
+        }
+        return `<div class="ex-help" id="${T}-ex-help"><ul>${items.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+    }
+
+    function infoHtml(item) {
+        const vars = item.groups.map(g =>
+            `${g.names.map(n => `<code>${esc(n)}</code>`).join(', ')}${g.text ? ` (${esc(g.text)})` : ''}`).join('; ');
+        const tags = [];
+        if (item.allow.length) {
+            tags.push(`<span class="ex-tag">You may use: ${item.allow.map(f => `<code>${esc(f)}()</code>`).join(' ')}</span>`);
+        }
+        if (item.forbid.length) {
+            tags.push(`<span class="ex-tag ex-no">Do not use: ${item.forbid.map(o => OPNAMES[o] || `<code>${esc(o)}</code>`).join(', ')}</span>`);
+        }
+        if (item.require.length) {
+            tags.push(`<span class="ex-tag ex-yes">You must use: ${item.require.map(o => OPNAMES[o] || `<code>${esc(o)}</code>`).join(', ')}</span>`);
+        }
+        return `<div class="ex-info">Variable${item.vars.length === 1 ? '' : 's'}: ${vars || '—'}${tags.length ? '<br>' + tags.join('') : ''}</div>`;
+    }
+
+    function msgHtml(i) {
+        const mark = marks[i];
+        if (mark) {
+            return `<div class="ex-msg ${mark.ok ? 'ex-good' : 'ex-bad'}" id="${T}-ex-msg-${i}">${mark.ok ? '✓ Correct' : '✗ ' + esc(mark.text)}</div>`;
+        }
+        const found = exprs[i].trim() && !/\{\{/.test(exprs[i]) ? hints(exprs[i], Q[i]) : [];
+        return `<div class="ex-msg ex-warn" id="${T}-ex-msg-${i}">${found.map(esc).join('<br>')}</div>`;
+    }
+
+    function cardHtml(item, i) {
+        const mark = marks[i];
+        const cls = mark ? (mark.ok ? ' ex-good' : ' ex-bad') : '';
+        return `<div class="ex-card${cls}" data-ex-card="${i}"><div class="ex-num">${i + 1}</div>
+<div class="ex-statement">${rich(item.statement)}</div>${infoHtml(item)}
+<input type="text" class="ex-in${cls}" data-ex-i="${i}" value="${esc(exprs[i])}" spellcheck="false" autocapitalize="off" autocomplete="off" ` +
+            `placeholder="${MODE === 'teacher' ? 'correct expression' : 'your expression'}" aria-label="Expression for statement ${i + 1}" aria-describedby="${T}-ex-msg-${i}"${readOnly ? ' readonly' : ''}>
+${msgHtml(i)}</div>`;
+    }
+
+    function render(focus) {
+        let body;
+        if (MODE === 'author') {
+            body = '<div class="ex-note">The Answer preload is not used by this question type.</div>';
+        } else if (!Q.length) {
+            body = `<div class="ex-note">${MODE === 'teacher' ?
+                'Write the statements in <strong>Global extra</strong> (see <em>Help</em>), save, and then write the correct expressions here.' :
+                'This question has no statements yet.'}</div>`;
+        } else {
+            body = (MODE === 'teacher' ? '<div class="ex-note">Write the <strong>correct expression</strong> for each statement. Students never see these expressions during the quiz.</div>' : '') +
+                Q.map(cardHtml).join('');
+        }
+        box.innerHTML = barHtml() + helpHtml() + `<div class="ex-body">${body}</div>`;
+        if (focus) {
+            const el = box.querySelector(focus);
+            if (el) {
+                el.focus();
+            }
+        }
+    }
+
+    function renderBar() {
+        const old = box.querySelector('.ex-bar');
+        const tmp = document.createElement('div');
+        tmp.innerHTML = barHtml();
+        old.replaceWith(tmp.firstChild);
+    }
+
+    // ----- Events -----
+
+    box.addEventListener('input', event => {
+        const el = event.target;
+        if (!el.classList.contains('ex-in') || readOnly) {
+            return;
+        }
+        const i = +el.getAttribute('data-ex-i');
+        exprs[i] = el.value;
+        if (marks[i]) {
+            delete marks[i];
+            el.classList.remove('ex-good', 'ex-bad');
+            el.closest('.ex-card').classList.remove('ex-good', 'ex-bad');
+        }
+        const tmp = document.createElement('div');
+        tmp.innerHTML = msgHtml(i);
+        document.getElementById(`${T}-ex-msg-${i}`).replaceWith(tmp.firstChild);
+        save();
+        renderBar();
+    });
+
+    box.addEventListener('keydown', event => {
+        // Enter would submit the quiz page: move to the next expression instead.
+        if (event.key === 'Enter' && event.target.classList.contains('ex-in')) {
+            event.preventDefault();
+            const next = box.querySelector(`input[data-ex-i="${+event.target.getAttribute('data-ex-i') + 1}"]`);
+            if (next) {
+                next.focus();
+            }
+        }
+    });
+
+    box.addEventListener('click', event => {
+        const button = event.target.closest('[data-ex-bar]');
+        if (!button) {
+            return;
+        }
+        const act = button.getAttribute('data-ex-bar');
+        if (act === 'help') {
+            helpOpen = !helpOpen;
+            render('[data-ex-bar="help"]');
+        } else if (readOnly) {
+            return;
+        } else if (act === 'reset') {
+            confirming = true;
+            render('[data-ex-bar="reset-no"]');
+        } else if (act === 'reset-no') {
+            confirming = false;
+            render('[data-ex-bar="reset"]');
+        } else if (act === 'reset-yes') {
+            confirming = false;
+            exprs = Q.map(() => '');
+            Object.keys(marks).forEach(k => delete marks[k]);
+            save();
+            render('.ex-in');
+        }
+    });
+
+    load();
+    save();
+    readMarks();
+    render();
+    if (document.readyState === 'loading') {
+        // The feedback of the last Check may come after this question in the page.
+        document.addEventListener('DOMContentLoaded', () => {
+            readMarks();
+            render();
+        });
+    }
+
+})();
+</script>
+]]></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>

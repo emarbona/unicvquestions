@@ -1,0 +1,1197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 21973  -->
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[UNICV_PROTOTYPE_python3_predict]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>UniCV prototype for <strong>"predict the result"</strong> questions in Python. The student works out, without running the code, the <strong>value</strong> (and optionally the <strong>type</strong>) of some expressions and the <strong>output</strong> of some short programs. The values in the code can be <strong>random</strong>, so that each attempt is different. The teacher never writes the correct answers: the grader computes them by running the code with Python, for the values of each attempt.</p>
+<h4>How to write a question</h4>
+<ol>
+<li>Write the items in the <strong>Global extra</strong> field, in sections (see the example below):
+<ul>
+<li><code>## context</code>: code run before every item and shown to the student under "Consider:" (e.g. a list or a text used by the expressions).</li>
+<li><code>## expressions</code>: one expression per line; the student gives its <strong>value and type</strong>.</li>
+<li><code>## values</code>: one expression per line; the student gives only its <strong>value</strong>.</li>
+<li><code>## output</code>: the following lines are a program; the student writes <strong>what it prints</strong>. If the program reads data, give it in the header, separated by semicolons: <code>## output input: 4; 7</code>.</li>
+</ul>
+Without any section header, every line is an expression with value and type. Lines starting with # in the expression sections are ignored.</li>
+<li>For <strong>random values</strong>: in <em>Template params</em> write, for example, <code>{"a": {{ random(10, 30) }}, "b": {{ random(2, 6) }}, "city": "{{ random(["Praia", "Mindelo", "Assomada"]) }}"}</code>, set the language of the template parameters to <em>twig</em>, tick <em>Twig all</em>, and write <code>{{ a }}</code>, <code>{{ b }}</code>, <code>{{ city }}</code> in Global extra (and in the question text if needed). Each attempt gets its own values; the same student keeps them during the attempt. <code>random(10, 30)</code> gives an integer from 10 to 30 and <code>random([...])</code> one element of the list.</li>
+<li>Leave the <strong>Answer</strong> field as the interface fills it (there is nothing to write) and keep <em>Validate on save</em> ticked: saving checks that every item runs (an item that takes too long, or a context that fails, is reported).</li>
+<li>To see the correct answers for some values, preview the question, click <em>Fill in correct responses</em> and then <em>Check</em>: the feedback shows a table with all the answers.</li>
+</ol>
+<p>Example of Global extra (with the template parameters above):</p>
+<pre>## context
+numbers = [{{ a }}, {{ b }}, 1, 9]
+city = "{{ city }}"
+## expressions
+{{ a }} // {{ b }} + {{ a }} % {{ b }}
+city[::-1]
+numbers[1:3]
+"7" + {{ b }}
+## values
+len(city) * 2
+## output input: {{ b }}
+num = int(input("num? "))
+for k in range(num):
+    if k % 2 == 0:
+        print(k)</pre>
+<h4>What the student gets</h4>
+<ul>
+<li>The context code, a table of expressions with a box for the value and a list for the type (int, float, str, bool, list, tuple, dict, set, NoneType, range or Error), and for each program its code with line numbers, the input typed on the keyboard and a box for the output.</li>
+<li>A counter of the answers given, a <em>Help</em> panel and a <em>Start again</em> button (with confirmation).</li>
+<li>After <strong>Check</strong>, each answer is marked in green or red, and a table summarises the results.</li>
+</ul>
+<h4>How answers are compared</h4>
+<ul>
+<li>Values are read as Python literals and must have the right type: <code>4</code> is not <code>4.0</code>, and <code>1</code> is not <code>True</code>. Floats are compared with a tiny tolerance, so <code>3.50</code> is accepted for 3.5. Spaces do not matter in lists, tuples and dictionaries.</li>
+<li>Texts can be written with quotes (<code>'abab'</code>, as Python shows them) or without them (<code>abab</code>), unless <code>requirequotes</code> is true.</li>
+<li>If an expression raises an error, the correct answer is the type <strong>Error</strong> and, as the value, the name of the error (e.g. <code>TypeError</code>).</li>
+<li>The output of a program is compared line by line; spaces at the end of lines and empty lines at the end are ignored. If the program reads data, what is typed also appears in the output (e.g. <code>num? 4</code>), as on a screen. If the program stops with an error, the name of the error is its last line.</li>
+<li>The mark is the fraction of correct answers (each value and each type counts as one answer), unless <em>All-or-nothing grading</em> is ticked.</li>
+</ul>
+<h4>Limitations</h4>
+<ul>
+<li>Expressions must fit on one line; longer code goes in <code>## context</code> or in an <code>## output</code> program.</li>
+<li>In Global extra, Twig is used only to insert values (<code>{{ a }}</code>); the random values are chosen in <em>Template params</em>.</li>
+<li>Values that are not literals (e.g. objects) are compared with how Python shows them (their repr).</li>
+<li>Moodle's emoticon filter turns some short texts in brackets, such as the letters n, y or i between round brackets, into icons in the question text and in the code shown to the student. Avoid them (e.g. write <code>range(num)</code>) or turn off the emoticon filter for the course.</li>
+</ul>
+<h4>Template parameters (all optional, besides the random values)</h4>
+<ul>
+<li><strong>showcorrect</strong> (default false): if true, the correct answer is shown for each wrong answer after Check (useful for practice, not for tests).</li>
+<li><strong>requirequotes</strong> (default false): if true, texts must be written with quotes, as Python shows them.</li>
+<li><strong>echostandardinput</strong> (default true): if false, the values read by <code>input()</code> do not appear in the output.</li>
+<li><strong>timeout</strong> (default 2): time limit in seconds for each item.</li>
+<li><strong>maxoutputlength</strong> (default 5000): longer outputs are cut.</li>
+</ul>
+<p>Example: <code>{"a": {{ random(10, 30) }}, "b": {{ random(2, 6) }}, "showcorrect": true}</code></p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype><![CDATA[unicv_python3_predict]]></coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing><![CDATA[0]]></allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>5</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA["""Grader for the UniCV "predict the result" prototype (unicv_python3_predict).
+
+The question author writes, in Global extra, a list of items: expressions whose
+value (and type) the student must predict, and short programs whose output the
+student must write. Values may be randomised with Twig template parameters, so
+each attempt can have different numbers. The correct answers are never written
+by the author: this grader computes them by running the code with Python.
+
+Global extra format:
+    ## context              code run before every item and shown to the student
+    ## expressions          one expression per line: the student gives value and type
+    ## values               one expression per line: the student gives the value only
+    ## output [input: a; b] the following lines are a program: the student writes its output
+
+The student's answer is {"answers": ["[[value, type], ...]"]}, one pair per item.
+The result of each answer is written in the feedback as
+<span class="unicv-pr-cell" data-item="N" data-cell="v|t" data-ok="1|0">text</span>.
+"""
+import ast
+import builtins
+import html
+import io
+import json
+import math
+import re
+import signal
+import sys
+
+STUDENT_ANSWER = """{{ STUDENT_ANSWER | e('py') }}"""
+QUESTION_ANSWER = """{{ QUESTION.answer | e('py') }}"""
+GLOBAL_EXTRA = """{{ QUESTION.globalextra | e('py') }}"""
+ALL_OR_NOTHING = "{{ QUESTION.allornothing }}" == "1"
+IS_PRECHECK = "{{ IS_PRECHECK }}" == "1"
+
+try:
+    PARAMS = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+except ValueError:
+    PARAMS = {}
+if not isinstance(PARAMS, dict):  # Twig encodes an empty set of parameters as []
+    PARAMS = {}
+
+SHOW_CORRECT = PARAMS.get('showcorrect', False)
+REQUIRE_QUOTES = PARAMS.get('requirequotes', False)
+ECHO_INPUT = PARAMS.get('echostandardinput', True)
+TIMEOUT = float(PARAMS.get('timeout', 2))
+MAX_OUTPUT = int(PARAMS.get('maxoutputlength', 5000))
+
+TYPE_NAMES = ['int', 'float', 'str', 'bool', 'list', 'tuple', 'dict', 'set', 'NoneType', 'range', 'Error']
+
+
+# ---------------------------------------------------------------------------
+# Reading the items
+# ---------------------------------------------------------------------------
+
+def expand(text):
+    """Replace any {{ name }} left in the text by the template parameter of that name."""
+    def value(match):
+        name = match.group(1)
+        if name in PARAMS:
+            v = PARAMS[name]
+            return v if isinstance(v, str) else json.dumps(v)
+        return match.group(0)
+    return re.sub(r'\{\{\s*([A-Za-z_]\w*)\s*\}\}', value, text)
+
+
+SECTION = re.compile(r'^##\s*(context|expressions|values|output)\b(.*)$', re.I)
+
+
+def parse(text):
+    """The context code and the list of items of the question."""
+    lines = expand(text).replace('\r\n', '\n').split('\n')
+    if not any(SECTION.match(line) for line in lines):
+        lines = ['## expressions'] + lines
+    context, items = [], []
+    kind, body, arg = None, [], ''
+
+    def close():
+        if kind == 'context':
+            context.extend(body)
+        elif kind in ('expressions', 'values'):
+            for line in body:
+                code = line.strip()
+                if code and not code.startswith('#'):
+                    items.append({'kind': 'expr', 'code': code, 'typed': kind == 'expressions'})
+        elif kind == 'output':
+            code = '\n'.join(body).strip('\n')
+            if code.strip():
+                found = re.search(r'input\s*:\s*(.*)$', arg, re.I)
+                stdin = [s.strip() for s in found.group(1).split(';')] if found else []
+                items.append({'kind': 'output', 'code': code, 'input': stdin})
+
+    for line in lines:
+        match = SECTION.match(line)
+        if match:
+            close()
+            kind, body, arg = match.group(1).lower(), [], match.group(2)
+        else:
+            body.append(line)
+    close()
+    return '\n'.join(context).strip('\n'), items
+
+
+def read_answers(answer):
+    try:
+        data = json.loads(answer)
+        raw = data.get('answers', [''])
+        raw = raw[0] if isinstance(raw, list) else raw
+        if isinstance(raw, str) and raw.startswith('AUTO:'):
+            return raw
+        pairs = json.loads(raw) if raw else []
+        return [(str(p[0]) if p else '', str(p[1]) if len(p) > 1 else '') for p in pairs]
+    except (ValueError, TypeError, AttributeError, IndexError):
+        return []
+
+
+# ---------------------------------------------------------------------------
+# Running code
+# ---------------------------------------------------------------------------
+
+class TimeLimit(Exception):
+    pass
+
+
+class OutOfInput(Exception):
+    pass
+
+
+def on_alarm(signum, frame):
+    raise TimeLimit()
+
+
+def run(context, code, mode, stdin_lines=()):
+    """Run the context and then evaluate (mode 'eval') or execute (mode 'exec') the code.
+    Returns (value or printed output, name of the exception raised or '')."""
+    out = io.StringIO()
+    stdin = io.StringIO(''.join(line + '\n' for line in stdin_lines))
+    names = dict(vars(builtins))
+
+    def echo_input(prompt=''):
+        out.write(str(prompt))
+        line = stdin.readline()
+        if not line:
+            raise OutOfInput()
+        line = line.rstrip('\n')
+        if ECHO_INPUT:
+            out.write(line + '\n')
+        return line
+
+    def to_out(*values, sep=' ', end='\n', file=None, flush=False):
+        out.write((sep if sep is not None else ' ').join(str(v) for v in values) + (end if end is not None else '\n'))
+
+    names['input'] = echo_input
+    names['print'] = to_out
+    scope = {'__name__': '__main__', '__builtins__': names}
+    result, error = None, ''
+    signal.signal(signal.SIGALRM, on_alarm)
+    signal.setitimer(signal.ITIMER_REAL, TIMEOUT)
+    try:
+        if context.strip():
+            exec(compile(context, 'context', 'exec'), scope)
+        if mode == 'eval':
+            result = eval(compile(code, 'expression', 'eval'), scope)
+        else:
+            exec(compile(code, 'program', 'exec'), scope)
+            result = out.getvalue()
+    except TimeLimit:
+        error = 'TimeLimit'
+    except OutOfInput:
+        error = 'EOFError'
+    except SystemExit:
+        result = out.getvalue()
+    except BaseException as exc:
+        error = type(exc).__name__
+        if mode == 'exec':
+            result = out.getvalue()
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+    if isinstance(result, str) and mode == 'exec' and len(result) > MAX_OUTPUT:
+        result = result[:MAX_OUTPUT]
+    return result, error
+
+
+# ---------------------------------------------------------------------------
+# Comparing answers
+# ---------------------------------------------------------------------------
+
+def same(a, b):
+    """Equality that also requires the same types (so 4 is not 4.0 and 1 is not True)."""
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, float):
+        return math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-9) or (math.isnan(a) and math.isnan(b))
+    if isinstance(a, (list, tuple)):
+        return len(a) == len(b) and all(same(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(same(a[k], b[k]) for k in a)
+    return a == b
+
+
+def value_ok(text, expected):
+    s = text.strip()
+    if not s:
+        return False
+    try:
+        literal = ast.literal_eval(s)
+        if same(literal, expected):
+            return True
+    except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
+        literal = None
+    if isinstance(expected, str):
+        return not REQUIRE_QUOTES and s == expected
+    return ''.join(s.split()) == ''.join(repr(expected).split())
+
+
+def type_name(value):
+    return type(value).__name__
+
+
+def normalise(text):
+    lines = [line.rstrip() for line in str(text).replace('\r\n', '\n').split('\n')]
+    while lines and not lines[-1]:
+        lines.pop()
+    return '\n'.join(lines)
+
+
+def shown(value):
+    return repr(value)
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def cell(item, cell_name, ok, text):
+    return (f'<span class="unicv-pr-cell" data-item="{item}" data-cell="{cell_name}" data-ok="{1 if ok else 0}" '
+            f'style="display:none">{html.escape(text)}</span>')
+
+
+def pre(text):
+    return f'<pre style="margin:0;white-space:pre-wrap">{html.escape(text)}</pre>'
+
+
+def main():
+    context, items = parse(GLOBAL_EXTRA)
+    outcome = {'fraction': 0.0}
+    if not items:
+        outcome['prologuehtml'] = "<div class='coderunner-test-results bad'><h3>This question has no items</h3><p>Please tell your teacher.</p></div>"
+        return outcome
+
+    # The correct answers, computed now.
+    expected = []
+    problems = []
+    if context.strip():
+        _, error = run(context, '', 'exec')
+        if error:
+            problems.append(f'the context code raises {error}')
+    for k, item in enumerate(items):
+        if item['kind'] == 'expr':
+            value, error = run(context, item['code'], 'eval')
+            if error == 'TimeLimit':
+                problems.append(f'item {k + 1} takes too long')
+            expected.append({'error': error, 'value': value, 'type': 'Error' if error else type_name(value)})
+        else:
+            output, error = run(context, item['code'], 'exec', item['input'])
+            if error == 'TimeLimit':
+                problems.append(f'item {k + 1} takes too long (endless loop?)')
+            elif error:
+                # A program that stops with an error: the name of the error is its last line.
+                output = (output or '') + ('' if not output or output.endswith('\n') else '\n') + error + '\n'
+            expected.append({'error': error, 'value': output})
+
+    answers = read_answers(STUDENT_ANSWER)
+    teacher = read_answers(QUESTION_ANSWER)
+    style = 'style="border:1px solid #c4cdd5;padding:4px 8px;vertical-align:top"'
+
+    # The teacher's answer: a check of the question, showing every correct answer.
+    if isinstance(answers, str):
+        if not (isinstance(teacher, str) and answers == teacher):
+            outcome['prologuehtml'] = "<div class='coderunner-test-results bad'><h3>Invalid answer</h3></div>"
+            return outcome
+        if problems:
+            outcome['prologuehtml'] = ("<div class='coderunner-test-results bad'><h3>The question has problems</h3><ul>" +
+                                       ''.join(f'<li>{html.escape(p)}</li>' for p in problems) + '</ul></div>')
+            return outcome
+        rows = []
+        for k, (item, exp) in enumerate(zip(items, expected)):
+            if item['kind'] == 'expr':
+                answer = exp['error'] if exp['error'] else shown(exp['value'])
+                kind = exp['type'] if item['typed'] else ''
+            else:
+                answer = exp['value']
+                kind = 'output'
+            rows.append(f'<tr><td {style}>{k + 1}</td><td {style}>{pre(item["code"])}</td><td {style}>{pre(answer)}</td><td {style}>{html.escape(kind)}</td></tr>')
+        outcome['fraction'] = 1.0
+        outcome['prologuehtml'] = ("<div class='coderunner-test-results good'><h3>The correct answers for these values</h3></div>"
+                                   f'<table style="border-collapse:collapse"><tr><th {style}>#</th><th {style}>Item</th>'
+                                   f'<th {style}>Answer</th><th {style}>Type</th></tr>' + ''.join(rows) + '</table>')
+        return outcome
+
+    if problems:
+        outcome['prologuehtml'] = ("<div class='coderunner-test-results bad'><h3>This question has a problem</h3><p>"
+                                   + html.escape('; '.join(problems)) + '. Please tell your teacher.</p></div>')
+        return outcome
+
+    total = right = 0
+    marks = []
+    rows = []
+    for k, (item, exp) in enumerate(zip(items, expected)):
+        value, kind = answers[k] if k < len(answers) else ('', '')
+        cells = []
+        if item['kind'] == 'expr':
+            if exp['error']:
+                v_ok = value.strip() == exp['error']
+                correct_value = exp['error']
+            else:
+                v_ok = value_ok(value, exp['value'])
+                correct_value = shown(exp['value'])
+            cells.append(('v', v_ok, correct_value))
+            if item['typed']:
+                t_ok = kind.strip() == exp['type']
+                cells.append(('t', t_ok, exp['type']))
+        else:
+            v_ok = normalise(value) == normalise(exp['value'])
+            cells.append(('v', v_ok, exp['value'].rstrip('\n')))
+        for name, ok, correct in cells:
+            total += 1
+            right += ok
+            if ok:
+                text = 'Correct'
+            elif SHOW_CORRECT:
+                text = 'Correct answer: ' + correct
+            else:
+                text = 'Not correct'
+            marks.append(cell(k, name, ok, text))
+        ok_all = all(c[1] for c in cells)
+        mark = '<span style="color:#2f7d32;font-weight:700">✓</span>' if ok_all else \
+            '<span style="color:#a51d2a;font-weight:700">✗</span>'
+        answer_text = value if item['kind'] == 'output' else (value + (f'  ({kind})' if item['typed'] and kind else ''))
+        correct_col = ''
+        if SHOW_CORRECT and not ok_all:
+            c = [x[2] for x in cells]
+            correct_col = c[0] + (f'  ({c[1]})' if len(c) > 1 else '')
+        rows.append((k, item['code'], answer_text, mark, correct_col))
+
+    if ALL_OR_NOTHING:
+        outcome['fraction'] = 1.0 if right == total else 0.0
+    else:
+        outcome['fraction'] = right / total if total else 0.0
+    good = right == total
+    head = (f"<div class='coderunner-test-results {'good' if good else 'bad'}'><h3>"
+            f"{'All your answers are correct.' if good else f'{right} of your {total} answers are correct.'}</h3></div>")
+    show_col = SHOW_CORRECT and not good
+    table = (f'<table style="border-collapse:collapse;margin-top:8px"><tr><th {style}>#</th><th {style}>Item</th>'
+             f'<th {style}>Your answer</th><th {style}></th>' + (f'<th {style}>Correct answer</th>' if show_col else '') + '</tr>')
+    for k, code, answer_text, mark, correct_col in rows:
+        table += (f'<tr><td {style}>{k + 1}</td><td {style}>{pre(code)}</td><td {style}>{pre(answer_text)}</td><td {style}>{mark}</td>'
+                  + (f'<td {style}>{pre(correct_col)}</td>' if show_col else '') + '</tr>')
+    table += '</table>'
+    outcome['prologuehtml'] = head + table + ''.join(marks)
+    if IS_PRECHECK:
+        outcome['fraction'] = 1.0
+        outcome['prologuehtml'] = "<p class='precheckresult'>Your answers have been saved.</p>"
+    return outcome
+
+
+print(json.dumps(main()))
+]]></template>
+    <iscombinatortemplate><![CDATA[1]]></iscombinatortemplate>
+    <allowmultiplestdins><![CDATA[0]]></allowmultiplestdins>
+    <answer></answer>
+    <validateonsave>0</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader><![CDATA[TemplateGrader]]></grader>
+    <cputimelimitsecs><![CDATA[20]]></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson><![CDATA[0]]></extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald></templateparamsevald>
+    <twigall><![CDATA[0]]></twigall>
+    <uiplugin><![CDATA[html]]></uiplugin>
+    <uiparameters><![CDATA[{"html_src": "prototypeextra"}]]></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra><![CDATA[<script>
+// If the DOM header does not already contain the style sheet for this
+// question type, insert it.
+if (document.getElementsByClassName('qtype-coderunner-unicv-pr').length === 0) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+    div.pr-box {
+        background: #ffffff;
+        border: 1px solid #c4cdd5;
+        border-radius: 8px;
+        color: #1d2125;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+    }
+
+    div.pr-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-bottom: 1px solid #e3e7eb;
+        border-radius: 8px 8px 0 0;
+        background: #f6f8fa;
+        font-size: 13px;
+        color: #48535e;
+    }
+
+    div.pr-box button.pr-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        margin: 0;
+        padding: 0 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    div.pr-box button.pr-btn:hover,
+    div.pr-box button.pr-btn:focus {
+        background: #e7f0fa;
+        border-color: #0f6cbf;
+    }
+
+    div.pr-box button.pr-btn[aria-expanded="true"] {
+        background: #0f6cbf;
+        border-color: #0f6cbf;
+        color: #ffffff;
+    }
+
+    div.pr-box button.pr-btn.pr-danger {
+        background: #a51d2a;
+        border-color: #a51d2a;
+        color: #ffffff;
+    }
+
+    div.pr-help {
+        padding: 10px 14px;
+        border-bottom: 1px solid #e3e7eb;
+        background: #f3f8fd;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    div.pr-help ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    div.pr-help code,
+    div.pr-note code {
+        color: #a51d2a;
+    }
+
+    div.pr-body {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 12px;
+    }
+
+    div.pr-label {
+        margin-bottom: 4px;
+        color: #48535e;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    div.pr-code {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        overflow-x: auto;
+        border: 1px solid #e3e7eb;
+        border-radius: 6px;
+        background: #f6f8fa;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 20px;
+    }
+
+    div.pr-code .pr-nums {
+        padding: 6px 8px;
+        border-right: 1px solid #e3e7eb;
+        color: #8f959e;
+        text-align: right;
+        white-space: pre;
+        user-select: none;
+    }
+
+    div.pr-code .pr-src {
+        padding: 6px 10px;
+        white-space: pre;
+    }
+
+    .pr-src .pr-kw { color: #a51d2a; font-weight: 600; }
+    .pr-src .pr-bi { color: #7a3e9d; }
+    .pr-src .pr-str { color: #2f7d32; }
+    .pr-src .pr-numl { color: #b0672a; }
+    .pr-src .pr-com { color: #6a737b; font-style: italic; }
+
+    div.pr-box table.pr-table {
+        width: 100% !important;
+        max-width: none !important;
+        table-layout: auto;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0;
+    }
+
+    table.pr-table th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #c4cdd5;
+        background: transparent;
+        color: #48535e;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    table.pr-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #e3e7eb;
+        vertical-align: top;
+    }
+
+    table.pr-table td.pr-num {
+        width: 24px;
+        padding-top: 12px;
+        color: #8f959e;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 12px;
+        text-align: right;
+    }
+
+    table.pr-table td.pr-expr {
+        padding-top: 12px;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 20px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    table.pr-table td.pr-typecol {
+        width: 140px;
+    }
+
+    table.pr-table td.pr-valcol {
+        width: 45%;
+    }
+
+    div.pr-box input.pr-in,
+    div.pr-box select.pr-in,
+    div.pr-box textarea.pr-in {
+        box-sizing: border-box;
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 34px;
+        margin: 0;
+        padding: 6px 10px;
+        border: 1px solid #8f959e;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1d2125;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 20px;
+    }
+
+    select.pr-in {
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        padding: 4px 6px;
+    }
+
+    textarea.pr-in {
+        display: block;
+        resize: vertical;
+        overflow: hidden;
+        white-space: pre;
+    }
+
+    div.pr-box .pr-in:focus {
+        outline: 2px solid #0f6cbf;
+        outline-offset: 0;
+        border-color: #0f6cbf;
+    }
+
+    div.pr-box .pr-in.pr-good {
+        border: 2px solid #2f7d32;
+        background: #f1f8f1;
+    }
+
+    div.pr-box .pr-in.pr-bad {
+        border: 2px solid #a51d2a;
+        background: #fdf0f1;
+    }
+
+    div.pr-msg {
+        margin-top: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: pre-wrap;
+    }
+
+    div.pr-msg.pr-good {
+        color: #2f7d32;
+    }
+
+    div.pr-msg.pr-bad {
+        color: #8a1622;
+    }
+
+    div.pr-prog {
+        padding: 10px;
+        border: 1px solid #e3e7eb;
+        border-radius: 6px;
+    }
+
+    div.pr-prog .pr-input {
+        margin: 6px 0;
+        color: #48535e;
+        font-size: 13px;
+    }
+
+    div.pr-prog .pr-input code {
+        padding: 0 4px;
+        border-radius: 3px;
+        background: #f1f3f5;
+        color: #1d2125;
+    }
+
+    div.pr-note {
+        padding: 10px 12px;
+        border: 1px solid #e3e7eb;
+        border-radius: 6px;
+        background: #fffdf5;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .pr-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+`;
+    styleElement.classList.add('qtype-coderunner-unicv-pr');
+    document.head.append(styleElement);
+}
+</script>
+
+<input type="hidden" id="___textareaId___-pr" class="coderunner-ui-element" name="answers">
+<div class="pr-box" id="___textareaId___-pr-box"></div>
+
+<script>
+(() => {
+
+    //jshint esversion: 6
+
+    const T = '___textareaId___';
+    const store = document.getElementById(T + '-pr');
+    const box = document.getElementById(T + '-pr-box');
+    const textarea = document.getElementById(T);
+    const readOnly = !!(textarea && (textarea.readOnly || textarea.disabled));
+    const MODE = T === 'id_answerpreload' ? 'author' : (T === 'id_answer' ? 'teacher' : 'student');
+
+    const TYPES = ['int', 'float', 'str', 'bool', 'list', 'tuple', 'dict', 'set', 'NoneType', 'range', 'Error'];
+    const ERRORS = ['TypeError', 'ValueError', 'ZeroDivisionError', 'NameError', 'IndexError', 'KeyError',
+        'AttributeError', 'SyntaxError', 'EOFError'];
+
+    const HELP_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="6"></circle><path d="M5.3 5.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.3M7 10.3v.1"></path></svg>';
+    const RESET_ICON = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7a4.5 4.5 0 1 0 1.4-3.3"></path><path d="M2.2 1.6v2.6h2.6"></path></svg>';
+
+    function esc(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ----- The items, from Global extra (already expanded by Twig) -----
+
+    const SECTION = /^##\s*(context|expressions|values|output)\b(.*)$/i;
+
+    function parse(text) {
+        let lines = String(text || '').replace(/\r\n/g, '\n').split('\n');
+        if (!lines.some(line => SECTION.test(line))) {
+            lines = ['## expressions'].concat(lines);
+        }
+        const context = [], items = [];
+        let kind = null, body = [], arg = '';
+        const close = () => {
+            if (kind === 'context') {
+                context.push(...body);
+            } else if (kind === 'expressions' || kind === 'values') {
+                body.forEach(line => {
+                    const code = line.trim();
+                    if (code && code[0] !== '#') {
+                        items.push({ kind: 'expr', code: code, typed: kind === 'expressions' });
+                    }
+                });
+            } else if (kind === 'output') {
+                const code = body.join('\n').replace(/^\n+|\n+$/g, '');
+                if (code.trim()) {
+                    const found = arg.match(/input\s*:\s*(.*)$/i);
+                    items.push({ kind: 'output', code: code, input: found ? found[1].split(';').map(s => s.trim()) : [] });
+                }
+            }
+        };
+        lines.forEach(line => {
+            const m = line.match(SECTION);
+            if (m) {
+                close();
+                kind = m[1].toLowerCase();
+                body = [];
+                arg = m[2];
+            } else {
+                body.push(line);
+            }
+        });
+        close();
+        return { context: context.join('\n').replace(/^\n+|\n+$/g, ''), items: items };
+    }
+
+    const Q = parse(textarea.getAttribute('data-globalextra'));
+    let answers = Q.items.map(() => ['', '']);
+    let auto = '';
+
+    function savedValue() {
+        if (store.value) {
+            return store.value;
+        }
+        const outer = document.getElementById('qtype-coderunner-outer-div-' + T);
+        const leftovers = outer ? outer.getAttribute('data-leftovers') : '';
+        if (leftovers) {
+            try {
+                const data = JSON.parse(leftovers);
+                return data.answers ? data.answers[0] : '';
+            } catch (e) {
+                return '';
+            }
+        }
+        return '';
+    }
+
+    function load() {
+        const raw = savedValue();
+        if (raw && raw.indexOf('AUTO:') === 0) {
+            auto = raw;
+            return;
+        }
+        if (!raw) {
+            return;
+        }
+        try {
+            const list = JSON.parse(raw);
+            list.forEach((pair, i) => {
+                if (i < answers.length && Array.isArray(pair)) {
+                    answers[i] = [String(pair[0] || ''), String(pair[1] || '')];
+                }
+            });
+        } catch (e) {
+            // Leave the answers empty.
+        }
+    }
+
+    function save() {
+        if (readOnly) {
+            return;
+        }
+        if (auto && MODE === 'student') {
+            // The teacher's answer (Fill in correct responses): keep it as it is.
+            store.value = auto;
+            return;
+        }
+        if (MODE === 'teacher') {
+            if (!auto) {
+                auto = 'AUTO:' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+            }
+            store.value = auto;
+            return;
+        }
+        if (MODE === 'author') {
+            store.value = '';
+            return;
+        }
+        const any = answers.some(a => a[0].trim() !== '' || a[1] !== '');
+        store.value = any ? JSON.stringify(answers) : '';
+    }
+
+    // ----- Marks from the last Check -----
+
+    const marks = {};
+
+    function readMarks() {
+        const question = box.closest('.que') || document;
+        question.querySelectorAll('.unicv-pr-cell').forEach(el => {
+            const key = el.getAttribute('data-item') + ':' + el.getAttribute('data-cell');
+            marks[key] = { ok: el.getAttribute('data-ok') === '1', text: el.textContent.trim() };
+        });
+    }
+
+    // ----- Drawing -----
+
+    const KEYWORDS = ['False', 'None', 'True', 'and', 'as', 'assert', 'break', 'class', 'continue', 'def',
+        'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
+        'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'];
+    const BUILTINS = ['abs', 'bool', 'dict', 'enumerate', 'float', 'input', 'int', 'len', 'list', 'map',
+        'max', 'min', 'print', 'range', 'reversed', 'round', 'set', 'sorted', 'str', 'sum', 'tuple', 'type', 'zip'];
+
+    function highlight(text) {
+        const re = /(#.*$)|("(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/gm;
+        let out = '', last = 0, m;
+        while ((m = re.exec(text)) !== null) {
+            out += esc(text.slice(last, m.index));
+            let cls = '';
+            if (m[1]) {
+                cls = 'pr-com';
+            } else if (m[2]) {
+                cls = 'pr-str';
+            } else if (m[3]) {
+                cls = 'pr-numl';
+            } else if (KEYWORDS.includes(m[4])) {
+                cls = 'pr-kw';
+            } else if (BUILTINS.includes(m[4])) {
+                cls = 'pr-bi';
+            }
+            out += cls ? `<span class="${cls}">${esc(m[0])}</span>` : esc(m[0]);
+            last = re.lastIndex;
+        }
+        return out + esc(text.slice(last));
+    }
+
+    function codeBlock(code) {
+        const n = code.split('\n').length;
+        const nums = Array.from({ length: n }, (_, k) => k + 1).join('\n');
+        return `<div class="pr-code"><div class="pr-nums" aria-hidden="true">${nums}</div><div class="pr-src">${highlight(code)}</div></div>`;
+    }
+
+    function markOf(i, cell) {
+        return marks[i + ':' + cell];
+    }
+
+    function markClass(mark) {
+        return mark ? (mark.ok ? ' pr-good' : ' pr-bad') : '';
+    }
+
+    function markMsg(mark) {
+        if (!mark || mark.ok || mark.text === 'Not correct') {
+            return '';
+        }
+        return `<div class="pr-msg pr-bad">${esc(mark.text)}</div>`;
+    }
+
+    let helpOpen = false;
+    let confirming = false;
+
+    function counts() {
+        let total = 0, done = 0;
+        Q.items.forEach((item, i) => {
+            total += 1;
+            done += answers[i][0].trim() !== '' || (item.kind === 'output' && answers[i][0] !== '') ? 1 : 0;
+            if (item.kind === 'expr' && item.typed) {
+                total += 1;
+                done += answers[i][1] ? 1 : 0;
+            }
+        });
+        return { total: total, done: done };
+    }
+
+    function barHtml() {
+        let left = '';
+        if (MODE === 'student' && !auto) {
+            const c = counts();
+            left = `<span>${c.done} of ${c.total} answer${c.total === 1 ? '' : 's'} given</span>`;
+        } else if (MODE === 'teacher') {
+            left = '<span style="font-weight:600;color:#0f6cbf">Teacher\'s answer</span>';
+        }
+        let right = `<button type="button" class="pr-btn" data-pr-bar="help" aria-expanded="${helpOpen}" aria-controls="${T}-pr-help">${HELP_ICON}<span>Help</span></button>`;
+        if (MODE === 'student' && !readOnly && !auto) {
+            right = confirming ? `<span style="font-weight:600;color:#1d2125">Clear all your answers?</span>
+<button type="button" class="pr-btn pr-danger" data-pr-bar="reset-yes">Yes, clear them</button>
+<button type="button" class="pr-btn" data-pr-bar="reset-no">Cancel</button>` :
+                right + ` <button type="button" class="pr-btn" data-pr-bar="reset">${RESET_ICON}<span>Start again</span></button>`;
+        }
+        return `<div class="pr-bar"><span>${left}</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${right}</span></div>`;
+    }
+
+    function helpHtml() {
+        if (!helpOpen) {
+            return '';
+        }
+        let items;
+        if (MODE === 'student') {
+            items = [
+                'Work out the result <strong>without running the code</strong>, as Python would.',
+                'Write values as Python shows them: <code>7</code>, <code>3.5</code>, <code>True</code>, <code>[8, 1]</code>, <code>(1, 2)</code>, <code>None</code>. Texts can be written with or without quotes: <code>\'abc\'</code> or <code>abc</code>.',
+                'Numbers must have the right type: <code>4</code> is an <code>int</code> and <code>4.0</code> a <code>float</code>.',
+                'If the expression gives an error, choose the type <strong>Error</strong> and write the name of the error as the value, e.g. <code>TypeError</code> or <code>ZeroDivisionError</code>.',
+                'For a program, write exactly what it prints, one line per line of output. If it reads data, what is typed also appears on the screen (e.g. <code>n? 4</code>). If it stops with an error, write the name of the error on the last line.'
+            ];
+        } else {
+            items = [
+                'The items of the question are written in the <strong>Global extra</strong> field, in sections: <code>## context</code>, <code>## expressions</code> (value and type), <code>## values</code> (value only) and <code>## output</code> (a program; optionally <code>## output input: 4; 7</code>).',
+                'Random values: write them in <em>Template params</em> (e.g. <code>{"a": &#123;&#123; random(10, 30) &#125;&#125;}</code>), use them as <code>&#123;&#123; a &#125;&#125;</code> in Global extra and the question text, and tick <em>Twig all</em>.',
+                'The correct answers are computed by Python for each attempt. This field only lets the question be validated: leave it as it is and keep <em>Validate on save</em> ticked; saving checks that the code of every item runs.',
+                'To see the answers for some values, preview the question, click <em>Fill in correct responses</em> and then <em>Check</em>.'
+            ];
+        }
+        return `<div class="pr-help" id="${T}-pr-help"><ul>${items.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+    }
+
+    function typeSelect(i, value) {
+        const options = ['<option value="">type…</option>'].concat(TYPES.map(t =>
+            `<option value="${t}"${t === value ? ' selected' : ''}>${t}</option>`));
+        return `<select class="pr-in${markClass(markOf(i, 't'))}" data-pr-i="${i}" data-pr-c="1" aria-label="Type of item ${i + 1}"${readOnly ? ' disabled' : ''}>${options.join('')}</select>`;
+    }
+
+    function exprRows() {
+        const rows = [];
+        Q.items.forEach((item, i) => {
+            if (item.kind !== 'expr') {
+                return;
+            }
+            const mv = markOf(i, 'v'), mt = markOf(i, 't');
+            const isError = answers[i][1] === 'Error';
+            const value = `<input type="text" class="pr-in${markClass(mv)}" data-pr-i="${i}" data-pr-c="0" value="${esc(answers[i][0])}" ` +
+                `spellcheck="false" autocapitalize="off" autocomplete="off" list="${T}-pr-errors" ` +
+                `placeholder="${isError ? 'name of the error' : 'value'}" aria-label="Value of item ${i + 1}"${readOnly ? ' readonly' : ''}>` + markMsg(mv);
+            const type = item.typed ? typeSelect(i, answers[i][1]) + markMsg(mt) : '';
+            rows.push(`<tr><td class="pr-num">${i + 1}</td><td class="pr-expr">${highlight(item.code)}</td><td class="pr-valcol">${value}</td>` +
+                (hasTyped ? `<td class="pr-typecol">${type}</td>` : '') + '</tr>');
+        });
+        if (!rows.length) {
+            return '';
+        }
+        return `<div><div class="pr-label">What is the value${hasTyped ? ' and the type' : ''} of each expression?</div>
+<table class="pr-table"><thead><tr><th>#</th><th>Expression</th><th>Value</th>${hasTyped ? '<th>Type</th>' : ''}</tr></thead><tbody>${rows.join('')}</tbody></table>
+<datalist id="${T}-pr-errors">${ERRORS.map(e => `<option value="${e}">`).join('')}</datalist></div>`;
+    }
+
+    function outputItems() {
+        return Q.items.map((item, i) => {
+            if (item.kind !== 'output') {
+                return '';
+            }
+            const m = markOf(i, 'v');
+            const input = item.input.length ? `<div class="pr-input">Input typed on the keyboard: ${item.input.map(s => `<code>${esc(s)}</code>`).join(' ')}</div>` : '';
+            const lines = Math.max(3, answers[i][0].split('\n').length);
+            return `<div class="pr-prog"><div class="pr-label">${i + 1}. What does this program print?</div>${codeBlock(item.code)}${input}
+<textarea class="pr-in${markClass(m)}" data-pr-i="${i}" data-pr-c="0" rows="${lines}" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Output of program ${i + 1}" placeholder="The output, line by line"${readOnly ? ' readonly' : ''}>${esc(answers[i][0])}</textarea>${markMsg(m)}</div>`;
+        }).join('');
+    }
+
+    const hasTyped = Q.items.some(item => item.kind === 'expr' && item.typed);
+
+    function render(focus) {
+        let body;
+        if (MODE !== 'student') {
+            const n = Q.items.length;
+            body = `<div class="pr-note">${MODE === 'author' ?
+                'The Answer preload is not used by this question type.' :
+                `<strong>No answer to write.</strong> The correct answers of the ${n} item${n === 1 ? '' : 's'} in Global extra are computed by Python for each attempt. Keep <em>Validate on save</em> ticked: saving checks that every item runs. To see the answers for some values, preview the question, click <em>Fill in correct responses</em> and then <em>Check</em>.`}</div>`;
+        } else if (auto) {
+            body = '<div class="pr-note">The correct answers are computed for the values of each attempt.</div>';
+        } else if (!Q.items.length) {
+            body = '<div class="pr-note">This question has no items yet.</div>';
+        } else {
+            body = (Q.context ? `<div><div class="pr-label">Consider:</div>${codeBlock(Q.context)}</div>` : '') + exprRows() + outputItems();
+        }
+        box.innerHTML = barHtml() + helpHtml() + `<div class="pr-body">${body}</div>` +
+            `<div class="pr-sr" aria-live="polite" id="${T}-pr-live"></div>`;
+        box.querySelectorAll('textarea.pr-in').forEach(fit);
+        if (focus) {
+            const el = box.querySelector(focus);
+            if (el) {
+                el.focus();
+            }
+        }
+    }
+
+    function renderBar() {
+        const old = box.querySelector('.pr-bar');
+        const tmp = document.createElement('div');
+        tmp.innerHTML = barHtml();
+        old.replaceWith(tmp.firstChild);
+    }
+
+    function fit(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight + 2) + 'px';
+    }
+
+    function clearMark(el, i, cell) {
+        const key = i + ':' + cell;
+        if (marks[key]) {
+            delete marks[key];
+            el.classList.remove('pr-good', 'pr-bad');
+            const msg = el.nextElementSibling;
+            if (msg && msg.classList.contains('pr-msg')) {
+                msg.remove();
+            }
+        }
+    }
+
+    // ----- Events -----
+
+    box.addEventListener('input', event => {
+        const el = event.target;
+        if (!el.classList.contains('pr-in') || readOnly) {
+            return;
+        }
+        const i = +el.getAttribute('data-pr-i'), c = +el.getAttribute('data-pr-c');
+        answers[i][c] = el.value;
+        if (el.tagName === 'TEXTAREA') {
+            fit(el);
+        }
+        clearMark(el, i, c === 0 ? 'v' : 't');
+        save();
+        renderBar();
+    });
+
+    box.addEventListener('change', event => {
+        const el = event.target;
+        if (el.tagName === 'SELECT' && el.classList.contains('pr-in') && !readOnly) {
+            const i = +el.getAttribute('data-pr-i');
+            answers[i][1] = el.value;
+            clearMark(el, i, 't');
+            save();
+            const value = box.querySelector(`input[data-pr-i="${i}"]`);
+            if (value) {
+                value.placeholder = el.value === 'Error' ? 'name of the error' : 'value';
+            }
+            renderBar();
+        }
+    });
+
+    box.addEventListener('click', event => {
+        const button = event.target.closest('[data-pr-bar]');
+        if (!button) {
+            return;
+        }
+        const act = button.getAttribute('data-pr-bar');
+        if (act === 'help') {
+            helpOpen = !helpOpen;
+            render('[data-pr-bar="help"]');
+        } else if (readOnly) {
+            return;
+        } else if (act === 'reset') {
+            confirming = true;
+            render('[data-pr-bar="reset-no"]');
+        } else if (act === 'reset-no') {
+            confirming = false;
+            render('[data-pr-bar="reset"]');
+        } else if (act === 'reset-yes') {
+            confirming = false;
+            answers = Q.items.map(() => ['', '']);
+            Object.keys(marks).forEach(k => delete marks[k]);
+            save();
+            render('.pr-in');
+        }
+    });
+
+    load();
+    save();
+    readMarks();
+    render();
+    if (document.readyState === 'loading') {
+        // The feedback of the last Check may come after this question in the page.
+        document.addEventListener('DOMContentLoaded', () => {
+            readMarks();
+            render();
+        });
+    }
+
+})();
+</script>
+]]></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>

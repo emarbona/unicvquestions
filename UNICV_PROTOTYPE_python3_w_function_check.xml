@@ -5,21 +5,40 @@
       <text>UNICV_PROTOTYPE_python3_w_function_check</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[<p>UniCV prototype for questions in which the student writes a Python 3 program with a <strong>required function</strong>.</p>
-<p>Before the tests are run, the student's code is analysed statically (without running it) to check that the required function is defined and called. If any requirement is not met, the tests are not run and the student sees the list of unmet requirements. As in the python3_w_input type, values read with input() are echoed to the output, as on a console.</p>
-<p>Template parameters (JSON, in the <em>Template params</em> field):</p>
+      <text><![CDATA[<p>UniCV prototype for questions in which the student writes a Python 3 program with a <strong>required function</strong> (e.g. "write a function <code>distancia_pontos</code> and use it to…"). Before the tests are run, the student's code is analysed statically (without running it) to check that the required function is defined, has the right number of parameters, returns a value and is called by the main program. If any requirement is not met, the tests are not run and the student sees the list of unmet requirements. As in <code>python3_w_input</code>, the values read with <code>input()</code> are echoed to the output, as on a console.</p>
+<h4>How to write a question</h4>
+<ol>
+<li>Create a CodeRunner question of type <code>python3_w_function_check</code>. In the question text, give the name and the parameters of the function the student must write.</li>
+<li>In <em>Template params</em>, write at least the name of the function, e.g. <code>{"function": "distancia_pontos", "num_params": 4}</code> (see the parameters below).</li>
+<li>Write the test cases as in any Python program question: the input in <em>Standard Input</em> and the expected output in <em>Expected output</em>. Because <code>input()</code> is echoed, the expected output contains the prompts and the values read, e.g. <code>x? 3</code>.</li>
+<li>Optionally, write <em>Test code</em>: it is run after the student's program, with access to its functions, so it can test the function directly (e.g. <code>print(distancia_pontos(0, 0, 3, 4))</code>). If the program reads data, the test code runs after it has read its input.</li>
+<li>Write the solution in the <strong>Answer</strong> field and keep <em>Validate on save</em> ticked.</li>
+</ol>
+<h4>What the student gets</h4>
 <ul>
-<li><strong>function</strong>: name of the required function (mandatory).</li>
-<li><strong>num_params</strong>: exact number of parameters (optional).</li>
-<li><strong>require_return</strong>: the function must return a value (default: true).</li>
-<li><strong>require_call</strong>: the function must be called from outside itself, after its definition (default: true).</li>
-<li><strong>forbid_input_in_function</strong>: the function must not call input() (default: true).</li>
-<li><strong>forbid_print_in_function</strong>: the function must not call print() (default: false).</li>
-<li><strong>only_in_function</strong>: list of strings that may appear only inside the function, e.g. ["math.sqrt"] (optional).</li>
-<li><strong>lang</strong>: language of the feedback messages, "en" (default) or "pt".</li>
+<li>The usual Ace code editor.</li>
+<li>After <strong>Check</strong>, if the function requirements are met, the usual table of tests. Otherwise each test shows the list of unmet requirements (e.g. <em>"The function 'distancia_pontos' must return its result with a return statement."</em>) and the line "The tests were not run.", so no test is passed.</li>
 </ul>
-<p>Example:</p>
-<pre>{"function": "distancia_pontos", "num_params": 4, "only_in_function": ["math.sqrt"], "lang": "pt"}</pre>]]></text>
+<h4>Limitations</h4>
+<ul>
+<li>The checks only look at the code: they show that the function exists and is used, not that the program uses its result in a sensible way.</li>
+<li>The function must be defined at the top level of the program (not inside another function or block). If it is defined more than once, the last definition is checked.</li>
+<li><code>only_in_function</code> is a plain text search: the text is also found in comments and in strings outside the function.</li>
+<li>Mark: all or nothing by default, as in the standard Python question types.</li>
+</ul>
+<h4>Template parameters</h4>
+<ul>
+<li><strong>function</strong> (mandatory): name of the required function.</li>
+<li><strong>num_params</strong> (optional): exact number of parameters (<code>*args</code> and <code>**kwargs</code> are not accepted when it is given).</li>
+<li><strong>require_return</strong> (default true): the function must return a value.</li>
+<li><strong>require_call</strong> (default true): the function must be called from outside itself, after its definition.</li>
+<li><strong>forbid_input_in_function</strong> (default true): the function must not call <code>input()</code>.</li>
+<li><strong>forbid_print_in_function</strong> (default false): the function must not call <code>print()</code>.</li>
+<li><strong>only_in_function</strong> (optional): list of texts that may appear only inside the function, e.g. <code>["math.sqrt"]</code>.</li>
+<li><strong>lang</strong> (default "en"): language of the messages, "en" or "pt".</li>
+</ul>
+<p>Example: <code>{"function": "distancia_pontos", "num_params": 4, "only_in_function": ["math.sqrt"], "lang": "pt"}</code></p>
+]]></text>
     </questiontext>
     <generalfeedback format="html">
       <text></text>

@@ -5,21 +5,37 @@
       <text>UNICV_PROTOTYPE_python3_sst_dynamic</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[<p>The prototype for a question type that asks a student to step through the execution of a given bit of code line-by-line, updating the program state at each step in a given table.</p>
-<p>This is the UniCV variant of python3_sst with a <strong>dynamic table</strong>. The author and the student add steps ("Add step" under the table, or Enter in the last row) and variable columns ("+ Variable" in the table header) as they are needed, and can remove any step or variable with its "x" button, so neither the number of steps nor the variables have to be fixed (or revealed) in advance: the student identifies the variables and adds a column for each one.</p>
-<p>When grading, trailing rows with no line number and trailing columns with no name and no values are ignored, and the variable columns may be in any order. For a program with no variables, remove all the variable columns (or leave a single unnamed, empty one).</p>
-<p>To create a new question of this type:</p>
+      <text><![CDATA[<p>UniCV prototype for <strong>trace table</strong> questions: the student steps through the execution of a given piece of code, line by line, and fills in a table with the line number, the values of the variables and the output at each step. It is the UniCV variant of <code>python3_sst</code> with a <strong>dynamic table</strong>: the author and the student add steps and variable columns as they need them, so neither the number of steps nor the variables have to be fixed (or revealed) in advance. The student can be asked to identify the variables and add a column for each one.</p>
+<h4>How to write a question</h4>
 <ol>
-<li>Create a new coderunner question of type python3_sst_dynamic</li>
-<li>Fill in the question name and question text and set the output for the first test case to OK.</li>
+<li>Create a CodeRunner question of type <code>python3_sst_dynamic</code>. In the question text, show the code to trace, with line numbers.</li>
+<li>Set the expected output of the first test case to <code>OK</code> (the grader prints OK when the table is right). Save.</li>
+<li>In the <strong>Answer</strong> field, fill in the correct table, adding steps ("Add step" under the table, or Enter in the last row) and variables ("+ Variable" in the header) as you go. Remove a step or a variable with its "x" button.</li>
+<li>Optionally, use the "Table options" panel above the table to set the minimum column widths and to turn on or off the <strong>output</strong> column and the <strong>return value</strong> row (width 0 = off).</li>
+<li>In <strong>Answer preload</strong>, set the table the student starts with: by default one step and one unnamed variable column (remove the column to start with none). Its size does not have to match the answer. To give the variable names to the student, type them in the preload table.</li>
 <li>Save.</li>
-<li>Open the Answer Preload section.</li>
-<li>The columns grow automatically as you type. The "Table options" panel above the answer is optional: it sets the minimum column widths and turns the printed output column and the return value row on or off (width 0 = off).</li>
-<li>Fill in the answer SST with the required values, adding steps and variables as you go.</li>
-<li>In the Answer Preload section, set the table the student starts with (by default one step and one unnamed variable column; remove the column to start with none). The size of the preload table is independent of the answer. To give the variable names to the student, type them in the preload table.</li>
-<li>Save</li>
 </ol>
-<p> </p>]]></text>
+<h4>What the student gets</h4>
+<ul>
+<li>The table of the Answer preload, with the buttons to add and remove steps and variable columns. The cells grow as the student types.</li>
+<li>After <strong>Check</strong>, either OK or the first problem found: wrong or missing variable names, the wrong sequence of line numbers (too few or too many steps), the first wrong value of a variable (with the step and the line number), a wrong output or a wrong return value.</li>
+</ul>
+<h4>How the table is compared</h4>
+<ul>
+<li>Trailing rows with no line number and no output, and trailing columns with no name and no values, are ignored. The variable columns may be in any order; each variable can appear only once, and names are case sensitive.</li>
+<li>The line numbers must be exactly those of the answer, in the same order.</li>
+<li>Values are read as Python literals and must have the right type (<code>4</code> is not <code>4.0</code>, texts need quotes: <code>'abc'</code>). An empty cell is compared as empty, so the student must leave a cell empty exactly where the answer does. Follow one convention in all your questions (e.g. write a value only in the step where the variable changes) and explain it to the students.</li>
+<li>The output column is compared line by line, ignoring the spaces at the ends.</li>
+<li>A program with no variables: remove all the variable columns (or leave a single unnamed, empty one).</li>
+</ul>
+<h4>Limitations</h4>
+<ul>
+<li>The grader does not run the code: the correct table is the one written by the teacher in the Answer, so it must be checked carefully.</li>
+<li>Only the first problem found is reported, and the mark is all or nothing.</li>
+<li>The code to trace is part of the question text, so it is not randomised.</li>
+</ul>
+<p>There are no template parameters.</p>
+]]></text>
     </questiontext>
     <generalfeedback format="html">
       <text></text>

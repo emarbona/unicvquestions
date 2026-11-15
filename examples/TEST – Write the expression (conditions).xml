@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[TEST – Write the expression (conditions)]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>For each statement, write a Python expression that gives <code>True</code> when the statement is true and <code>False</code> otherwise. Use only the variables given.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype><![CDATA[unicv_python3_expression]]></coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>5</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra><![CDATA[## The values `a`, `b` and `c` can be the sides of a triangle (each side is shorter than the sum of the other two).
+vars: a, b, c in 0..20
+## The triangle with sides `a`, `b` and `c` is equilateral.
+vars: a, b, c in 1..20
+## At least one of the two people is an adult (18 or older).
+vars: idade1, idade2 in 0..100
+## The year `ano` is a leap year: it is a multiple of 4, but not of 100 unless it is also a multiple of 400.
+vars: ano in 1800..2400
+forbid: if
+## `x` is between 0 and 10, both included. Write it as a chained comparison.
+vars: x in -5.0..15.0
+require: chain
+## The person can get a driving licence: `idade` is greater than {{ age }}, or equal to it.
+vars: idade in 0..100
+]]></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[{"exprs": ["[\"a + b > c and a + c > b and b + c > a\", \"a == b == c\", \"idade1 >= 18 or idade2 >= 18\", \"ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)\", \"0 <= x <= 10\", \"idade >= {{ age }}\"]"]}]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams><![CDATA[{"age": {{ random(16, 18) }}}]]></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>twig</templateparamslang>
+    <templateparamsevalpertry>1</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>1</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>

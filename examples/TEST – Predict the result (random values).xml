@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text>TEST – Predict the result (random values)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Without running the code, work out the value and the type of each expression and what each program prints. The numbers and the city change from attempt to attempt.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_python3_predict</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>5</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra><![CDATA[## context
+numbers = [{{ a }}, {{ b }}, 1, 9]
+city = "{{ city }}"
+## expressions
+{{ a }} // {{ b }} + {{ a }} % {{ b }}
+"ab" * {{ b }}
+city[::-1]
+numbers[1:3]
+{{ a }} / 2
+{{ a }} > {{ b }} and not {{ b }} > 3
+"7" + {{ b }}
+## values
+len(city) * 2
+numbers[-1] + numbers[0]
+## output input: {{ b }}
+num = int(input("num? "))
+for k in range(num):
+    if k % 2 == 0:
+        print(k)
+## output
+x = {{ a }}
+while x > 0:
+    print(x)
+    x = x - {{ b }} * 3
+]]></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[{"answers": ["AUTO:qhdb2js5pul0ap5zuj33"]}]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams><![CDATA[{"a": {{ random(10, 30) }}, "b": {{ random(2, 6) }}, "city": "{{ random(["Praia", "Mindelo", "Assomada", "Tarrafal"]) }}"}]]></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>twig</templateparamslang>
+    <templateparamsevalpertry>1</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>1</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>

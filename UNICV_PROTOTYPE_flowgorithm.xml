@@ -5,35 +5,56 @@
       <text>UNICV_PROTOTYPE_flowgorithm</text>
     </name>
     <questiontext format="html">
-      <text><![CDATA[<p>Protótipo da UniCV para perguntas em que o estudante <strong>constrói um fluxograma com as figuras e as regras do Flowgorithm</strong>: variáveis declaradas com tipo, vetores, funções com parâmetros e valor devolvido, e os mesmos operadores e funções predefinidas. O corretor executa o fluxograma com os dados de cada caso de teste e compara o que ele escreve com a saída esperada.</p>
-<p>Figuras disponíveis (com as cores e as formas do Flowgorithm):</p>
-<ul>
-<li><strong>Entrada</strong>: lê uma linha da entrada do teste para uma variável (ou uma posição de um vetor). O valor tem de corresponder ao tipo da variável.</li>
-<li><strong>Saída</strong>: escreve o valor de uma expressão; por omissão muda de linha no fim (pode desligar-se).</li>
-<li><strong>Declarar</strong>: cria variáveis de tipo Inteiro, Real, Texto ou Lógico, ou vetores com um tamanho.</li>
-<li><strong>Atribuição</strong>: <code>variável = expressão</code>.</li>
-<li><strong>Chamar</strong>: executa uma função definida pelo estudante.</li>
-<li><strong>Comentário</strong>: uma nota no fluxograma; não tem efeito na avaliação.</li>
-<li><strong>Se</strong>, <strong>Enquanto</strong>, <strong>Para</strong> (crescente ou decrescente, com passo) e <strong>Fazer</strong> (repete enquanto a condição for verdadeira, testando depois).</li>
-</ul>
-<p>Regras, como no Flowgorithm: as variáveis têm de ser declaradas antes de serem usadas; <code>/</code> dá sempre um real e um real guardado num Inteiro perde a parte decimal; <code>+</code> só soma números e <code>&amp;</code> junta textos; os vetores começam na posição 0; os nomes começam por uma letra, só têm letras e algarismos e não distinguem maiúsculas de minúsculas. Operadores: <code>+ - * / % mod ^</code>, <code>= == != &lt;&gt; &lt; &lt;= &gt; &gt;=</code>, <code>and &amp;&amp; or || not !</code>, <code>&amp;</code>; constantes <code>true</code>, <code>false</code>, <code>pi</code>. Funções predefinidas: Abs, Sgn, Int, Sqrt, Ln, Log, Log10, Sin, Cos, Tan, Arcsin, Arccos, Arctan, Random, Len, Char, ToChar, ToCode, ToInteger, ToReal, ToString, ToFixed e Size. Os valores lógicos escrevem-se <code>true</code> e <code>false</code>; os reais com parte decimal nula escrevem-se sem casas decimais.</p>
-<p>O editor tem, em cima, a lista das funções (Principal e as do estudante), os botões «Nova função», «Propriedades» e eliminar função; à direita, a escolha da língua (português, inglês ou espanhol), «Recomeçar» e «Ajuda». Não estão incluídas as figuras do Flowgorithm que só servem para depurar (Ponto de paragem) nem as de gráficos de tartaruga e de ficheiros.</p>
-<p>Para criar uma pergunta deste tipo:</p>
+      <text><![CDATA[<p>UniCV prototype for questions in which the student <strong>builds a flowchart with the shapes and the rules of Flowgorithm</strong>: variables declared with a type, arrays, functions with parameters and a return value, and the same operators and built-in functions. The grader runs the flowchart with the input of each test case and compares what it writes with the expected output, as in a programming question. For simpler flowcharts, without declarations or functions, use <code>unicv_flowchart</code>.</p>
+<h4>How to write a question</h4>
 <ol>
-<li>Crie uma pergunta CodeRunner do tipo unicv_flowgorithm, escreva o nome e o enunciado e guarde.</li>
-<li>Em cada caso de teste, ponha os dados em <em>Standard Input</em> (um valor por linha) e a saída esperada em <em>Expected output</em>. Deixe <em>Test code</em> vazio.</li>
-<li>Construa o fluxograma de solução no campo <em>Answer</em> e guarde com <em>Validate on save</em> ligado.</li>
-<li>Para fluxogramas altos, aumente o número de linhas da caixa de resposta (<em>Answer box, Rows</em>).</li>
+<li>Create a CodeRunner question of type <code>unicv_flowgorithm</code>, write the name and the question text, and save.</li>
+<li>In each test case, put the input data in <em>Standard Input</em> (one value per line) and the expected output in <em>Expected output</em>. Leave <em>Test code</em> empty.</li>
+<li>Build the solution flowchart in the <strong>Answer</strong> field and save with <em>Validate on save</em> ticked.</li>
+<li>For tall flowcharts, increase the number of rows of the answer box (<em>Answer box, Rows</em>).</li>
 </ol>
-<p>Parâmetros do modelo (opcionais, em JSON no campo <em>Template params</em>):</p>
+<h4>What the student gets</h4>
 <ul>
-<li><strong>exigir</strong> / <strong>proibir</strong>: listas de figuras, de entre "entrada", "saida", "declarar", "atribuicao", "chamar", "se", "enquanto", "para", "fazer", "comentario" e "ciclo" (também se aceitam os nomes em inglês).</li>
-<li><strong>funcoes</strong>: lista de nomes de funções que o estudante tem de definir, por exemplo <code>["Quadrado"]</code>.</li>
-<li><strong>max_passos</strong>: número máximo de figuras executadas em cada teste (por omissão 100000), para detetar ciclos infinitos.</li>
-<li><strong>lang</strong>: língua das mensagens de erro quando o estudante não escolheu outra no editor: "pt" (por omissão), "en" ou "es".</li>
+<li>An editor with the shapes of Flowgorithm (same colours and forms):
+<ul>
+<li><strong>Input</strong>: reads one line of the test input into a variable (or an element of an array). The value must match the type of the variable.</li>
+<li><strong>Output</strong>: writes the value of an expression; by default it ends the line (this can be turned off).</li>
+<li><strong>Declare</strong>: creates variables of type Integer, Real, String or Boolean, or arrays with a size.</li>
+<li><strong>Assign</strong>: <code>variable = expression</code>.</li>
+<li><strong>Call</strong>: runs a function defined by the student.</li>
+<li><strong>Comment</strong>: a note in the flowchart; it has no effect on grading.</li>
+<li><strong>If</strong>, <strong>While</strong>, <strong>For</strong> (up or down, with a step) and <strong>Do</strong> (repeats while the condition is true, tested after).</li>
+</ul></li>
+<li>At the top, the list of functions (Main and the student's own), the buttons "New function", "Properties" and delete function; on the right, the language of the editor (Portuguese, English or Spanish), "Start again" and "Help".</li>
+<li>After <strong>Check</strong>, the usual CodeRunner table of tests, and the reason when the flowchart cannot run (e.g. a variable used before it is declared, or a value of the wrong type).</li>
 </ul>
-<p>Exemplo:</p>
-<pre>{"exigir": ["para"], "funcoes": ["Fatorial"]}</pre>]]></text>
+<h4>Rules (as in Flowgorithm)</h4>
+<ul>
+<li>Variables must be declared before they are used; <code>/</code> always gives a real, and a real stored in an Integer loses its decimal part; <code>+</code> only adds numbers and <code>&amp;</code> joins texts; arrays start at position 0; names start with a letter, have only letters and digits, and are not case sensitive.</li>
+<li>Operators: <code>+ - * / % mod ^</code>, <code>= == != &lt;&gt; &lt; &lt;= &gt; &gt;=</code>, <code>and &amp;&amp; or || not !</code>, <code>&amp;</code>; constants <code>true</code>, <code>false</code>, <code>pi</code>.</li>
+<li>Built-in functions: Abs, Sgn, Int, Sqrt, Ln, Log, Log10, Sin, Cos, Tan, Arcsin, Arccos, Arctan, Random, Len, Char, ToChar, ToCode, ToInteger, ToReal, ToString, ToFixed and Size.</li>
+<li>Logical values are written <code>true</code> and <code>false</code>; reals with no decimal part are written without decimals.</li>
+</ul>
+<h4>Grading</h4>
+<ul>
+<li>Each test is passed when the output of the flowchart is exactly the expected output. With <em>All-or-nothing grading</em> (the default), the mark is 1 only if every test is passed.</li>
+<li>The requirements in <code>exigir</code>, <code>proibir</code> and <code>funcoes</code> (see below) are checked before running the tests.</li>
+</ul>
+<h4>Limitations</h4>
+<ul>
+<li>The Flowgorithm shapes used only for debugging (Breakpoint), turtle graphics and files are not included.</li>
+<li><code>Random</code> gives different values on each run, so tests should not depend on its result.</li>
+<li>The flowchart is stored as JSON in the answer; it cannot be imported from or exported to Flowgorithm (.fprg) files.</li>
+</ul>
+<h4>Template parameters (all optional)</h4>
+<ul>
+<li><strong>exigir</strong> / <strong>proibir</strong>: lists of shapes that the flowchart must use / must not use, among "entrada", "saida", "declarar", "atribuicao", "chamar", "se", "enquanto", "para", "fazer", "comentario" and "ciclo" (any loop). The English names are also accepted.</li>
+<li><strong>funcoes</strong>: list of the names of the functions the student must define, e.g. <code>["Quadrado"]</code>.</li>
+<li><strong>max_passos</strong> (default 100000): largest number of shapes run in each test, to detect endless loops.</li>
+<li><strong>lang</strong> (default "pt"): language of the error messages when the student has not chosen another one in the editor: "pt", "en" or "es".</li>
+</ul>
+<p>Example: <code>{"exigir": ["para"], "funcoes": ["Fatorial"]}</code></p>
+]]></text>
     </questiontext>
     <generalfeedback format="html">
       <text></text>
