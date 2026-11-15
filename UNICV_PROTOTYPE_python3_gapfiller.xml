@@ -9,7 +9,7 @@
       <text><![CDATA[<p>UniCV prototype for <strong>gap-filler</strong> questions in Python (based on python3_stage1_gapfiller, with its own interface and fixes). The student sees a complete program with some parts replaced by gaps and fills them in; the program is then run with each test case.</p>
 <h4>How to write a question</h4>
 <ol>
-<li>Put the complete program in the <em>Global extra</em> field and replace each part the student must write with a gap (below). Alternatively, set the UI parameters to <code>{"html_src": "prototypeextra", "ui_source": "test0"}</code> and write the gapped code in the first test case.</li>
+<li>Put the complete program in the <em>Global extra</em> field and replace each part the student must write with a gap (below). Alternatively, leave <em>Global extra</em> without gaps and write the code with the gaps in the <em>Test code</em> of every test case (<strong>test-case mode</strong>, chosen automatically): the student sees the code of the first test case, and their answers are put into the gaps of every test case, so each test can use different data (e.g. a different list). All the test cases must have the same number of gaps.</li>
 <li>Fill in the <strong>Answer</strong> with the interface (the correct gap contents) and add the test cases: <em>Standard input</em> and <em>Expected output</em>. Tick <em>Use as example</em> on one or two tests so that the student sees an example run above the code.</li>
 <li>Save with <em>Validate on save</em> ticked: the answer must pass all tests.</li>
 </ol>
@@ -27,6 +27,7 @@
 </ul>
 <h4>Limitations</h4>
 <ul>
+<li>In test-case mode, do not tick <em>Use as example</em>: the example would show the code with the gaps still empty.</li>
 <li>Gaps are single-line: a gap cannot hold several lines of code.</li>
 <li>Inside <code>{[ ... ]}</code> do not use <code>::</code> (it starts the hint) or <code>]}</code> (it closes the gap), and the options of a <code>select</code> or <code>drop</code> gap cannot contain <code>|</code>.</li>
 <li>An empty gap is always rejected, so the correct answer cannot be an empty gap.</li>
@@ -36,6 +37,7 @@
 </ul>
 <h4>Differences from python3_stage1_gapfiller</h4>
 <ul>
+<li>The place of the gaps (Global extra or the test cases) is detected automatically, so the UI parameter <code>ui_source</code> is not needed (the html interface does not accept it). To reuse a question of the types <code>python3_stage1_gapfiller</code> or <code>python3_gapfiller_demo</code>, change its type, empty its <em>UI parameters</em> field and save; the gaps and the answer are read as they are.</li>
 <li>The interface is new (UI plugin <code>html</code>): choice gaps, word bank, hints, line numbers and colours, the gap count, <em>Clear all gaps</em> and errors marked on their gap. Gaps written for the old interface (<code>{[20]}</code>, <code>{[10-30]}</code>) work unchanged, and answers given with the old interface (a plain list) are still read correctly by the grader.</li>
 <li><code>echostandardinput</code> can now be set in the template parameters (before, it was always on and could not be changed).</li>
 <li><code>proscribedsubstrings</code> is empty by default (before: <code>[";", "print", "import"]</code>), so <code>print</code> can be used in a gap unless the question forbids it.</li>
@@ -474,12 +476,21 @@ def process_global_params(ui_source, field_values):
     PARAMS['ALL_OR_NOTHING'] = "{{ QUESTION.allornothing }}" == "1" # Whether or not all-or-nothing grading is being used
     PARAMS['GLOBAL_EXTRA'] = """{{ QUESTION.globalextra | e('py') }}\n"""
 
-# Get fields and ui params.
-ui_params = json.loads("""{{ QUESTION.uiparameters | json_encode | e('py') }}""")
-if ui_params and 'ui_source' in ui_params:
-    ui_source = ui_params['ui_source']
-else:
-    ui_source = 'globalextra'
+def choose_ui_source():
+    """Where the code with the gaps is: 'globalextra' if Global extra has
+       gaps, otherwise 'test0' if the code of the first test case has gaps
+       (then the gaps are filled in the code of every test case).
+    """
+    if GAP_RE.search("""{{ QUESTION.globalextra | e('py') }}"""):
+        return 'globalextra'
+    tests = json.loads("""{{ TESTCASES | json_encode | e('py') }}""")
+    if tests and GAP_RE.search(tests[0]['testcode']):
+        return 'test0'
+    return 'globalextra'
+
+
+# Get fields and the source of the gaps.
+ui_source = choose_ui_source()
 
 field_values = read_fields(""" {{ STUDENT_ANSWER | e('py') }}""")
 answer_field_values = read_fields(""" {{ QUESTION.answer | e('py') }}""")
@@ -863,10 +874,15 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-gf').length === 0) {
         }
     }
 
+    // The gaps are in Global extra or, if it has none, in the code of the
+    // first test case (then the grader fills them in every test case).
     function source() {
-        const params = uiParams();
-        const attr = params.ui_source === 'test0' ? 'data-test0' : 'data-globalextra';
-        return (textarea.getAttribute(attr) || '').replace(/\r\n/g, '\n');
+        const extra = (textarea.getAttribute('data-globalextra') || '').replace(/\r\n/g, '\n');
+        const test0 = (textarea.getAttribute('data-test0') || '').replace(/\r\n/g, '\n');
+        if (!/\{\[.*?\]\}/.test(extra) && /\{\[.*?\]\}/.test(test0)) {
+            return test0;
+        }
+        return extra;
     }
 
     function parseGap(spec) {

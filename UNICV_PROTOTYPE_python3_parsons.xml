@@ -34,14 +34,14 @@
 <ul>
 <li>New interface without jQuery UI: line numbers, colours, indentation guides, a drop marker that shows where the block will go and at which indentation, buttons and keyboard for every action, works on touch screens, and errors marked on their line.</li>
 <li>Simpler authoring: the program is written once, in Global extra; there is no need to paste it twice, shuffle, unindent or tick <em>Twig all</em>.</li>
-<li>Given (fixed) lines with <code>#given</code>, an option to give the indentation (<code>"indent": false</code>), and an option to grade by order instead of running (<code>"grading": "order"</code>).</li>
+<li>Given (fixed) lines with <code>#given</code>, an option to give the indentation (a line <code>#indent: fixed</code> in Global extra), and an option to grade by order instead of running (<code>"grading": "order"</code>).</li>
 <li>New grader: syntax and indentation errors are explained before running, each test is run separately (an error in one test does not spoil the others), there is a time limit per test (endless loops are reported) and hidden tests are supported. It needs no support files.</li>
 <li>Fixed bugs of the original: an error in the syntax-colouring code (assignment to a constant) and the browser <code>alert()</code>.</li>
 </ul>
 <p><strong>Note on input():</strong> by default <code>input()</code> behaves as on the keyboard, so the prompt and the value read (followed by a new line) appear in the output and must be in the <em>Expected output</em>. For example, with <code>n = int(input("n? "))</code> and input 4 the output starts with <code>n? 4</code>. Set <code>echostandardinput</code> to false to get plain Python behaviour.</p>
-<h4>UI parameters (in the <em>UI parameters</em> field)</h4>
+<h4>Options in Global extra</h4>
 <ul>
-<li><strong>indent</strong> (default true): if false, every block keeps the indentation written in Global extra and the student only chooses the order. Example: <code>{"html_src": "prototypeextra", "indent": false}</code>.</li>
+<li><strong>#indent: fixed</strong>: a line with only this text anywhere in Global extra makes every block keep the indentation written there, so the student only chooses the order (no ◀ ▶ buttons). Without it, the student also chooses the indentation.</li>
 </ul>
 <h4>Template parameters (all optional)</h4>
 <ul>
@@ -812,8 +812,10 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-pp').length === 0) {
         }
     }
 
-    const PARAMS = uiParams();
-    const INDENTING = PARAMS.indent !== false;   // false: the blocks keep the author's indentation.
+    // A line  #indent: fixed  in Global extra: every block keeps the
+    // indentation written by the author, and the student only chooses the order.
+    const FIXED_INDENT = /^[ \t]*#[ \t]*indent[ \t]*:[ \t]*fixed[ \t]*$/im;
+    const INDENTING = !FIXED_INDENT.test(textarea.getAttribute('data-globalextra') || '');
 
     // ----- The code blocks, written by the question author in Global extra -----
     // One block per line, indented as in the correct program.
@@ -823,10 +825,9 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-pp').length === 0) {
 
     const blocks = [];
     (function parse() {
-        const attr = PARAMS.ui_source === 'test0' ? 'data-test0' : 'data-globalextra';
-        const source = (textarea.getAttribute(attr) || '').replace(/\r\n/g, '\n').replace(/\t/g, '    ');
+        const source = (textarea.getAttribute('data-globalextra') || '').replace(/\r\n/g, '\n').replace(/\t/g, '    ');
         source.split('\n').forEach(line => {
-            if (!line.trim()) {
+            if (!line.trim() || FIXED_INDENT.test(line)) {
                 return;
             }
             const tag = line.match(/\s*#\s*(distractor|given)\s*$/i);
