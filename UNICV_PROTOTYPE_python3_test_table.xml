@@ -11,6 +11,7 @@
 <ol>
 <li>In the <em>Question text</em>, describe the function or program to be tested (e.g. <code>is_even(number)</code> returns True if the number is even) and ask the student to complete the table.</li>
 <li>Open <strong>Answer preload</strong> and build the table there: choose whether the tests are <em>Python code that calls a function</em> or <em>the standard input of a program</em>, add the rows and write the cells. Cells with text are <strong>given</strong>; leave a cell <strong>empty</strong> for the student to fill in, or write <code>???</code> in it for the parts the student must complete (e.g. <code>print(is_even(???))</code>). You can also let students add some tests of their own.</li>
+<li>Optional: put the code to be tested (the function or the program) in <strong>Global extra</strong>. It is shown in a <em>Code to test</em> panel to the left of the table (above it on narrow screens). Global extra is not used for grading; the reference solution is still the one in the <em>Answer</em>. Leave Global extra empty if the student must not see the code.</li>
 <li>Save (<em>Save changes and continue editing</em>). The table now appears in the <strong>Answer</strong> field: fill in the open cells correctly, and write the <strong>reference solution</strong> in the box below the table.</li>
 <li>Optionally, add <strong>wrong versions</strong> after the reference solution, each starting with a line <code>#### wrong: description</code>. The description is shown to the student when their tests do not catch that mistake.</li>
 <li>Keep <em>Validate on save</em> ticked: the teacher's answer must be valid (and catch every wrong version). No test cases are needed, and <em>Twig all</em> is not needed.</li>
@@ -49,6 +50,7 @@ def is_even(number):
 <li>Tests for <strong>programs</strong> (standard input and output), not only for functions.</li>
 <li><strong>Wrong versions</strong> that the student's tests must catch, a new way to assess the quality of the tests.</li>
 <li>Students can add tests of their own, and each row is marked ✓ or ✗ in the table with the reason.</li>
+<li>The code to be tested can be shown next to the table (from Global extra).</li>
 <li>New self-contained grader: no support files and no pylint, a time limit per test (endless loops are reported) and clear messages.</li>
 </ul>
 <p><strong>Note on input():</strong> for program tests, by default <code>input()</code> behaves as on the keyboard: the prompt and the value read (followed by a new line) appear in the output, so they must be in the expected output. For example, with <code>a = int(input("a? "))</code> and input 3 the output starts with <code>a? 3</code>. Set <code>echostandardinput</code> to false to get plain Python behaviour.</p>
@@ -544,6 +546,48 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-tt').length === 0) {
         overflow-x: auto;
     }
 
+    div.tt-split {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    div.tt-split > div.tt-body {
+        flex: 3 1 420px;
+        min-width: 0;
+    }
+
+    div.tt-src {
+        flex: 0 1 auto;
+        max-width: calc(100% - 24px);
+        min-width: 0;
+        margin: 12px 0 0 12px;
+        border: 1px solid #d5dbe1;
+        border-radius: 6px;
+        background: #f6f8fa;
+    }
+
+    div.tt-src-h {
+        padding: 6px 10px;
+        border-bottom: 1px solid #d5dbe1;
+        font-size: 13px;
+        font-weight: 600;
+        color: #48535e;
+    }
+
+    div.tt-src pre {
+        margin: 0;
+        padding: 8px 10px;
+        overflow-x: auto;
+        background: transparent;
+        border: 0;
+        color: #1d2125;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.45;
+        white-space: pre;
+    }
+
     table.tt-table {
         width: 100%;
         border-collapse: separate;
@@ -934,7 +978,14 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-tt').length === 0) {
             return;
         }
         // Student. The first time, the saved value is the preload itself (it has no "given").
-        if (saved && saved.given) {
+        // After "Fill in correct responses" it is the teacher's answer (it has a "solution").
+        if (saved && saved.solution !== undefined && !saved.given) {
+            // A teacher's answer saved by an older version, without the table structure:
+            // show its rows as the student's own cells.
+            const theirs = cleanRows(saved.rows);
+            spec = { kind: saved.kind === 'program' ? 'program' : 'function', addrows: 0, rows: theirs.map(() => ['', '']) };
+            rows = theirs;
+        } else if (saved && saved.given) {
             spec = specFrom(saved);
             const mine = cleanRows(saved.rows);
             rows = startRows();
@@ -962,7 +1013,9 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-tt').length === 0) {
         if (MODE === 'author') {
             store.value = JSON.stringify({ kind: spec.kind, addrows: spec.addrows, rows: spec.rows });
         } else if (MODE === 'teacher') {
-            store.value = JSON.stringify({ rows: rows, solution: solution });
+            // The table structure goes with the answer too, so that "Fill in correct
+            // responses" can show the teacher's answer in the student's table.
+            store.value = JSON.stringify({ kind: spec.kind, addrows: spec.addrows, given: spec.rows, rows: rows, solution: solution });
         } else {
             const changed = rows.length !== spec.rows.length || rows.some((r, i) => r[0] !== spec.rows[i][0] || r[1] !== spec.rows[i][1]);
             store.value = changed ? JSON.stringify({ kind: spec.kind, addrows: spec.addrows, given: spec.rows, rows: rows }) : '';
@@ -1165,9 +1218,19 @@ if (document.getElementsByClassName('qtype-coderunner-unicv-tt').length === 0) {
         return '';
     }
 
+    // The code in Global extra, if any, is shown to the left of the table (above it on narrow screens).
+    const SOURCE = ((textarea && textarea.getAttribute('data-globalextra')) || '').replace(/\r\n/g, '\n').replace(/\s+$/, '');
+
+    function sourceHtml(table) {
+        if (!SOURCE.trim()) {
+            return table;
+        }
+        return `<div class="tt-split"><div class="tt-src"><div class="tt-src-h">Code to test</div><pre>${esc(SOURCE)}</pre></div>${table}</div>`;
+    }
+
     function render(focus) {
         box.innerHTML = barHtml() + helpHtml() + settingsHtml() +
-            `<div class="tt-body">${MODE === 'author' ? authorTable() : answerTable()}</div>` + solutionHtml() + warnHtml() +
+            sourceHtml(`<div class="tt-body">${MODE === 'author' ? authorTable() : answerTable()}</div>`) + solutionHtml() + warnHtml() +
             `<div class="tt-sr" aria-live="polite" id="${T}-tt-live"></div>`;
         box.querySelectorAll('textarea.tt-cell').forEach(fit);
         if (focus) {

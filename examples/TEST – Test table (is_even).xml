@@ -30,7 +30,7 @@
     <template></template>
     <iscombinatortemplate></iscombinatortemplate>
     <allowmultiplestdins></allowmultiplestdins>
-    <answer><![CDATA[{"table": ["{\"rows\": [[\"print(is_even(4))\", \"True\"], [\"print(is_even(7))\", \"False\"], [\"print(is_even(11))\", \"False\"], [\"print(is_even(0))\", \"True\"], [\"print(is_even(-6))\", \"True\"]], \"solution\": \"def is_even(n):\\n    return n % 2 == 0\\n#### wrong: does not work for negative numbers\\ndef is_even(n):\\n    return n > 0 and n % 2 == 0\\n#### wrong: says that 0 is odd\\ndef is_even(n):\\n    return n != 0 and n % 2 == 0\\n\"}"]}]]></answer>
+    <answer><![CDATA[{"table": ["{\"kind\": \"function\", \"addrows\": 2, \"given\": [[\"print(is_even(4))\", \"True\"], [\"print(is_even(7))\", \"\"], [\"print(is_even(???))\", \"False\"], [\"\", \"\"]], \"rows\": [[\"print(is_even(4))\", \"True\"], [\"print(is_even(7))\", \"False\"], [\"print(is_even(11))\", \"False\"], [\"print(is_even(0))\", \"True\"], [\"print(is_even(-6))\", \"True\"]], \"solution\": \"def is_even(n):\\n    return n % 2 == 0\\n#### wrong: does not work for negative numbers\\ndef is_even(n):\\n    return n > 0 and n % 2 == 0\\n#### wrong: says that 0 is odd\\ndef is_even(n):\\n    return n != 0 and n % 2 == 0\\n\"}"]}]]></answer>
     <validateonsave>1</validateonsave>
     <testsplitterre></testsplitterre>
     <language></language>
