@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[TEST – Program with print limits (tabuada)]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Escreva um programa que leia um número inteiro positivo <code>n</code> (com a mensagem <code>Número: </code>) e escreva a sua tabuada de 1 a 10, uma linha por multiplicação, na forma <code>7 x 3 = 21</code>.</p>
+<p><strong>Restrições:</strong> use um ciclo <code>for</code> (não use <code>while</code>) e o operador <code>*</code>; a instrução <code>print</code> só pode aparecer <strong>uma vez</strong> no programa e cada linha escrita tem de ter exatamente a forma pedida.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_python3_program</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[n = int(input("Número: "))
+for i in range(1, 11):
+    print(n, "x", i, "=", n * i)
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams><![CDATA[{
+ "require": [
+  "for",
+  "*"
+ ],
+ "forbid": [
+  "while"
+ ],
+ "max_print": 1,
+ "print_regex": "\\d+ x \\d+ = \\d+",
+ "_note": "One print, inside the loop; each line must have the form 'n x i = result'.",
+ "lang": "pt"
+}]]></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald><![CDATA[{"require": ["for", "*"], "forbid": ["while"], "max_print": 1, "print_regex": "\\d+ x \\d+ = \\d+", "_note": "One print, inside the loop; each line must have the form 'n x i = result'.", "lang": "pt"}]]></templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin>ace</uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[7
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Número: 7
+7 x 1 = 7
+7 x 2 = 14
+7 x 3 = 21
+7 x 4 = 28
+7 x 5 = 35
+7 x 6 = 42
+7 x 7 = 49
+7 x 8 = 56
+7 x 9 = 63
+7 x 10 = 70
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[3
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Número: 3
+3 x 1 = 3
+3 x 2 = 6
+3 x 3 = 9
+3 x 4 = 12
+3 x 5 = 15
+3 x 6 = 18
+3 x 7 = 21
+3 x 8 = 24
+3 x 9 = 27
+3 x 10 = 30
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[12
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Número: 12
+12 x 1 = 12
+12 x 2 = 24
+12 x 3 = 36
+12 x 4 = 48
+12 x 5 = 60
+12 x 6 = 72
+12 x 7 = 84
+12 x 8 = 96
+12 x 9 = 108
+12 x 10 = 120
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>HIDE</text>
+      </display>
+    </testcase>
+    </testcases>
+    <tags>
+      <tag><text>unicv_python3_program</text></tag>
+    </tags>
+  </question>
+
+</quiz>

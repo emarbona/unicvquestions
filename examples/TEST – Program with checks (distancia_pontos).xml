@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[TEST – Program with checks (distancia_pontos)]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Escreva um programa que leia as coordenadas de dois pontos do plano, <code>x1</code>, <code>y1</code>, <code>x2</code> e <code>y2</code> (números reais), e escreva a distância entre eles.</p>
+<p>A distância deve ser calculada numa função <code>distancia_pontos(x1, y1, x2, y2)</code> que <strong>devolve</strong> a distância arredondada a duas casas decimais (use <code>round</code>). A função não lê nem escreve nada. A raiz quadrada (<code>math.sqrt</code> ou <code>**</code>) só pode aparecer dentro da função. Alguns testes chamam a função diretamente.</p>
+<p>O programa principal lê os valores com as mensagens <code>x1: </code>, <code>y1: </code>, <code>x2: </code> e <code>y2: </code>, chama a função e escreve <code>Distância:</code> seguido de um espaço e do resultado.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_python3_program</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[import math
+
+
+def distancia_pontos(x1, y1, x2, y2):
+    d = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+    return round(d, 2)
+
+
+# Programa principal
+x1 = float(input("x1: "))
+y1 = float(input("y1: "))
+x2 = float(input("x2: "))
+y2 = float(input("y2: "))
+print("Distância:", distancia_pontos(x1, y1, x2, y2))
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams><![CDATA[{
+ "functions": {
+  "distancia_pontos": {
+   "num_params": 4,
+   "forbid": [
+    "input",
+    "print"
+   ],
+   "only_here": [
+    "math.sqrt",
+    "**"
+   ]
+  }
+ },
+ "_note": "The calculation must be in the function: the square root (math.sqrt or **) is allowed only there, and the test code calls the function directly.",
+ "lang": "pt"
+}]]></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald><![CDATA[{"functions": {"distancia_pontos": {"num_params": 4, "forbid": ["input", "print"], "only_here": ["math.sqrt", "**"]}}, "_note": "The calculation must be in the function: the square root (math.sqrt or **) is allowed only there, and the test code calls the function directly.", "lang": "pt"}]]></templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin>ace</uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text><![CDATA[print(distancia_pontos(1, 1, 4, 5))]]></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[0
+0
+3
+4
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[x1: 0
+y1: 0
+x2: 3
+y2: 4
+Distância: 5.0
+5.0
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text><![CDATA[print(distancia_pontos(0, 0, 1, 1))]]></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[0
+0
+3
+1
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[x1: 0
+y1: 0
+x2: 3
+y2: 1
+Distância: 3.16
+1.41
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text><![CDATA[print(distancia_pontos(2, 2, 2, 2))
+print(distancia_pontos(-3, -4, 0, 0))]]></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[-1
+-2
+3
+7
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[x1: -1
+y1: -2
+x2: 3
+y2: 7
+Distância: 9.85
+0.0
+5.0
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>HIDE</text>
+      </display>
+    </testcase>
+    </testcases>
+    <tags>
+      <tag><text>unicv_python3_program</text></tag>
+    </tags>
+  </question>
+
+</quiz>

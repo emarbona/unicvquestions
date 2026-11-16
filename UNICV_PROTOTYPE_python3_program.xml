@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[UNICV_PROTOTYPE_python3_program]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>UniCV prototype for <strong>Python 3 program questions</strong> with checks on the code. The student writes a program (and, if asked, some functions); before the tests are run, the code is analysed statically (without running it) to check the requirements of the question: constructs and syntax that must or must not be used (e.g. a <code>for</code> loop is required and <code>while</code> is forbidden), required functions with their parameters, and limits on <code>print()</code>. If a requirement is not met, the tests are not run and the student sees the list of unmet requirements. As on a console, the values read with <code>input()</code> are echoed to the output.</p>
+<p>It replaces <code>python3_IaP</code>, <code>restricted_print_IaP</code> and <code>python3_w_function_check</code>, with the same checks in one question type, plus checks inside each function.</p>
+<h4>How to write a question</h4>
+<ol>
+<li>Create a CodeRunner question of type <code>unicv_python3_program</code>. In the question text, state the requirements (e.g. the name and parameters of the function, "do not use while") and the exact text of the prompts and of the output.</li>
+<li>In <em>Template params</em>, write the requirements in JSON (all optional, see below), e.g. <code>{"functions": {"inverter_sinal": {"num_params": 1, "require": ["for"]}}, "forbid": ["while", "map", "comprehension"], "lang": "pt"}</code>.</li>
+<li>Write the test cases as in any Python program question: the input in <em>Standard Input</em> and the expected output in <em>Expected output</em>. Because <code>input()</code> is echoed, the expected output contains the prompts and the values read, e.g. <code>x? 3</code>.</li>
+<li>Optionally, write <em>Test code</em>: it is run after the student's program, with access to its functions, so it can test a function directly (e.g. <code>print(inverter_sinal([1, -2]))</code>). If the program reads data, the test code runs after it has read its input.</li>
+<li>Write the solution in the <em>Answer</em> field and keep <em>Validate on save</em> ticked: the solution must meet all the requirements and pass all the tests. A mistake in the template parameters (an unknown name or value) gives "Question error: …", so it is found when the question is saved.</li>
+</ol>
+<h4>What the student gets</h4>
+<ul>
+<li>The usual Ace code editor.</li>
+<li>After <em>Check</em>, if the requirements are met, the usual table of tests. Otherwise every test shows "*** Requirements not met ***", the list of unmet requirements (e.g. "The function 'inverter_sinal' must use a for loop.", "The program must not use a while loop.") and "The tests were not run.", so no test is passed.</li>
+<li>If the program gives an error, a short traceback that shows only the lines of the student's code.</li>
+</ul>
+<h4>Grading</h4>
+<p>As in the standard Python question types: each test compares the output with the expected output (<em>EqualityGrader</em>), all or nothing by default.</p>
+<h4>What can be required or forbidden</h4>
+<p>The lists <code>require</code>, <code>forbid</code> and <code>only_here</code> (for the whole program, or for one function) take these items:</p>
+<ul>
+<li><strong>Statements:</strong> <code>for</code>, <code>while</code>, <code>if</code>, <code>break</code>, <code>continue</code>, <code>return</code>, <code>def</code>, <code>import</code>, <code>try</code>, <code>with</code>, <code>global</code>, <code>class</code>, <code>lambda</code>.</li>
+<li><strong>Syntax:</strong> <code>list_comprehension</code> (<code>[x for x in a]</code>), <code>set_comprehension</code>, <code>dict_comprehension</code>, <code>generator</code> (<code>(x for x in a)</code>, e.g. inside <code>list(…)</code> or <code>sum(…)</code>), <code>comprehension</code> (any of these four), <code>f_string</code>, <code>slicing</code> (<code>a[1:3]</code>), <code>ternary</code> (<code>x if c else y</code>).</li>
+<li><strong>Operators</strong>, written as in Python: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>, <code>**</code> (each one also matches its augmented assignment, e.g. <code>**</code> matches <code>x **= 2</code>); <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>//=</code>, <code>%=</code>, <code>**=</code> (only the augmented assignment); <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>in</code>, <code>not in</code>, <code>is</code>, <code>is not</code>, <code>and</code>, <code>or</code>, <code>not</code>. For example <code>"forbid": ["**"]</code> forbids <code>x ** 0.5</code>, and <code>"require": ["//", "%"]</code> requires integer division and remainder. The unary minus (<code>-x</code>) is not the operator <code>-</code>.</li>
+<li><strong>Names:</strong> any other name is a function, method or variable that must (not) be used, e.g. <code>map</code>, <code>sum</code>, <code>sorted</code>, <code>append</code>, <code>split</code>, <code>input</code>, <code>print</code>. A name is found wherever it is used, not only in calls, so <code>f = map</code> and <code>from math import factorial as f</code> also count as using <code>map</code> and <code>factorial</code>; but a variable, function or parameter that the student defines with that name (e.g. <code>max = lista[0]</code>) is the student's own and is not reported. A dotted name such as <code>math.sqrt</code> is found only written in that form.</li>
+</ul>
+<h4>Template parameters (all optional)</h4>
+<ul>
+<li><strong>require</strong> (default []): items that the program must use.</li>
+<li><strong>forbid</strong> (default []): items that the program must not use.</li>
+<li><strong>functions</strong> (default {}): the functions that the student must write, as an object whose keys are the names of the functions, e.g. <code>{"media": {"num_params": 3}}</code>, or simply a list of names, e.g. <code>["media"]</code>. Each function must be defined at the top level of the program. For each function:
+<ul>
+<li><strong>num_params</strong>: exact number of parameters (*args and **kwargs are not accepted when it is given).</li>
+<li><strong>return</strong> (default true): the function must return a value with <code>return</code>.</li>
+<li><strong>call</strong> (default true): the function must be called by the program, outside itself and after its definition. Set it to false if only the test code calls it.</li>
+<li><strong>require</strong> (default []): items that the function must use, e.g. <code>["for"]</code>.</li>
+<li><strong>forbid</strong> (default ["input"]): items that the function must not use, e.g. <code>["input", "print"]</code> so that the reading and writing are done in the main program. Write <code>[]</code> to allow everything.</li>
+<li><strong>only_here</strong> (default []): items that may be used only inside this function, e.g. <code>["math.sqrt"]</code>.</li>
+</ul></li>
+<li><strong>max_print</strong>: the maximum number of times <code>print</code> may appear in the code (it counts the appearances in the code, not the executions; a <code>print</code> in a loop counts once).</li>
+<li><strong>max_print_args</strong>: the maximum number of arguments of each <code>print</code>.</li>
+<li><strong>print_regex</strong>: a regular expression that the text written by each <code>print</code> of the program must match in full (the arguments joined with <code>sep</code>, without <code>end</code>). Checked while the program runs; a <code>print</code> that does not match stops it with an error. The test code is not checked. In JSON, backslashes are doubled: <code>{"print_regex": "\\d+ \\d+"}</code>.</li>
+<li><strong>echo_input</strong> (default true): <code>input()</code> echoes the value read, as on a console. Set it to false to get plain Python behaviour (the prompt is written, the value is not).</li>
+<li><strong>lang</strong> (default "en"): language of the messages, "en" or "pt".</li>
+</ul>
+<p>Unknown parameter names, unknown keys of a function and unknown items give "Question error: …". Parameters whose names start with <code>_</code> are ignored (they can be used as comments).</p>
+<h4>Limitations</h4>
+<ul>
+<li>The checks only look at the code: they show that something is used or not, not that it is used in a sensible way (e.g. a required <code>for</code> could be a loop that does nothing).</li>
+<li>A forbidden name can still be reached in indirect ways (e.g. through <code>getattr</code> or <code>__builtins__</code>), which students of an introductory course are unlikely to use.</li>
+<li>If a required function is defined more than once, the last definition is checked.</li>
+</ul>
+<h4>Differences from the question types it replaces</h4>
+<ul>
+<li>From <code>python3_IaP</code>: the parameters <code>require</code> and <code>forbid</code> replace requiredconstructs, proscribedconstructs, proscribedfunctions, proscribedmethods and proscribedsyntactic; generator expressions and the other comprehensions can be forbidden; a forbidden function is also found when it is assigned to a variable.</li>
+<li>From <code>python3_w_function_check</code>: several functions, with their own required and forbidden items; <code>only_in_function</code> is now <code>only_here</code> and looks at the code, not at the text (comments and strings are ignored).</li>
+<li>From <code>restricted_print_IaP</code>: the print limits work with stdin and with test code, and together with the other checks.</li>
+</ul>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_python3_program</coderunnertype>
+    <prototypetype>2</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template><![CDATA[""" UniCV prototype unicv_python3_program: a Python 3 program (or function) question.
+    Before the tests are run, the student's code is analysed statically (without
+    running it): required and forbidden constructs, syntax and functions, required
+    functions with their parameters, and limits on print(). If a requirement is not
+    met, the tests are not run and the student sees the list of unmet requirements.
+    The template parameters are documented in the question text of the prototype.
+"""
+import ast
+import json
+import linecache
+import re
+import sys
+import traceback
+
+__code__ = """{{ STUDENT_ANSWER | e('py') }}"""
+__test__ = """{{ TEST.testcode | e('py') }}"""
+__params__ = json.loads("""{{ QUESTION.parameters | json_encode | e('py') }}""")
+
+# ----------------------------------------------------------------------------------
+# Messages
+# ----------------------------------------------------------------------------------
+__MESSAGES__ = {
+    'en': {
+        'question': "Question error: {msg} Please tell your teacher.",
+        'bad_name': "unknown template parameter '{name}'.",
+        'bad_value': "invalid value for the template parameter '{name}'.",
+        'bad_item': "'{item}' in '{name}' is not a known construct, operator or valid name.",
+        'bad_fkey': "unknown key '{key}' for the function '{func}'.",
+        'syntax': "Syntax error on line {line}: {msg}",
+        'header': "*** Requirements not met ***",
+        'footer': "The tests were not run.",
+        'must': "The program must use {what}.",
+        'must_not': "The program must not use {what}.",
+        'f_must': "The function '{name}' must use {what}.",
+        'f_must_not': "The function '{name}' must not use {what}.",
+        'not_defined': "No function called '{name}' has been defined.",
+        'not_top': "The function '{name}' must be defined at the top level of the program "
+                   "(not inside another function or block).",
+        'num_params': "The function '{name}' must have {num} parameter(s); yours has {has}.",
+        'num_params_var': "The function '{name}' must have exactly {num} parameter(s), without *args or **kwargs.",
+        'no_return': "The function '{name}' must return its result with a return statement.",
+        'not_called': "The function '{name}' is defined but never called in the main program.",
+        'called_before': "The function '{name}' is called before it is defined.",
+        'only_here': "{what} must be used only inside the function '{name}'.",
+        'max_print': "print() may appear at most {num} time(s) in the program; it appears {has} time(s).",
+        'max_print_args': "Each print() may have at most {num} argument(s); the one on line {line} has {has}.",
+        'max_print_star': "Each print() may have at most {num} argument(s); the one on line {line} uses * and its arguments cannot be counted.",
+        'print_regex': "The text written by print() on this line does not have the required form: {text}",
+        'what': {
+            'for': "a for loop", 'while': "a while loop", 'if': "an if statement",
+            'break': "break", 'continue': "continue", 'return': "return", 'def': "a function definition (def)",
+            'import': "import", 'try': "try/except", 'lambda': "lambda", 'with': "with",
+            'global': "global", 'class': "a class", 'ternary': "a conditional expression (x if c else y)",
+            'list_comprehension': "list comprehensions ([... for ...])",
+            'set_comprehension': "set comprehensions ({... for ...})",
+            'dict_comprehension': "dictionary comprehensions ({k: v for ...})",
+            'generator': "generator expressions ((... for ...))",
+            'comprehension': "comprehensions or generator expressions",
+            'f_string': "f-strings (f\"...\")", 'slicing': "slicing ([a:b])",
+            'name': "'{item}'", 'operator': "the operator {item}",
+        },
+    },
+    'pt': {
+        'question': "Erro na pergunta: {msg} Avise o docente.",
+        'bad_name': "parâmetro de modelo desconhecido '{name}'.",
+        'bad_value': "valor inválido no parâmetro de modelo '{name}'.",
+        'bad_item': "'{item}' em '{name}' não é uma construção, um operador nem um nome válido.",
+        'bad_fkey': "chave desconhecida '{key}' na função '{func}'.",
+        'syntax': "Erro de sintaxe na linha {line}: {msg}",
+        'header': "*** Requisitos não cumpridos ***",
+        'footer': "Os testes não foram executados.",
+        'must': "O programa tem de usar {what}.",
+        'must_not': "O programa não pode usar {what}.",
+        'f_must': "A função '{name}' tem de usar {what}.",
+        'f_must_not': "A função '{name}' não pode usar {what}.",
+        'not_defined': "Não foi definida nenhuma função chamada '{name}'.",
+        'not_top': "A função '{name}' deve ser definida no nível principal do programa "
+                   "(não dentro de outra função nem de um bloco).",
+        'num_params': "A função '{name}' deve ter {num} parâmetro(s); a sua tem {has}.",
+        'num_params_var': "A função '{name}' deve ter exatamente {num} parâmetro(s), sem *args nem **kwargs.",
+        'no_return': "A função '{name}' deve devolver o resultado com a instrução return.",
+        'not_called': "A função '{name}' está definida, mas nunca é chamada no programa principal.",
+        'called_before': "A função '{name}' é chamada antes de ser definida.",
+        'only_here': "{what} só pode ser usado dentro da função '{name}'.",
+        'max_print': "print() pode aparecer no máximo {num} vez(es) no programa; aparece {has} vez(es).",
+        'max_print_args': "Cada print() pode ter no máximo {num} argumento(s); o da linha {line} tem {has}.",
+        'max_print_star': "Cada print() pode ter no máximo {num} argumento(s); o da linha {line} usa * e não é possível contar os seus argumentos.",
+        'print_regex': "O texto escrito pelo print() nesta linha não tem a forma pedida: {text}",
+        'what': {
+            'for': "um ciclo for", 'while': "um ciclo while", 'if': "uma instrução if",
+            'break': "break", 'continue': "continue", 'return': "return", 'def': "uma definição de função (def)",
+            'import': "import", 'try': "try/except", 'lambda': "lambda", 'with': "with",
+            'global': "global", 'class': "uma classe", 'ternary': "uma expressão condicional (x if c else y)",
+            'list_comprehension': "listas em compreensão ([... for ...])",
+            'set_comprehension': "conjuntos em compreensão ({... for ...})",
+            'dict_comprehension': "dicionários em compreensão ({k: v for ...})",
+            'generator': "expressões geradoras ((... for ...))",
+            'comprehension': "compreensões ou expressões geradoras",
+            'f_string': "f-strings (f\"...\")", 'slicing': "fatiamento ([a:b])",
+            'name': "'{item}'", 'operator': "o operador {item}",
+        },
+    },
+}
+__lang__ = __params__.get('lang', 'en') if isinstance(__params__, dict) else 'en'
+__msg__ = __MESSAGES__.get(__lang__, __MESSAGES__['en'])
+
+# ----------------------------------------------------------------------------------
+# Constructs and syntax that can be required or forbidden
+# ----------------------------------------------------------------------------------
+__COMPS__ = (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
+__NODES__ = {
+    'for': (ast.For, ast.AsyncFor), 'while': (ast.While,), 'if': (ast.If,),
+    'break': (ast.Break,), 'continue': (ast.Continue,), 'return': (ast.Return,),
+    'def': (ast.FunctionDef, ast.AsyncFunctionDef), 'import': (ast.Import, ast.ImportFrom),
+    'try': (ast.Try,) + ((ast.TryStar,) if hasattr(ast, 'TryStar') else ()),
+    'lambda': (ast.Lambda,), 'with': (ast.With, ast.AsyncWith), 'global': (ast.Global, ast.Nonlocal),
+    'class': (ast.ClassDef,), 'ternary': (ast.IfExp,),
+    'list_comprehension': (ast.ListComp,), 'set_comprehension': (ast.SetComp,),
+    'dict_comprehension': (ast.DictComp,), 'generator': (ast.GeneratorExp,),
+    'comprehension': __COMPS__, 'f_string': (ast.JoinedStr,),
+}
+__BINOPS__ = {'+': ast.Add, '-': ast.Sub, '*': ast.Mult, '/': ast.Div, '//': ast.FloorDiv,
+              '%': ast.Mod, '**': ast.Pow}
+__AUGOPS__ = {k + '=': v for k, v in __BINOPS__.items()}
+__CMPOPS__ = {'==': ast.Eq, '!=': ast.NotEq, '<': ast.Lt, '<=': ast.LtE, '>': ast.Gt, '>=': ast.GtE,
+              'in': ast.In, 'not in': ast.NotIn, 'is': ast.Is, 'is not': ast.IsNot}
+__BOOLOPS__ = {'and': ast.And, 'or': ast.Or}
+__OPERATORS__ = set(__BINOPS__) | set(__AUGOPS__) | set(__CMPOPS__) | set(__BOOLOPS__) | {'not'}
+__NAME_RE__ = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$')
+
+PARAM_NAMES = ('functions', 'require', 'forbid', 'max_print', 'max_print_args',
+               'print_regex', 'echo_input', 'lang')
+FUNCTION_KEYS = ('num_params', 'return', 'call', 'require', 'forbid', 'only_here')
+
+
+class QuestionError(Exception):
+    pass
+
+
+def __valid_item__(item):
+    return isinstance(item, str) and (item in __NODES__ or item in __OPERATORS__ or item == 'slicing'
+                                      or bool(__NAME_RE__.match(item)))
+
+
+def __uses_operator__(n, item):
+    """True if the node n is the operator 'item' (x ** y also matches x **= y)."""
+    if item in __BINOPS__:
+        return isinstance(n, (ast.BinOp, ast.AugAssign)) and isinstance(n.op, __BINOPS__[item])
+    if item in __AUGOPS__:
+        return isinstance(n, ast.AugAssign) and isinstance(n.op, __AUGOPS__[item])
+    if item in __CMPOPS__:
+        return isinstance(n, ast.Compare) and any(isinstance(op, __CMPOPS__[item]) for op in n.ops)
+    if item in __BOOLOPS__:
+        return isinstance(n, ast.BoolOp) and isinstance(n.op, __BOOLOPS__[item])
+    return isinstance(n, ast.UnaryOp) and isinstance(n.op, ast.Not)
+
+
+def __dotted__(n):
+    """The dotted name of an attribute such as math.sqrt, or None."""
+    parts = []
+    while isinstance(n, ast.Attribute):
+        parts.append(n.attr)
+        n = n.value
+    if not isinstance(n, ast.Name):
+        return None
+    return '.'.join([n.id] + parts[::-1])
+
+
+__BOUND__ = set()   # Names defined by the student's code (variables, functions, parameters).
+
+
+def __bound_names__(tree):
+    """The names that the student's code defines (not imports). A forbidden name such as max is
+    not reported when it is the student's own variable (max = lista[0])."""
+    names = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)):
+            names.add(n.id)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            names.add(n.name)
+        elif isinstance(n, ast.arg):
+            names.add(n.arg)
+    return names
+
+
+def __uses__(node, item):
+    """True if the code in 'node' uses the construct, syntax or name 'item'."""
+    for n in ast.walk(node):
+        if item in __OPERATORS__:
+            if __uses_operator__(n, item):
+                return True
+        elif item in __NODES__:
+            if isinstance(n, __NODES__[item]):
+                return True
+        elif item == 'slicing':
+            if isinstance(n, ast.Subscript) and isinstance(n.slice, ast.Slice):
+                return True
+        elif '.' in item:
+            if isinstance(n, ast.Attribute) and __dotted__(n) == item:
+                return True
+        elif isinstance(n, ast.Name) and n.id == item and item not in __BOUND__:
+            return True
+        elif isinstance(n, ast.ImportFrom) and any(a.name == item for a in n.names):
+            return True
+        elif isinstance(n, ast.Attribute) and n.attr == item:
+            return True
+    return False
+
+
+def __what__(item):
+    w = __msg__['what']
+    if item in __OPERATORS__:
+        return w['operator'].format(item=item)
+    return w[item] if item in w else w['name'].format(item=item)
+
+
+def __check_params__(p):
+    """Check the template parameters; raise QuestionError if something is wrong."""
+    if not isinstance(p, dict):
+        raise QuestionError(__msg__['bad_value'].format(name='template params'))
+    for name in p:
+        if name.startswith('_'):
+            continue
+        if name not in PARAM_NAMES:
+            raise QuestionError(__msg__['bad_name'].format(name=name))
+    for name in ('require', 'forbid'):
+        items = p.get(name, [])
+        if not isinstance(items, list):
+            raise QuestionError(__msg__['bad_value'].format(name=name))
+        for item in items:
+            if not __valid_item__(item):
+                raise QuestionError(__msg__['bad_item'].format(item=item, name=name))
+    funcs = p.get('functions', {})
+    if isinstance(funcs, list):
+        funcs = {f: {} for f in funcs}
+    if not isinstance(funcs, dict) or not all(isinstance(k, str) and __NAME_RE__.match(k) for k in funcs):
+        raise QuestionError(__msg__['bad_value'].format(name='functions'))
+    for fname, spec in funcs.items():
+        if not isinstance(spec, dict):
+            raise QuestionError(__msg__['bad_value'].format(name='functions'))
+        for key in spec:
+            if key not in FUNCTION_KEYS:
+                raise QuestionError(__msg__['bad_fkey'].format(key=key, func=fname))
+        for key in ('require', 'forbid', 'only_here'):
+            items = spec.get(key, [])
+            if not isinstance(items, list):
+                raise QuestionError(__msg__['bad_value'].format(name=fname + '.' + key))
+            for item in items:
+                if not __valid_item__(item):
+                    raise QuestionError(__msg__['bad_item'].format(item=item, name=fname + '.' + key))
+        if 'num_params' in spec and not (isinstance(spec['num_params'], int) and spec['num_params'] >= 0):
+            raise QuestionError(__msg__['bad_value'].format(name=fname + '.num_params'))
+    for name in ('max_print', 'max_print_args'):
+        if name in p and not (isinstance(p[name], int) and not isinstance(p[name], bool) and p[name] >= 0):
+            raise QuestionError(__msg__['bad_value'].format(name=name))
+    if 'print_regex' in p:
+        try:
+            re.compile(p['print_regex'])
+        except (re.error, TypeError):
+            raise QuestionError(__msg__['bad_value'].format(name='print_regex'))
+    if 'echo_input' in p and not isinstance(p['echo_input'], bool):
+        raise QuestionError(__msg__['bad_value'].format(name='echo_input'))
+    if p.get('lang', 'en') not in __MESSAGES__:
+        raise QuestionError(__msg__['bad_value'].format(name='lang'))
+    return funcs
+
+
+def __print_calls__(node):
+    return [n for n in ast.walk(node)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == 'print']
+
+
+def __check__(code, p, funcs):
+    """Return the list of unmet requirements (empty if all is well)."""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        return [__msg__['syntax'].format(line=e.lineno, msg=e.msg)]
+    __BOUND__.update(__bound_names__(tree))
+    errors = []
+
+    for item in p.get('require', []):
+        if not __uses__(tree, item):
+            errors.append(__msg__['must'].format(what=__what__(item)))
+    for item in p.get('forbid', []):
+        if __uses__(tree, item):
+            errors.append(__msg__['must_not'].format(what=__what__(item)))
+
+    inside = set()   # Lines inside the required functions.
+    for name, spec in funcs.items():
+        all_defs = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == name]
+        top_defs = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == name]
+        if not all_defs:
+            errors.append(__msg__['not_defined'].format(name=name))
+            continue
+        if not top_defs:
+            errors.append(__msg__['not_top'].format(name=name))
+            continue
+        func = top_defs[-1]
+        for f in all_defs:
+            inside.update(range(f.lineno, f.end_lineno + 1))
+        num = spec.get('num_params')
+        if num is not None:
+            a = func.args
+            has = len(a.posonlyargs) + len(a.args) + len(a.kwonlyargs)
+            if a.vararg or a.kwarg:
+                errors.append(__msg__['num_params_var'].format(name=name, num=num))
+            elif has != num:
+                errors.append(__msg__['num_params'].format(name=name, num=num, has=has))
+        if spec.get('return', True):
+            if not any(isinstance(n, ast.Return) and n.value is not None for n in ast.walk(func)):
+                errors.append(__msg__['no_return'].format(name=name))
+        for item in spec.get('require', []):
+            if not __uses__(func, item):
+                errors.append(__msg__['f_must'].format(name=name, what=__what__(item)))
+        for item in spec.get('forbid', ['input']):
+            if __uses__(func, item):
+                errors.append(__msg__['f_must_not'].format(name=name, what=__what__(item)))
+        if spec.get('call', True):
+            calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                     and n.func.id == name and not (func.lineno <= n.lineno <= func.end_lineno)]
+            if not calls:
+                errors.append(__msg__['not_called'].format(name=name))
+            elif all(c.lineno < func.lineno for c in calls):
+                errors.append(__msg__['called_before'].format(name=name))
+
+    for name, spec in funcs.items():
+        for item in spec.get('only_here', []):
+            outside = [n for n in tree.body
+                       if not (isinstance(n, ast.FunctionDef) and n.name == name) and __uses__(n, item)]
+            if outside:
+                text = __msg__['only_here'].format(what=__what__(item), name=name)
+                errors.append(text[0].upper() + text[1:])
+
+    prints = __print_calls__(tree)
+    if 'max_print' in p and len(prints) > p['max_print']:
+        errors.append(__msg__['max_print'].format(num=p['max_print'], has=len(prints)))
+    if 'max_print_args' in p:
+        for c in prints:
+            has = len(c.args)
+            if any(isinstance(a, ast.Starred) for a in c.args):
+                errors.append(__msg__['max_print_star'].format(num=p['max_print_args'], line=c.lineno))
+                break
+            if has > p['max_print_args']:
+                errors.append(__msg__['max_print_args'].format(num=p['max_print_args'], line=c.lineno, has=has))
+                break
+    return errors
+
+
+def __fail__(lines):
+    print(__msg__['header'])
+    for line in lines:
+        print("- " + line)
+    print(__msg__['footer'])
+    sys.exit(0)
+
+
+try:
+    __funcs__ = __check_params__(__params__)
+except QuestionError as e:
+    print(__msg__['question'].format(msg=str(e)))
+    sys.exit(0)
+
+__errors__ = __check__(__code__, __params__, __funcs__)
+if __errors__:
+    __fail__(__errors__)
+
+# ----------------------------------------------------------------------------------
+# Run the program and then the test code, in the same namespace
+# ----------------------------------------------------------------------------------
+__original_input__ = input
+__original_print__ = print
+__regex__ = re.compile(__params__['print_regex']) if __params__.get('print_regex') else None
+
+
+class PrintFormError(Exception):
+    pass
+
+
+def __echo_input__(prompt=''):
+    """Like input(), but also echoes the value read, as on a console."""
+    try:
+        s = __original_input__(prompt)
+    except EOFError:
+        raise EOFError("input() was called, but there is no more input data") from None
+    __original_print__(s)
+    return s
+
+
+def __checked_print__(*args, sep=' ', end='\n', file=None, flush=False):
+    """print() that checks the text written against print_regex."""
+    text = (' ' if sep is None else str(sep)).join(str(a) for a in args)
+    if not __regex__.fullmatch(text):
+        raise PrintFormError(__msg__['print_regex'].format(text=text))
+    __original_print__(*args, sep=sep, end=end, file=file, flush=flush)
+
+
+def __run__(source, filename, ns):
+    """Run source code; on an error show a short traceback of the student's code only."""
+    try:
+        exec(compile(source, filename, 'exec'), ns)
+        return True
+    except SystemExit:
+        return False
+    except Exception as e:
+        frames = [f for f in traceback.extract_tb(e.__traceback__) if f.filename in ('program.py', 'test.py')]
+        sys.stdout.flush()
+        lines = ['Traceback (most recent call last):\n'] + traceback.format_list(frames)
+        if isinstance(e, PrintFormError):
+            lines.append(str(e) + '\n')
+        else:
+            lines += traceback.format_exception_only(type(e), e)
+        print(''.join(lines), file=sys.stderr, end='')
+        return False
+
+
+__ns__ = {'__name__': '__main__'}
+if __params__.get('echo_input', True):
+    __ns__['input'] = __echo_input__
+if __regex__ is not None:
+    __ns__['print'] = __checked_print__
+
+# So that the tracebacks show the lines of the student's code.
+linecache.cache['program.py'] = (len(__code__), None, __code__.splitlines(True), 'program.py')
+linecache.cache['test.py'] = (len(__test__), None, __test__.splitlines(True), 'test.py')
+
+if __run__(__code__, 'program.py', __ns__) and __test__.strip():
+    __ns__['print'] = __original_print__   # The teacher's test code is not restricted.
+    __run__(__test__, 'test.py', __ns__)
+]]></template>
+    <iscombinatortemplate>0</iscombinatortemplate>
+    <allowmultiplestdins>0</allowmultiplestdins>
+    <answer></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre><![CDATA[|#<ab@17943918#@>#\n|ms]]></testsplitterre>
+    <language>python3</language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader>EqualityGrader</grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin>ace</uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+    </testcases>
+  </question>
+
+</quiz>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="coderunner">
+    <name>
+      <text><![CDATA[TEST – Program with checks (inverter_sinal)]]></text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Escreva um programa em Python que leia vários números inteiros e escreva uma nova lista em que o sinal de cada número é invertido (os positivos passam a negativos e os negativos a positivos).</p>
+<p>O cálculo deve ser feito numa função <code>inverter_sinal(lista)</code> que recebe uma lista de números e <strong>devolve</strong> uma nova lista com os sinais invertidos, percorrendo a lista com um ciclo <code>for</code>. A função não lê nem escreve nada.</p>
+<p>O programa principal:</p>
+<ul>
+<li>lê a quantidade de números com a mensagem <code>Quantos números deseja introduzir? </code>;</li>
+<li>lê cada número com a mensagem <code>Introduza o número 1: </code>, <code>Introduza o número 2: </code>, …;</li>
+<li>chama a função e escreve o resultado com <code>Lista com os sinais invertidos:</code> seguido de um espaço e da lista.</li>
+</ul>
+<p><strong>Restrições:</strong> não pode usar <code>while</code>, <code>map</code>, listas em compreensão, expressões geradoras nem f-strings.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>unicv_python3_program</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>1</allornothing>
+    <penaltyregime>10, 20, ...</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload></answerpreload>
+    <globalextra></globalextra>
+    <useace>1</useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def inverter_sinal(lista):
+    nova_lista = []
+    for valor in lista:
+        nova_lista.append(-valor)
+    return nova_lista
+
+
+# Programa principal
+quantidade = int(input("Quantos números deseja introduzir? "))
+numeros = []
+for i in range(quantidade):
+    numero = int(input("Introduza o número " + str(i + 1) + ": "))
+    numeros.append(numero)
+print("Lista com os sinais invertidos:", inverter_sinal(numeros))
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams><![CDATA[{
+ "functions": {
+  "inverter_sinal": {
+   "num_params": 1,
+   "require": [
+    "for"
+   ],
+   "forbid": [
+    "input",
+    "print"
+   ]
+  }
+ },
+ "forbid": [
+  "while",
+  "map",
+  "comprehension",
+  "f_string"
+ ],
+ "lang": "pt"
+}]]></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald><![CDATA[{"functions": {"inverter_sinal": {"num_params": 1, "require": ["for"], "forbid": ["input", "print"]}}, "forbid": ["while", "map", "comprehension", "f_string"], "lang": "pt"}]]></templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin>ace</uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[3
+4
+-5
+12
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Quantos números deseja introduzir? 3
+Introduza o número 1: 4
+Introduza o número 2: -5
+Introduza o número 3: 12
+Lista com os sinais invertidos: [-4, 5, -12]
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[2
+-2
+-102
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Quantos números deseja introduzir? 2
+Introduza o número 1: -2
+Introduza o número 2: -102
+Lista com os sinais invertidos: [2, 102]
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[5
+-14
+123
+0
+23
+-74
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Quantos números deseja introduzir? 5
+Introduza o número 1: -14
+Introduza o número 2: 123
+Introduza o número 3: 0
+Introduza o número 4: 23
+Introduza o número 5: -74
+Lista com os sinais invertidos: [14, -123, 0, -23, 74]
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>HIDE</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[1
+8
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Quantos números deseja introduzir? 1
+Introduza o número 1: 8
+Lista com os sinais invertidos: [-8]
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>HIDE</text>
+      </display>
+    </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000" >
+      <testcode>
+                <text><![CDATA[print(inverter_sinal([0, -7, 5]))]]></text>
+      </testcode>
+      <stdin>
+                <text><![CDATA[0
+]]></text>
+      </stdin>
+      <expected>
+                <text><![CDATA[Quantos números deseja introduzir? 0
+Lista com os sinais invertidos: []
+[0, 7, -5]
+]]></text>
+      </expected>
+      <extra>
+                <text></text>
+      </extra>
+      <display>
+                <text>SHOW</text>
+      </display>
+    </testcase>
+    </testcases>
+    <tags>
+      <tag><text>unicv_python3_program</text></tag>
+    </tags>
+  </question>
+
+</quiz>
