@@ -17,13 +17,12 @@ Each prototype is a Moodle XML file with a single CodeRunner prototype question.
 | `unicv_python3_expression` | writes one Python expression for each statement in words (e.g. "a, b and c can be the sides of a triangle") | compared with the teacher's expression for many (often all) combinations of values; a counterexample is shown | *Write the expression (conditions)* |
 | `python3_sst_dynamic` | fills in a trace table (line, variables, output) whose steps and variable columns are added as needed | compared with the teacher's table | *Dynamic trace (sum)*, *Dynamic trace (no variables)*, *Trace table (dynamic)* |
 | `unicv_python3_program` | writes a Python program, possibly with required functions | before the tests are run, the code is checked statically: required and forbidden constructs, syntax, operators and functions (also inside each function, or only inside one function), the parameters of the functions, limits on `print()` | *Program with checks (inverter_sinal)*, *Program with checks (distancia_pontos)*, *Program with print limits (tabuada)* |
-| `python3_w_function_check` | writes a Python program with a required function | the function is checked statically before the tests are run (superseded by `unicv_python3_program`; kept for existing questions) | — |
 
 All the user interfaces and documents are in English; the question texts can be written in any language. `unicv_flowchart` and `unicv_flowgorithm` have an editor in Portuguese, English and Spanish.
 
 ## Installing
 
-1. In the question bank of a course (or at system level), create a category for the prototypes, e.g. `PROTOTYPES`.
+1. Create a category for the prototypes, e.g. `UNICV_PROTOTYPES`. In Moodle 5, CodeRunner looks for prototypes in the question banks of the current course and in the shared question banks of the site's front page, so a category in the front page's shared question bank (*Site home → Question banks*) makes the prototypes available in every course. A category in the question bank of one course makes them available in that course only.
 2. Import the `UNICV_PROTOTYPE_*.xml` files you need into that category (*Question bank → Import → Moodle XML format*). Do not edit or delete them while there are questions of their type.
 3. Import the example questions from `examples/` into another category and open them in *Preview*. *Fill in correct responses* followed by *Check* shows that each one works.
 
@@ -36,7 +35,7 @@ A question works only if the prototype of its type is available in its course (o
 - **Review options.** If *Right answer* is shown in the quiz review options, students see the teacher's answer after the attempt. Turn it off for assessed quizzes if the questions will be reused.
 - **Random values** (`unicv_python3_predict`, `unicv_python3_expression`): write them in *Template params* with Twig, e.g. `{"a": {{ random(10, 30) }}}`, set the language of the template parameters to **twig**, tick ***Twig all*** and use `{{ a }}` in *Global extra* and in the question text. With the language set to *None* the question shows "ERROR WHEN INITIALISING QUESTION".
 - **Moodle's emoticon filter** can turn short texts in brackets in the question text (such as the letters n, y or i between round brackets) into icons. If it is on in your Moodle, turn it off for the course, or avoid one-letter names in brackets in the question text. Code shown by the interfaces is not affected.
-- **`input()` is echoed** in the Python question types that run programs (gapfiller, parsons, test_table, predict, program, w_function_check): the prompt and the value read appear in the output, as on a console. Most of them have a parameter to turn this off (`echostandardinput`; `echo_input` in `unicv_python3_program`).
+- **`input()` is echoed** in the Python question types that run programs (gapfiller, parsons, test_table, predict, program): the prompt and the value read appear in the output, as on a console. Most of them have a parameter to turn this off (`echostandardinput`; `echo_input` in `unicv_python3_program`).
 - **Template parameters** are written as JSON in *Template params*; each prototype documents its own.
 
 ## Repository layout
@@ -49,7 +48,7 @@ README.md               this file
 
 ## Credits
 
-**Question types designed at UniCV:** `unicv_flowchart`, `unicv_flowgorithm`, `unicv_python3_predict`, `unicv_python3_expression`, `unicv_python3_program` and `python3_w_function_check`.
+**Question types designed at UniCV:** `unicv_flowchart`, `unicv_flowgorithm`, `unicv_python3_predict`, `unicv_python3_expression` and `unicv_python3_program`.
 
 **Question types based on existing prototypes:** `python3_sst_dynamic`, `unicv_python3_gapfiller`, `unicv_python3_parsons` and `unicv_python3_test_table` are based on the CodeRunner sample question types by Richard Lobb (`python3_sst`, `python3_stage1_gapfiller`, `python3_parsons_problem` and `python3_test_table`, from the `ucquestiontypes` collection). They have new interfaces and graders; the documentation of each prototype explains what is new. CodeRunner is developed by Richard Lobb and Tim Hunt.
 
